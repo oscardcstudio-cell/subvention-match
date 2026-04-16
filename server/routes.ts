@@ -819,8 +819,16 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
       if (!submission.pdfPath) {
         return res.status(404).json({ error: "PDF not generated yet" });
       }
-      
-      res.sendFile(submission.pdfPath, { root: process.cwd() });
+
+      // submission.pdfPath is absolute on Railway (/tmp/subvention-pdfs/…) so
+      // we must NOT pass { root: process.cwd() } — express would then prepend
+      // /app/ to the path and 404.
+      const isAbsolute = submission.pdfPath.startsWith("/") || /^[A-Za-z]:[\\/]/.test(submission.pdfPath);
+      if (isAbsolute) {
+        res.sendFile(submission.pdfPath);
+      } else {
+        res.sendFile(submission.pdfPath, { root: process.cwd() });
+      }
     } catch (error: any) {
       console.error("Error serving PDF:", error);
       res.status(500).json({ error: error.message });
