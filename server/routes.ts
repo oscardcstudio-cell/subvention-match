@@ -811,23 +811,45 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
     try {
       const { sessionId } = req.params;
       const submission = await storage.getFormSubmission(sessionId);
-      
+
       if (!submission) {
         return res.status(404).json({ error: "Submission not found" });
       }
-      
-      if (!submission.pdfPath) {
-        return res.status(404).json({ error: "PDF not generated yet" });
+
+      // Regenerate if cache is missing (Railway /tmp is wiped on container restart).
+      const fs = await import('fs');
+      const cacheMissing = !submission.pdfPath || !fs.existsSync(submission.pdfPath);
+      let pdfPath = submission.pdfPath || "";
+
+      if (cacheMissing) {
+        const results = (submission.results as any[]) || [];
+        if (results.length === 0) {
+          return res.status(404).json({ error: "No grants matched — nothing to render." });
+        }
+        const grantsWithDetails = await Promise.all(
+          results.map(async (result: any) => {
+            const grant = await grantStorage.getGrantById(result.grantId);
+            return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
+          })
+        );
+        const validGrants = grantsWithDetails.filter((g): g is NonNullable<typeof g> => g !== null);
+        if (validGrants.length === 0) {
+          return res.status(404).json({ error: "No valid grants resolvable from cached results." });
+        }
+        const { path: freshPath } = await generateAndSaveGrantsPDF(
+          { grants: validGrants, userEmail: submission.email },
+          sessionId,
+        );
+        await storage.savePdfPath(sessionId, freshPath);
+        pdfPath = freshPath;
       }
 
-      // submission.pdfPath is absolute on Railway (/tmp/subvention-pdfs/…) so
-      // we must NOT pass { root: process.cwd() } — express would then prepend
-      // /app/ to the path and 404.
-      const isAbsolute = submission.pdfPath.startsWith("/") || /^[A-Za-z]:[\\/]/.test(submission.pdfPath);
+      res.setHeader("Content-Disposition", `inline; filename="subventions_${sessionId}.pdf"`);
+      const isAbsolute = pdfPath.startsWith("/") || /^[A-Za-z]:[\\/]/.test(pdfPath);
       if (isAbsolute) {
-        res.sendFile(submission.pdfPath);
+        res.sendFile(pdfPath);
       } else {
-        res.sendFile(submission.pdfPath, { root: process.cwd() });
+        res.sendFile(pdfPath, { root: process.cwd() });
       }
     } catch (error: any) {
       console.error("Error serving PDF:", error);
@@ -853,9 +875,20 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
       console.log(`📧 [send-email] Submission trouvée, pdfPath: ${submission.pdfPath ? "yes" : "no"}, email: ${maskEmail(submission.email)}`);
       
       let pdfBuffer: Buffer;
-      
+
+      // Check if the cached PDF file is still on disk (Railway /tmp is wiped
+      // on every container restart, so a saved pdfPath may be stale).
+      let cachedExists = false;
+      if (submission.pdfPath) {
+        const fs = await import('fs');
+        cachedExists = fs.existsSync(submission.pdfPath);
+        if (!cachedExists) {
+          console.log(`⚠️ [send-email] Cached pdfPath ${submission.pdfPath} no longer exists — regenerating.`);
+        }
+      }
+
       // Si le PDF n'existe pas, le générer
-      if (!submission.pdfPath) {
+      if (!submission.pdfPath || !cachedExists) {
         console.log(`📄 [send-email] Generating PDF for session: ${maskSessionId(sessionId)}...`);
         
         // Récupérer les détails complets des subventions
