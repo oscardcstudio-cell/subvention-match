@@ -70,13 +70,20 @@ export async function generateGrantsPDF(data: PDFData): Promise<Buffer> {
 
 export async function generateAndSaveGrantsPDF(data: PDFData, sessionId: string): Promise<{ buffer: Buffer; path: string }> {
   const pdfBuffer = await generateGrantsPDF(data);
-  
-  // Save PDF to disk
+
+  // Save PDF to an ephemeral tmp dir. On Railway the container filesystem is
+  // not persistent — PDFs here are only a short-term cache so we don't
+  // regenerate them if the user re-triggers the same email. For durable
+  // storage we should eventually upload to Supabase Storage or S3.
+  const dir = process.env.PDF_OUTPUT_DIR || "/tmp/subvention-pdfs";
+  const { mkdir } = await import("fs/promises");
+  await mkdir(dir, { recursive: true });
+
   const filename = `grants_${sessionId}_${Date.now()}.pdf`;
-  const pdfPath = join('server', 'generated-pdfs', filename);
-  
+  const pdfPath = join(dir, filename);
+
   await writeFile(pdfPath, pdfBuffer);
-  
+
   return {
     buffer: pdfBuffer,
     path: pdfPath,
