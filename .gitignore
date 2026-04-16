@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist
+server/public
+client/dist
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Database dumps (may contain user data)
+*.sql
+database_export.sql
+*.dump
+
+# Replit artifacts
+.replit
+.config/
+.upm/
+.agents/
+replit.md
+SETUP_CLAUDE_CODE.md
+INSTALLATION.md
+EXEMPLE_JSON_N8N.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.backup
+
+# Logs
+logs
+*.log
+
+# Misc
+*.tar.gz
+vite.config.ts.*
+attached_assets/
+generated-icon.png
