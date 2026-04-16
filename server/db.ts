@@ -1,4 +1,5 @@
 import pg from "pg";
+import { parse as parseConnString } from "pg-connection-string";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "@shared/schema";
 
@@ -10,12 +11,29 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Supabase (and most managed Postgres) require TLS. Accept the managed CA chain.
-const needsSSL = /supabase\.com|sslmode=require|neon\.tech/.test(process.env.DATABASE_URL);
+// We parse the URL ourselves and pass discrete host/user/password/port/db
+// parameters rather than `connectionString`. This prevents node-postgres
+// (v8+) from overriding our `ssl` config when merging the parsed URL.
+// Supabase's Supavisor pooler presents a cert chain that Node 20 / OpenSSL 3
+// flags as "self-signed in chain", so we explicitly disable cert validation.
+const parsed = parseConnString(process.env.DATABASE_URL);
+const needsSSL = /supabase\.com|neon\.tech/.test(parsed.host || "") ||
+  /sslmode=require/.test(process.env.DATABASE_URL);
 
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: needsSSL ? { rejectUnauthorized: false } : undefined,
+  host: parsed.host || undefined,
+  port: parsed.port ? Number(parsed.port) : undefined,
+  user: parsed.user || undefined,
+  password: parsed.password || undefined,
+  database: parsed.database || undefined,
+  ssl: needsSSL
+    ? {
+        rejectUnauthorized: false,
+        // Also skip hostname verification — not relevant here (we trust the
+        // connection string) and avoids another failure mode.
+        checkServerIdentity: () => undefined,
+      }
+    : undefined,
 });
 
 export const db = drizzle(pool, { schema });
