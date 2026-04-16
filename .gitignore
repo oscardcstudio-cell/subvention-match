@@ -15,10 +15,11 @@ client/dist
 .env.*.local
 !.env.example
 
-# Database dumps (may contain user data)
+# Database dumps & seed files (may contain user data / too large for git)
 *.sql
 database_export.sql
 *.dump
+grants_*.csv
 
 # Replit artifacts
 .replit
