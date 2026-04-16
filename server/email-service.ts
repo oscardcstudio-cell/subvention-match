@@ -1,6 +1,17 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-init so the server can boot without RESEND_API_KEY (e.g. smoke tests).
+// Calls to sendGrantsEmail will throw explicitly if the key is missing.
+let resend: Resend | null = null;
+function getResend(): Resend {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured — emails disabled.");
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 interface EmailData {
   to: string;
@@ -12,7 +23,7 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
   const { to, grantsCount, pdfBuffer } = data;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'SubventionMatch <onboarding@resend.dev>', // Change to your verified domain
       to,
       subject: `Vos ${grantsCount} subventions culturelles personnalisées`,
