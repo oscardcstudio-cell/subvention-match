@@ -41,7 +41,7 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
 
   try {
     const result = await getResend().emails.send({
-      from: 'SubventionMatch <onboarding@resend.dev>', // Change to your verified domain
+      from: 'SubventionMatch <noreply@send.odcstudio.fr>', // Change to your verified domain
       to,
       subject: `Vos ${grantsCount} subventions culturelles personnalisées`,
       html: `
@@ -165,7 +165,7 @@ export async function sendGrantsEmailFallback(data: FallbackEmailData): Promise<
 
   try {
     const result = await getResend().emails.send({
-      from: 'SubventionMatch <onboarding@resend.dev>',
+      from: 'SubventionMatch <noreply@send.odcstudio.fr>',
       to,
       subject: `Vos ${grants.length} subventions culturelles personnalisees`,
       html: `
