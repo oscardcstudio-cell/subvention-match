@@ -105,7 +105,6 @@ export default function FormWizard() {
   const domainParam = urlParams.get('domain') || '';
   
   // États pour les questions optionnelles dépliables
-  const [showInternational, setShowInternational] = useState(false);
   const [showInnovation, setShowInnovation] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
   const [showUrgency, setShowUrgency] = useState(false);
@@ -238,6 +237,7 @@ export default function FormWizard() {
   });
 
   const totalSteps = isExtended ? 7 : 6;
+  // Steps: 0=Statut, 1=Domaine, 2=Description, 3=Type, 4=Région, 5=Email+Submit, 6=OptionalExtended
 
   // Detect scroll position
   useEffect(() => {
@@ -253,6 +253,10 @@ export default function FormWizard() {
       
       if (newStep !== currentStep) {
         setCurrentStep(newStep);
+        // Déclenche le mode étendu dès qu'on dépasse l'étape email (5)
+        if (newStep >= 5 && !isExtended) {
+          setIsExtended(true);
+        }
       }
     };
 
@@ -261,7 +265,7 @@ export default function FormWizard() {
       container.addEventListener('scroll', handleScroll);
       return () => container.removeEventListener('scroll', handleScroll);
     }
-  }, [currentStep, totalSteps]);
+  }, [currentStep, totalSteps, isExtended]);
 
   const onSubmit = async (data: FormData) => {
     console.log("🚀 Soumission du formulaire:", data);
@@ -285,7 +289,6 @@ export default function FormWizard() {
   const projectType = form.watch("projectType");
   const projectStage = form.watch("projectStage");
   const region = form.watch("region");
-  const isInternational = form.watch("isInternational");
   const innovation = form.watch("innovation");
   const socialDimension = form.watch("socialDimension");
   const urgency = form.watch("urgency");
@@ -294,41 +297,16 @@ export default function FormWizard() {
 
   const helpTextKeys = ["status", "artisticDomain", "projectDescription", "projectType", "projectStage", "region", "isInternational", "innovation", "socialDimension", "urgency", "aidTypes", "geographicScope", "email"] as const;
 
-  // Calcul dynamique du nombre de subventions (règles simplifiées)
-  const calculateGrantCount = (): number => {
-    let count = 132; // Base
-    
-    // Filtre par statut (effet le plus important)
-    if (status?.includes('association')) {
-      count = 103; // Beaucoup d'aides pour associations
-    } else if (status?.includes('porteur-projet')) {
-      count = 78;
-    } else if (status?.includes('artiste-auteur')) {
-      count = 65;
-    } else if (status?.includes('artiste-auto')) {
-      count = 71;
-    } else if (status?.includes('micro-entreprise')) {
-      count = 58;
-    }
-    
-    // International ajoute des programmes européens
-    if (isInternational === 'oui') {
-      count += 15;
-    }
-    
-    // Région affine (sauf si aucun statut sélectionné)
-    if (status && status.length > 0) {
-      if (region === 'Île-de-France') {
-        count = Math.min(count, 95); // IDF a beaucoup d'aides mais plafonne
-      } else if (region && region !== 'Île-de-France') {
-        count = Math.min(count, 85); // Autres régions
-      }
-    }
-    
-    return count;
-  };
+  // Nombre réel de subventions actives (fetch au mount)
+  const [totalGrants, setTotalGrants] = useState(264);
+  useEffect(() => {
+    fetch("/api/grants/stats")
+      .then(r => r.json())
+      .then(d => { if (d?.total) setTotalGrants(d.total); })
+      .catch(() => { /* fallback: keep 264 */ });
+  }, []);
 
-  const grantCount = calculateGrantCount();
+  const grantCount = totalGrants;
 
   // Fonction de gamification - Affiche un toast encourageant selon le choix
   const showUnlockToast = (choice: string, field: string) => {
@@ -337,17 +315,9 @@ export default function FormWizard() {
     // Éviter les doublons
     if (shownToasts.has(toastKey)) return;
     
-    // Messages de gamification (seulement les plus marquants)
-    const unlockMessages: Record<string, { fr: { title: string; description: string }, en: { title: string; description: string } }> = {
-      'status-association': {
-        fr: { title: '🎉 Bravo !', description: '21 subventions européennes débloquées pour les associations' },
-        en: { title: '🎉 Great!', description: '21 European grants unlocked for associations' }
-      },
-      'isInternational-oui': {
-        fr: { title: '🌍 International débloqué !', description: '15 programmes européens maintenant accessibles' },
-        en: { title: '🌍 International unlocked!', description: '15 European programs now accessible' }
-      }
-    };
+    // Messages de gamification (désactivés — les chiffres hardcoded
+    // étaient potentiellement trompeurs vs la vraie DB)
+    const unlockMessages: Record<string, { fr: { title: string; description: string }, en: { title: string; description: string } }> = {};
 
     const message = unlockMessages[toastKey];
     if (message) {
@@ -618,12 +588,132 @@ export default function FormWizard() {
           </AnimatePresence>
         </section>
 
-        {/* Section 2: Project Description */}
+        {/* Section 2: Artistic Domain (NEW) */}
         <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 1 && (
               <motion.div
-                key="step-1"
+                key="step-1-domain"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -40 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="max-w-6xl w-full flex flex-col items-center"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  className="space-y-8 w-full max-w-2xl"
+                >
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-black">
+                    {language === "fr" ? "Votre domaine artistique ?" : "Your artistic domain?"}
+                  </h2>
+
+                  <div className="space-y-3">
+                    {/* Top 3 choices */}
+                    {["musique", "arts-plastiques", "spectacle-vivant"].map((item, idx) => (
+                      <motion.label
+                        key={item}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.3 + idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                        className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
+                        data-testid={`checkbox-domain-${item}`}
+                      >
+                        <Checkbox
+                          checked={artisticDomain?.includes(item)}
+                          onCheckedChange={(checked) => {
+                            const newValue = checked ? [...(artisticDomain || []), item] : artisticDomain?.filter((value) => value !== item) || [];
+                            form.setValue("artisticDomain", newValue, { shouldValidate: true });
+                          }}
+                        />
+                        <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
+                          {item === "musique" && t.musique}
+                          {item === "arts-plastiques" && t.artsPlastiques}
+                          {item === "spectacle-vivant" && t.spectacleVivant}
+                        </span>
+                      </motion.label>
+                    ))}
+
+                    {/* Additional options */}
+                    <AnimatePresence>
+                      {showMoreDomain && (
+                        <>
+                          {["ecriture", "audiovisuel", "arts-numeriques", "patrimoine"].map((item, idx) => (
+                            <motion.label
+                              key={item}
+                              initial={{ opacity: 0, height: 0, y: -10 }}
+                              animate={{ opacity: 1, height: "auto", y: 0 }}
+                              exit={{ opacity: 0, height: 0, y: -10 }}
+                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
+                              data-testid={`checkbox-domain-${item}`}
+                            >
+                              <Checkbox
+                                checked={artisticDomain?.includes(item)}
+                                onCheckedChange={(checked) => {
+                                  const newValue = checked ? [...(artisticDomain || []), item] : artisticDomain?.filter((value) => value !== item) || [];
+                                  form.setValue("artisticDomain", newValue, { shouldValidate: true });
+                                }}
+                              />
+                              <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
+                                {item === "ecriture" && t.ecriture}
+                                {item === "audiovisuel" && t.audiovisuel}
+                                {item === "arts-numeriques" && t.artsNumeriques}
+                                {item === "patrimoine" && t.patrimoine}
+                              </span>
+                            </motion.label>
+                          ))}
+                        </>
+                      )}
+                    </AnimatePresence>
+
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setShowMoreDomain(!showMoreDomain)}
+                        className="w-full text-sm text-gray-500 hover:text-black"
+                      >
+                        {showMoreDomain
+                          ? (language === "fr" ? "Voir moins d'options" : "See fewer options")
+                          : (language === "fr" ? "Voir plus d'options" : "See more options")
+                        }
+                        <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMoreDomain ? 'rotate-180' : ''}`} />
+                      </Button>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-12 max-w-2xl w-full text-center space-y-4"
+                >
+                  <p className="text-base text-gray-600 leading-relaxed">
+                    {helpTexts.artisticDomain[language as 'fr' | 'en']}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {language === "fr" ? "🔒 Vos données restent privées" : "🔒 Your data stays private"}
+                  </p>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+
+        {/* Section 3: Project Description */}
+        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+          <AnimatePresence mode="wait">
+            {currentStep === 2 && (
+              <motion.div
+                key="step-2-desc"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
@@ -716,12 +806,12 @@ export default function FormWizard() {
           </AnimatePresence>
         </section>
 
-        {/* Section 3: Project Type */}
+        {/* Section 4: Project Type */}
         <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
-            {currentStep === 2 && (
+            {currentStep === 3 && (
               <motion.div
-                key="step-2"
+                key="step-3-type"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
@@ -836,12 +926,12 @@ export default function FormWizard() {
           </AnimatePresence>
         </section>
 
-        {/* Section 4: Région */}
+        {/* Section 5: Région */}
         <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
-            {currentStep === 3 && (
+            {currentStep === 4 && (
               <motion.div
-                key="step-3"
+                key="step-4-region"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
@@ -900,55 +990,120 @@ export default function FormWizard() {
           </AnimatePresence>
         </section>
 
-        {/* Section 5: Page intermédiaire - On pourrait s'arrêter là */}
-        <section className="h-screen snap-start snap-always flex items-center justify-center px-8 pb-16 w-full max-w-7xl mx-auto">
+        {/* Section 6: Email + Submit (always accessible, extended mode shows optional questions after) */}
+        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <motion.div
-                key="step-4-intermediate"
+                key="step-5-email"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className="max-w-2xl w-full mx-auto text-center"
-                onViewportEnter={() => {
-                  if (!isExtended) {
-                    setTimeout(() => setIsExtended(true), 1000);
-                  }
-                }}
               >
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="text-2xl md:text-3xl text-gray-600 mb-4"
-                >
-                  {language === "fr" 
-                    ? "On pourrait s'arrêter là." 
-                    : "We could stop here."
-                  }
-                </motion.p>
-
                 <motion.h2
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-black"
+                  transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-black mb-6"
                 >
-                  {language === "fr" 
-                    ? "Maiiiis..." 
-                    : "Buuuut..."
-                  }
+                  {language === "fr" ? "Votre email ?" : "Your email?"}
                 </motion.h2>
 
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  className="text-sm text-gray-400 mt-12"
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="text-lg text-gray-600 mb-8"
                 >
-                  {language === "fr" ? "Scroll pour affiner ↓" : "Scroll to refine ↓"}
+                  {language === "fr"
+                    ? "Pour recevoir votre PDF personnalisé avec toutes les subventions matchées."
+                    : "To receive your personalized PDF with all matched grants."
+                  }
                 </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="mb-6"
+                >
+                  <Input
+                    {...form.register("email")}
+                    type="email"
+                    placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
+                    className="w-full text-lg px-8 py-6 bg-white border-2 border-gray-200 focus:border-black text-black placeholder:text-gray-400 rounded-full text-center"
+                    data-testid="input-email"
+                  />
+                </motion.div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="text-sm text-gray-400 leading-relaxed mb-8 max-w-md mx-auto"
+                >
+                  {language === "fr"
+                    ? "🔒 Vos données restent privées. Pas de spam."
+                    : "🔒 Your data stays private. No spam."
+                  }
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col items-center gap-4"
+                >
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const formErrors = form.formState.errors;
+                      if (Object.keys(formErrors).length > 0) {
+                        toast({
+                          title: language === "fr" ? "Formulaire incomplet" : "Incomplete form",
+                          description: language === "fr"
+                            ? "Veuillez remplir tous les champs obligatoires"
+                            : "Please fill all required fields",
+                          variant: "destructive",
+                          duration: 2500,
+                        });
+                        return;
+                      }
+                      form.handleSubmit(onSubmit)();
+                    }}
+                    disabled={submitMutation.isPending}
+                    className="px-12 py-5 bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-white font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-testid="button-submit-early"
+                  >
+                    {submitMutation.isPending ? (
+                      <div className="flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>{language === "fr" ? "Analyse en cours..." : "Analyzing..."}</span>
+                      </div>
+                    ) : (
+                      language === "fr" ? "Voir mes résultats" : "See my results"
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!isExtended) setIsExtended(true);
+                      // Smooth scroll to next section
+                      setTimeout(() => {
+                        if (containerRef.current) {
+                          containerRef.current.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                    className="text-sm text-gray-500 hover:text-black underline underline-offset-4"
+                    data-testid="button-refine"
+                  >
+                    {language === "fr" ? "Ou affiner avec des questions optionnelles ↓" : "Or refine with optional questions ↓"}
+                  </button>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -974,60 +1129,6 @@ export default function FormWizard() {
             >
               {language === "fr" ? "Questions optionnelles" : "Optional questions"}
             </motion.h2>
-
-            {/* International */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowInternational(!showInternational)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-international"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Dimension internationale ?" : "International dimension?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showInternational ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showInternational && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="px-6 pb-6"
-                  >
-                    <RadioGroup
-                      value={isInternational}
-                      onValueChange={(value) => {
-                        form.setValue("isInternational", value, { shouldValidate: true });
-                        
-                        // Gamification toast
-                        if (value === 'oui') {
-                          showUnlockToast('oui', 'isInternational');
-                        }
-                      }}
-                      className="space-y-3 mt-4"
-                    >
-                      {["oui", "non"].map((item) => (
-                        <label
-                          key={item}
-                          className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                          data-testid={`radio-international-${item}`}
-                        >
-                          <RadioGroupItem value={item} className="" />
-                          <span className="text-base font-medium text-black">
-                            {item === "oui" && (language === "fr" ? "Oui" : "Yes")}
-                            {item === "non" && (language === "fr" ? "Non" : "No")}
-                          </span>
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
 
             {/* Innovation */}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -1334,119 +1435,45 @@ export default function FormWizard() {
                 )}
               </AnimatePresence>
             </div>
-          </motion.div>
-        </section>
-        )}
-        {/* Section finale: Email & Submit (uniquement en mode étendu) */}
-        {isExtended && (
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
+            {/* Submit button at the bottom of optional questions */}
             <motion.div
-                key="step-11"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-2xl w-full mx-auto text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex justify-center pt-8"
+            >
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  const formErrors = form.formState.errors;
+                  if (Object.keys(formErrors).length > 0) {
+                    toast({
+                      title: language === "fr" ? "Formulaire incomplet" : "Incomplete form",
+                      description: language === "fr"
+                        ? "Veuillez remplir tous les champs obligatoires"
+                        : "Please fill all required fields",
+                      variant: "destructive",
+                      duration: 2500,
+                    });
+                    return;
+                  }
+                  form.handleSubmit(onSubmit)();
+                }}
+                disabled={submitMutation.isPending}
+                className="px-12 py-5 bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-white font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-submit-refined"
               >
-                {/* Titre simple et rassurant */}
-                <motion.h2
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-black mb-6"
-                >
-                  {language === "fr" 
-                    ? "Votre email ?"
-                    : "Your email?"
-                  }
-                </motion.h2>
-
-                {/* Texte rassurant */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="text-lg text-gray-600 mb-8"
-                >
-                  {language === "fr"
-                    ? "C'est juste pour vous envoyer votre PDF !"
-                    : "Just to send you your PDF!"
-                  }
-                </motion.p>
-
-                {/* Email Input - Style arrondi */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="mb-6"
-                >
-                  <Input
-                    {...form.register("email")}
-                    type="email"
-                    placeholder={language === "fr" ? "Votre email*" : "Your email*"}
-                    className="w-full text-lg px-8 py-6 bg-white border-2 border-gray-200 focus:border-black text-black placeholder:text-gray-400 rounded-full text-center"
-                    data-testid="input-email"
-                  />
-                </motion.div>
-
-                {/* Texte de confidentialité */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="text-sm text-gray-400 leading-relaxed mb-12 max-w-md mx-auto"
-                >
-                  {language === "fr"
-                    ? "🔒 Vos données restent privées"
-                    : "🔒 Your data stays private"
-                  }
-                </motion.p>
-
-                {/* Bouton de soumission */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex justify-center"
-                >
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log("🖱️ Clic sur le bouton");
-                      
-                      const formErrors = form.formState.errors;
-                      if (Object.keys(formErrors).length > 0) {
-                        console.log("❌ Formulaire invalide:", formErrors);
-                        toast({
-                          title: language === "fr" ? "Formulaire incomplet" : "Incomplete form",
-                          description: language === "fr" 
-                            ? "Veuillez remplir tous les champs obligatoires" 
-                            : "Please fill all required fields",
-                          variant: "destructive",
-                          duration: 2500,
-                        });
-                        return;
-                      }
-                      form.handleSubmit(onSubmit)();
-                    }}
-                    disabled={submitMutation.isPending}
-                    className="px-12 py-5 bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-white font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                    data-testid="button-submit"
-                  >
-                    {submitMutation.isPending ? (
-                      <div className="flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>{language === "fr" ? "Analyse en cours..." : "Analyzing..."}</span>
-                      </div>
-                    ) : (
-                      language === "fr" ? "Découvrir mes résultats" : "Discover my results"
-                    )}
-                  </button>
-                </motion.div>
-              </motion.div>
-          </AnimatePresence>
+                {submitMutation.isPending ? (
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>{language === "fr" ? "Analyse en cours..." : "Analyzing..."}</span>
+                  </div>
+                ) : (
+                  language === "fr" ? "Découvrir mes résultats affinés" : "Discover my refined results"
+                )}
+              </button>
+            </motion.div>
+          </motion.div>
         </section>
         )}
       </div>
