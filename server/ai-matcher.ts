@@ -159,55 +159,65 @@ Critères :
 `.trim();
 
   // Build grants database for AI (only grants that passed the quality gate)
-  // Ultra-compact format to stay under token limit
+  // Format enrichi : on inclut désormais un snippet de description ET le
+  // grantType pour que l'IA puisse filtrer par secteur/domaine réel, pas
+  // juste par éligibilité administrative.
   const grantsDatabase = qualifiedGrants.map((grant) => {
-    const eligibilityShort = grant.eligibility?.substring(0, 150) || "";
-    const sectorsShort = grant.eligibleSectors?.slice(0, 3).join(",") || "";
-    return `${grant.id}|${grant.title}|${grant.organization}|${eligibilityShort}|${sectorsShort}`;
+    const eligShort = (grant.eligibility || "").replace(/<[^>]*>/g, "").substring(0, 120).trim();
+    const descShort = (grant.description || "").replace(/<[^>]*>/g, "").substring(0, 100).trim();
+    const sectors = grant.eligibleSectors?.slice(0, 3).join(",") || "";
+    const types = grant.grantType?.slice(0, 3).join(",") || "";
+    return `${grant.id}|${grant.title}|${grant.organization}|${descShort}|${eligShort}|${sectors}|${types}`;
   }).join("\n");
 
-  // System prompt
-  const systemPrompt = `Tu es un expert en subventions culturelles françaises et européennes. Ta mission est d'analyser le profil d'un artiste/structure culturelle et de sélectionner les 5-10 subventions les plus pertinentes parmi une base de données.
+  // System prompt — réécrit pour forcer la précision sectorielle
+  const systemPrompt = `Tu es un expert en subventions culturelles françaises et européennes. Ta mission est d'analyser le profil d'un artiste/structure et de sélectionner UNIQUEMENT les subventions réellement pertinentes.
 
-⚠️ RÈGLES D'ÉLIGIBILITÉ CRITIQUES :
+⚠️ RÈGLE N°1 — PERTINENCE SECTORIELLE (PRIORITÉ ABSOLUE) :
+- NE JAMAIS proposer une aide dont le domaine est incompatible avec le profil.
+  Exemples d'incompatibilités : aide "mobilier/bâtiment" pour un écrivain,
+  aide "arts visuels" pour un musicien, aide "cinéma" pour un danseur.
+- Le titre ET la description de la subvention doivent être cohérents avec
+  le domaine artistique de l'utilisateur.
+- En cas de doute sur la compatibilité sectorielle, NE PAS inclure la subvention.
+- Mieux vaut renvoyer 3 résultats vraiment pertinents que 10 vaguement liés.
 
-**Statut juridique** (TRÈS IMPORTANT) :
-- Les aides "Commission Européenne - Creative Europe" nécessitent une STRUCTURE LÉGALE (association, micro-entreprise, collectif avec SIRET)
-- Si l'utilisateur est "artiste-auto" (auto-entrepreneur individuel) SANS association/collectif, NE PAS matcher les aides EU Creative Europe
-- Les artistes individuels peuvent candidater aux aides françaises (CNC, DRAC, CNM, etc.)
-- Si l'utilisateur a une association OU micro-entreprise OU collectif : TOUTES les aides sont éligibles (FR + EU)
+⚠️ RÈGLE N°2 — STATUT JURIDIQUE :
+- Les aides "Creative Europe" (Commission Européenne) nécessitent une STRUCTURE LÉGALE (association, micro-entreprise, collectif avec SIRET).
+- Si l'utilisateur est artiste individuel SANS structure, exclure les aides EU Creative Europe.
+- Les aides françaises nationales (CNC, DRAC, CNM, SACEM, etc.) sont ouvertes aux individus.
 
-**Périmètre géographique** :
-- Aides régionales : Vérifier que la région de l'utilisateur correspond
-- Aides EU Creative Europe : Ouvertes à tous les pays UE (France incluse) mais STRUCTURE OBLIGATOIRE
-- Aides nationales françaises : Accessibles depuis toute la France
+⚠️ RÈGLE N°3 — PÉRIMÈTRE GÉOGRAPHIQUE :
+- Aides régionales : vérifier que la RÉGION de l'utilisateur correspond.
+- Aides nationales : ouvertes depuis toute la France.
+- Aides EU : ouvertes à l'UE mais structure obligatoire (règle N°2).
 
-Critères de matching importants (par ordre de priorité) :
-1. **Statut juridique compatible** (structure pour EU, tout pour FR)
-2. Correspondance avec le domaine artistique
-3. Adéquation avec le type de projet (création, diffusion, médiation, etc.)
-4. Cohérence avec la localisation géographique
-5. Alignement avec le stade du projet (idée, développement, production, finalisation)
-6. Montant adapté au projet
-7. Urgence compatible avec les délais de l'aide
-8. Dimension sociale et innovation si pertinent
+CRITÈRES DE SÉLECTION (par ordre de priorité) :
+1. Domaine artistique compatible (titre + description vs profil utilisateur)
+2. Statut juridique compatible
+3. Type de projet cohérent (création, diffusion, médiation, résidence, etc.)
+4. Localisation géographique
+5. Stade du projet (idée, développement, production, etc.)
+6. Montant adapté
+7. Urgence vs délais de l'aide
 
-Tu dois retourner UNIQUEMENT une liste d'IDs de subventions séparés par des virgules, dans l'ordre de pertinence (la plus pertinente en premier).
-Format attendu : id1,id2,id3,id4,id5
-
-Ne retourne que les IDs, rien d'autre. Maximum 10 subventions.`;
+FORMAT DE RÉPONSE :
+- Retourne UNIQUEMENT les IDs séparés par des virgules, du plus pertinent au moins pertinent.
+- Minimum 1, maximum 10.
+- Si moins de 3 subventions sont vraiment pertinentes, n'en retourne que 1, 2 ou 3. NE REMPLIS PAS avec des résultats médiocres.
+- Format : id1,id2,id3`;
 
   const userPrompt = `${userProfile}
 
 ---
 
-Base de données des subventions (format: ID|Titre|Organisme|Éligibilité|Secteurs):
+Base de données des subventions (format: ID|Titre|Organisme|Description|Éligibilité|Secteurs|Types):
 
 ${grantsDatabase}
 
 ---
 
-Analyse ce profil et retourne les IDs des 5-10 subventions les plus pertinentes, séparés par des virgules (format: id1,id2,id3).`;
+Analyse ce profil et retourne UNIQUEMENT les IDs des subventions pertinentes (pas de remplissage si peu de résultats valables).`;
 
   try {
     const messages: OpenRouterMessage[] = [
