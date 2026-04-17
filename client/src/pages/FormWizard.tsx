@@ -1533,15 +1533,22 @@ export default function FormWizard() {
                 onClick={(e) => {
                   e.preventDefault();
                   const formErrors = form.formState.errors;
-                  if (Object.keys(formErrors).length > 0) {
+                  const emailValue = form.getValues("email");
+                  if (Object.keys(formErrors).length > 0 || !emailValue) {
                     toast({
-                      title: language === "fr" ? "Formulaire incomplet" : "Incomplete form",
+                      title: language === "fr" ? "Email manquant" : "Email required",
                       description: language === "fr"
-                        ? "Veuillez remplir tous les champs obligatoires"
-                        : "Please fill all required fields",
+                        ? "Remontez en haut pour renseigner votre email"
+                        : "Scroll up to enter your email",
                       variant: "destructive",
                       duration: 2500,
                     });
+                    // Scroll jusqu'au champ email et le focus
+                    const emailInput = document.querySelector<HTMLInputElement>('[data-testid="input-email"]');
+                    if (emailInput) {
+                      emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setTimeout(() => emailInput.focus(), 600);
+                    }
                     return;
                   }
                   form.handleSubmit(onSubmit)();

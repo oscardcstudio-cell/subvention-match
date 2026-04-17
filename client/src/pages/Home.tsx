@@ -342,11 +342,11 @@ export default function Home() {
                 {language === "fr" ? "Je suis..." : "I am..."}
               </h2>
               
-              <div className="flex flex-col gap-3 w-full max-w-md">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
                 <Link href="/form?domain=musique">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-musician"
                   >
                     🎵 {language === "fr" ? "un musicien" : "a musician"}
@@ -356,7 +356,7 @@ export default function Home() {
                 <Link href="/form?profile=dj-producteur">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-dj-producer"
                   >
                     🎧 {language === "fr" ? "un DJ / producteur" : "a DJ / producer"}
@@ -366,7 +366,7 @@ export default function Home() {
                 <Link href="/form?domain=ecriture">
                   <Badge 
                     variant="outline" 
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-writer"
                   >
                     ✍️ {language === "fr" ? "un écrivain" : "a writer"}
@@ -376,7 +376,7 @@ export default function Home() {
                 <Link href="/form?domain=arts-plastiques">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-visual-artist"
                   >
                     🎨 {language === "fr" ? "un artiste" : "an artist"}
@@ -386,7 +386,7 @@ export default function Home() {
                 <Link href="/form?profile=artisan-art">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-craftsperson"
                   >
                     🛠️ {language === "fr" ? "un artisan d'art" : "a craft artisan"}
@@ -396,7 +396,7 @@ export default function Home() {
                 <Link href="/form?domain=spectacle-vivant">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-performer"
                   >
                     🎭 {language === "fr" ? "un comédien" : "an actor"}
@@ -406,7 +406,7 @@ export default function Home() {
                 <Link href="/form?profile=danseur">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-dancer"
                   >
                     💃 {language === "fr" ? "un danseur / une danseuse" : "a dancer"}
@@ -416,7 +416,7 @@ export default function Home() {
                 <Link href="/form?profile=compagnie">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-company"
                   >
                     🎟️ {language === "fr" ? "une compagnie" : "a company"}
@@ -426,7 +426,7 @@ export default function Home() {
                 <Link href="/form?domain=audiovisuel">
                   <Badge 
                     variant="outline" 
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-filmmaker"
                   >
                     🎬 {language === "fr" ? "un cinéaste" : "a filmmaker"}
@@ -436,7 +436,7 @@ export default function Home() {
                 <Link href="/form?domain=arts-numeriques">
                   <Badge 
                     variant="outline" 
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-digital-artist"
                   >
                     💻 {language === "fr" ? "un artiste numérique" : "a digital artist"}
@@ -446,7 +446,7 @@ export default function Home() {
                 <Link href="/form?domain=patrimoine">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-heritage"
                   >
                     🏛️ {language === "fr" ? "dans le patrimoine" : "in heritage"}
@@ -456,7 +456,7 @@ export default function Home() {
                 <Link href="/form?profile=lieu-culturel">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-venue"
                   >
                     🏢 {language === "fr" ? "un lieu culturel" : "a cultural venue"}
@@ -466,7 +466,7 @@ export default function Home() {
                 <Link href="/form?profile=orga-soiree">
                   <Badge
                     variant="outline"
-                    className="px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
+                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
                     data-testid="badge-event-organizer"
                   >
                     🎪 {language === "fr" ? "un organisateur d'événements" : "an event organizer"}
