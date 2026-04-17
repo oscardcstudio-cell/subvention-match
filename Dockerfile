@@ -7,7 +7,9 @@ WORKDIR /app
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# npm install au lieu de npm ci — le lockfile local est genere par npm 11 (Node 24)
+# mais l'image Docker utilise npm 10 (Node 20). npm ci refuse les lockfiles cross-version.
+RUN npm install --no-audit --no-fund
 
 COPY . .
 RUN npm run build
