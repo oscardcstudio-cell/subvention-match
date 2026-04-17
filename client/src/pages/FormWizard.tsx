@@ -495,10 +495,10 @@ export default function FormWizard() {
       {/* Scrollable Container with Snap */}
       <div 
         ref={containerRef}
-        className="h-screen overflow-y-scroll snap-y snap-mandatory scroll-smooth"
+        className="h-screen overflow-y-scroll snap-y snap-proximity scroll-smooth"
       >
         {/* Section 1: Status */}
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 0 && (
               <motion.div
@@ -555,14 +555,20 @@ export default function FormWizard() {
                     {/* Additional options */}
                     <AnimatePresence>
                       {showMoreStatus && (
-                        <>
+                        <motion.div
+                          key="more-status"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden"
+                        >
                           {["artiste-auto", "micro-entreprise", "collectif", "lieu-culturel", "compagnie", "label", "festival-structure", "galerie", "maison-edition", "tourneur-producteur"].map((item, idx) => (
                             <motion.label
                               key={item}
-                              initial={{ opacity: 0, height: 0, y: -10 }}
-                              animate={{ opacity: 1, height: "auto", y: 0 }}
-                              exit={{ opacity: 0, height: 0, y: -10 }}
-                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.03 }}
                               className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
                               data-testid={`checkbox-status-${item}`}
                             >
@@ -592,7 +598,7 @@ export default function FormWizard() {
                               </span>
                             </motion.label>
                           ))}
-                        </>
+                        </motion.div>
                       )}
                     </AnimatePresence>
                     
@@ -638,7 +644,7 @@ export default function FormWizard() {
         </section>
 
         {/* Section 2: Artistic Domain (NEW) */}
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 1 && (
               <motion.div
@@ -688,14 +694,20 @@ export default function FormWizard() {
                     {/* Additional options */}
                     <AnimatePresence>
                       {showMoreDomain && (
-                        <>
+                        <motion.div
+                          key="more-domain"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden"
+                        >
                           {["ecriture", "audiovisuel", "arts-numeriques", "patrimoine", "metiers-art"].map((item, idx) => (
                             <motion.label
                               key={item}
-                              initial={{ opacity: 0, height: 0, y: -10 }}
-                              animate={{ opacity: 1, height: "auto", y: 0 }}
-                              exit={{ opacity: 0, height: 0, y: -10 }}
-                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.03 }}
                               className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
                               data-testid={`checkbox-domain-${item}`}
                             >
@@ -715,7 +727,7 @@ export default function FormWizard() {
                               </span>
                             </motion.label>
                           ))}
-                        </>
+                        </motion.div>
                       )}
                     </AnimatePresence>
 
@@ -759,7 +771,7 @@ export default function FormWizard() {
         </section>
 
         {/* Section 3: Project Description */}
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 2 && (
               <motion.div
@@ -857,7 +869,7 @@ export default function FormWizard() {
         </section>
 
         {/* Section 4: Project Type */}
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 3 && (
               <motion.div
@@ -908,14 +920,20 @@ export default function FormWizard() {
                     {/* Additional options */}
                     <AnimatePresence>
                       {showMoreType && (
-                        <>
+                        <motion.div
+                          key="more-type"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden"
+                        >
                           {["evenementiel", "residence", "formation", "edition", "investissement", "tournee", "enregistrement", "promotion"].map((item, idx) => (
                             <motion.label
                               key={item}
-                              initial={{ opacity: 0, height: 0, y: -10 }}
-                              animate={{ opacity: 1, height: "auto", y: 0 }}
-                              exit={{ opacity: 0, height: 0, y: -10 }}
-                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.03 }}
                               className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
                               data-testid={`checkbox-type-${item}`}
                             >
@@ -938,7 +956,7 @@ export default function FormWizard() {
                               </span>
                             </motion.label>
                           ))}
-                        </>
+                        </motion.div>
                       )}
                     </AnimatePresence>
                     
@@ -983,7 +1001,7 @@ export default function FormWizard() {
         </section>
 
         {/* Section 5: Région */}
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 4 && (
               <motion.div
@@ -1047,7 +1065,7 @@ export default function FormWizard() {
         </section>
 
         {/* Section 6: Email + Submit (always accessible, extended mode shows optional questions after) */}
-        <section className="h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
+        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {currentStep === 5 && (
               <motion.div
@@ -1143,7 +1161,7 @@ export default function FormWizard() {
                     )}
                   </button>
 
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => {
                       if (!isExtended) setIsExtended(true);
@@ -1154,11 +1172,22 @@ export default function FormWizard() {
                         }
                       }, 100);
                     }}
-                    className="text-sm text-gray-500 hover:text-black underline underline-offset-4"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group inline-flex items-center gap-3 px-6 py-4 mt-4 bg-indigo-50 border-2 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-500 rounded-xl shadow-sm hover:shadow-md transition-all"
                     data-testid="button-refine"
                   >
-                    {language === "fr" ? "Ou affiner avec des questions optionnelles ↓" : "Or refine with optional questions ↓"}
-                  </button>
+                    <span className="text-base md:text-lg font-semibold text-indigo-900">
+                      {language === "fr" ? "Ou affiner avec des questions optionnelles" : "Or refine with optional questions"}
+                    </span>
+                    <motion.span
+                      animate={{ y: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="text-xl text-indigo-600 group-hover:text-indigo-800"
+                    >
+                      ↓
+                    </motion.span>
+                  </motion.button>
                 </motion.div>
               </motion.div>
             )}
