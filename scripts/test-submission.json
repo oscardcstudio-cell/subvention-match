@@ -1,0 +1,13 @@
+{
+  "email": "oscarinternship@gmail.com",
+  "region": "Île-de-France",
+  "status": ["artiste-auteur"],
+  "artisticDomain": ["musique"],
+  "projectDescription": "Compositeur de musique électronique expérimentale basé à Paris, je prépare la production de mon premier album. Je recherche un financement pour enregistrer en studio, mixer et mastériser, ainsi qu'une résidence de création de 3 mois. Budget estimé : 25 000 euros.",
+  "projectType": ["creation", "production"],
+  "projectStage": "en-cours",
+  "urgency": "court-terme",
+  "aidTypes": ["subvention", "bourse", "residence"],
+  "geographicScope": ["national", "regional"],
+  "innovation": ["artistique"]
+}
