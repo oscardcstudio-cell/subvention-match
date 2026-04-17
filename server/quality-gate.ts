@@ -22,10 +22,10 @@ import type { Grant } from "../shared/schema";
 import type { GrantResult } from "../shared/schema";
 import { scoreUrl } from "./url-validator";
 
-// Seuil abaissé à 35 pour la beta — beaucoup de grants ont des descriptions
-// courtes ou absentes. L'enrichissement IA à la volée comble les lacunes.
-// À remonter à 60 une fois la base enrichie.
-export const QUALITY_GATE_THRESHOLD = 35;
+// Seuil abaissé à 20 pour la beta — beaucoup de grants ont org="Non spécifié",
+// descriptions courtes, pas de montant. L'enrichissement IA comble les lacunes.
+// À remonter progressivement en enrichissant la base.
+export const QUALITY_GATE_THRESHOLD = 20;
 export const ENRICHMENT_THRESHOLD = 80; // En dessous, on tente d'enrichir à la volée
 
 function stripHtml(html: string | null | undefined): string {
@@ -57,10 +57,9 @@ export function calculateQualityScore(grant: Grant | GrantResult): QualityBreakd
   const title = (grant.title || "").trim();
   const organization = (grant.organization || "").trim();
   const hasTitle = title.length >= 5;
-  const hasOrganization =
-    organization.length >= 3 &&
-    organization.toLowerCase() !== "inconnu" &&
-    organization.toLowerCase() !== "non spécifié";
+  // Beta: on accepte "Non spécifié" car beaucoup de grants importées
+  // depuis Aides & Territoires n'ont pas d'organisme renseigné.
+  const hasOrganization = organization.length >= 3;
 
   if (hasTitle && hasOrganization) {
     score += 20;
