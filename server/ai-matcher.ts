@@ -8,6 +8,7 @@ import {
   needsEnrichment,
 } from "./quality-gate";
 import { enrichGrant } from "./ai-enricher";
+import { isRegionCompatible } from "./region-filter";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "deepseek/deepseek-chat"; // DeepSeek-v3.1-terminus
@@ -167,6 +168,19 @@ export async function matchGrantsWithAI(
     return [];
   }
 
+  // 2b. Filtre géographique — rejette les aides régionales d'une autre région
+  // (ex: Conseil départemental des Landes pour un user breton). Laisse passer
+  // les aides nationales, UE, et celles sans région clairement identifiable.
+  const regionCompatibleGrants = qualifiedGrants.filter((g) =>
+    isRegionCompatible(g.organization, submission.region)
+  );
+  const rejectedByRegion = qualifiedGrants.length - regionCompatibleGrants.length;
+  if (rejectedByRegion > 0) {
+    console.log(
+      `🗺️  Filtre régional (${submission.region}) : ${rejectedByRegion} aides d'autres régions rejetées`
+    );
+  }
+
   // Build user profile summary (gérer les champs vides)
   const hasStatus = submission.status && submission.status.length > 0;
   const hasArtisticDomain = submission.artisticDomain && submission.artisticDomain.length > 0;
@@ -196,12 +210,13 @@ Critères :
   // Format enrichi : on inclut désormais un snippet de description ET le
   // grantType pour que l'IA puisse filtrer par secteur/domaine réel, pas
   // juste par éligibilité administrative.
-  const grantsDatabase = qualifiedGrants.map((grant) => {
+  const grantsDatabase = regionCompatibleGrants.map((grant) => {
     const eligShort = (grant.eligibility || "").replace(/<[^>]*>/g, "").substring(0, 120).trim();
     const descShort = (grant.description || "").replace(/<[^>]*>/g, "").substring(0, 100).trim();
     const sectors = grant.eligibleSectors?.slice(0, 3).join(",") || "";
     const types = grant.grantType?.slice(0, 3).join(",") || "";
-    return `${grant.id}|${grant.title}|${grant.organization}|${descShort}|${eligShort}|${sectors}|${types}`;
+    const geo = grant.geographicZone?.slice(0, 3).join(",") || "";
+    return `${grant.id}|${grant.title}|${grant.organization}|${descShort}|${eligShort}|${sectors}|${types}|${geo}`;
   }).join("\n");
 
   // System prompt — réécrit pour forcer la précision sectorielle
@@ -245,7 +260,7 @@ FORMAT DE RÉPONSE :
 
 ---
 
-Base de données des subventions (format: ID|Titre|Organisme|Description|Éligibilité|Secteurs|Types):
+Base de données des subventions (format: ID|Titre|Organisme|Description|Éligibilité|Secteurs|Types|Zone):
 
 ${grantsDatabase}
 
@@ -272,9 +287,9 @@ Analyse ce profil et retourne UNIQUEMENT les IDs des subventions pertinentes (pa
 
     console.log(`✅ IDs sélectionnés par l'IA: ${grantIds.join(", ")}`);
 
-    // Find matched grants (from qualified grants only)
+    // Find matched grants (from region-compatible grants only)
     const matchedGrants = grantIds
-      .map(id => qualifiedGrants.find(grant => grant.id === id))
+      .map(id => regionCompatibleGrants.find(grant => grant.id === id))
       .filter((grant): grant is GrantResult => grant !== undefined);
 
     console.log(`✅ ${matchedGrants.length} subventions matchées avec succès`);
