@@ -145,7 +145,14 @@ export const translations = {
     association: "Association loi 1901",
     microEntreprise: "Micro-entreprise culturelle",
     collectif: "Collectif artistique",
-    
+    lieuCulturel: "Lieu culturel (salle, club, MJC, théâtre)",
+    compagnie: "Compagnie (théâtre, danse, cirque, musique)",
+    label: "Label / Éditeur musical",
+    festivalStructure: "Structure festival",
+    galerie: "Galerie d'art / Artist-run space",
+    maisonEdition: "Maison d'édition",
+    tourneurProducteur: "Tourneur / Producteur de spectacles",
+
     // Artistic domains
     artsNumeriques: "Arts numériques / Nouvelles technologies",
     audiovisuel: "Audiovisuel / Cinéma",
@@ -154,6 +161,7 @@ export const translations = {
     musique: "Musique",
     ecriture: "Écriture / Littérature",
     patrimoine: "Patrimoine / Médiation culturelle",
+    metiersArt: "Métiers d'art / Artisanat",
     
     // Project types
     creationArtistique: "Création artistique",
@@ -394,7 +402,14 @@ export const translations = {
     association: "Non-profit association",
     microEntreprise: "Cultural micro-enterprise",
     collectif: "Artistic collective",
-    
+    lieuCulturel: "Cultural venue (hall, club, community center, theater)",
+    compagnie: "Company (theater, dance, circus, music)",
+    label: "Record label / Music publisher",
+    festivalStructure: "Festival organization",
+    galerie: "Art gallery / Artist-run space",
+    maisonEdition: "Publishing house",
+    tourneurProducteur: "Booking agent / Show producer",
+
     // Artistic domains
     artsNumeriques: "Digital arts / New technologies",
     audiovisuel: "Audiovisual / Cinema",
@@ -403,6 +418,7 @@ export const translations = {
     musique: "Music",
     ecriture: "Writing / Literature",
     patrimoine: "Heritage / Cultural mediation",
+    metiersArt: "Craft trades / Artisanry",
     
     // Project types
     creationArtistique: "Artistic creation",

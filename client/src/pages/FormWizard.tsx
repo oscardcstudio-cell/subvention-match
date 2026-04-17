@@ -103,6 +103,7 @@ export default function FormWizard() {
   // Extraire le paramètre domain de l'URL
   const urlParams = new URLSearchParams(window.location.search);
   const domainParam = urlParams.get('domain') || '';
+  const profileParam = urlParams.get('profile') || '';
   
   // États pour les questions optionnelles dépliables
   const [showInnovation, setShowInnovation] = useState(false);
@@ -217,6 +218,47 @@ export default function FormWizard() {
       }
     }
   }, [domainParam, form]);
+
+  // Pré-remplir un profil complet (raccourcis depuis la home "Je suis...")
+  useEffect(() => {
+    const profiles: Record<string, { status?: string[]; artisticDomain?: string[]; projectType?: string[] }> = {
+      'orga-soiree': {
+        status: ['collectif'],
+        artisticDomain: ['musique'],
+        projectType: ['evenementiel'],
+      },
+      'dj-producteur': {
+        status: ['artiste-auteur'],
+        artisticDomain: ['musique'],
+        projectType: ['enregistrement', 'diffusion'],
+      },
+      'danseur': {
+        status: ['artiste-auteur'],
+        artisticDomain: ['spectacle-vivant'],
+        projectType: ['creation'],
+      },
+      'compagnie': {
+        status: ['compagnie'],
+        artisticDomain: ['spectacle-vivant'],
+        projectType: ['creation', 'production'],
+      },
+      'lieu-culturel': {
+        status: ['lieu-culturel'],
+        projectType: ['evenementiel', 'investissement'],
+      },
+      'artisan-art': {
+        status: ['artiste-auto'],
+        artisticDomain: ['metiers-art'],
+      },
+    };
+
+    const preset = profiles[profileParam];
+    if (preset) {
+      if (preset.status) form.setValue('status', preset.status);
+      if (preset.artisticDomain) form.setValue('artisticDomain', preset.artisticDomain);
+      if (preset.projectType) form.setValue('projectType', preset.projectType);
+    }
+  }, [profileParam, form]);
 
   const submitMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -514,7 +556,7 @@ export default function FormWizard() {
                     <AnimatePresence>
                       {showMoreStatus && (
                         <>
-                          {["artiste-auto", "micro-entreprise", "collectif"].map((item, idx) => (
+                          {["artiste-auto", "micro-entreprise", "collectif", "lieu-culturel", "compagnie", "label", "festival-structure", "galerie", "maison-edition", "tourneur-producteur"].map((item, idx) => (
                             <motion.label
                               key={item}
                               initial={{ opacity: 0, height: 0, y: -10 }}
@@ -540,6 +582,13 @@ export default function FormWizard() {
                                 {item === "artiste-auto" && t.artisteAutoEntrepreneur}
                                 {item === "micro-entreprise" && t.microEntreprise}
                                 {item === "collectif" && t.collectif}
+                                {item === "lieu-culturel" && t.lieuCulturel}
+                                {item === "compagnie" && t.compagnie}
+                                {item === "label" && t.label}
+                                {item === "festival-structure" && t.festivalStructure}
+                                {item === "galerie" && t.galerie}
+                                {item === "maison-edition" && t.maisonEdition}
+                                {item === "tourneur-producteur" && t.tourneurProducteur}
                               </span>
                             </motion.label>
                           ))}
@@ -640,7 +689,7 @@ export default function FormWizard() {
                     <AnimatePresence>
                       {showMoreDomain && (
                         <>
-                          {["ecriture", "audiovisuel", "arts-numeriques", "patrimoine"].map((item, idx) => (
+                          {["ecriture", "audiovisuel", "arts-numeriques", "patrimoine", "metiers-art"].map((item, idx) => (
                             <motion.label
                               key={item}
                               initial={{ opacity: 0, height: 0, y: -10 }}
@@ -662,6 +711,7 @@ export default function FormWizard() {
                                 {item === "audiovisuel" && t.audiovisuel}
                                 {item === "arts-numeriques" && t.artsNumeriques}
                                 {item === "patrimoine" && t.patrimoine}
+                                {item === "metiers-art" && t.metiersArt}
                               </span>
                             </motion.label>
                           ))}
@@ -859,7 +909,7 @@ export default function FormWizard() {
                     <AnimatePresence>
                       {showMoreType && (
                         <>
-                          {["residence", "formation"].map((item, idx) => (
+                          {["evenementiel", "residence", "formation", "edition", "investissement", "tournee", "enregistrement", "promotion"].map((item, idx) => (
                             <motion.label
                               key={item}
                               initial={{ opacity: 0, height: 0, y: -10 }}
@@ -877,8 +927,14 @@ export default function FormWizard() {
                                 }}
                               />
                               <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
+                                {item === "evenementiel" && (language === "fr" ? "Événementiel / Festival" : "Event / Festival")}
                                 {item === "residence" && (language === "fr" ? "Résidence" : "Residency")}
                                 {item === "formation" && (language === "fr" ? "Formation" : "Training")}
+                                {item === "edition" && (language === "fr" ? "Édition / Publication" : "Publishing")}
+                                {item === "investissement" && (language === "fr" ? "Investissement / Équipement" : "Investment / Equipment")}
+                                {item === "tournee" && (language === "fr" ? "Tournée" : "Tour")}
+                                {item === "enregistrement" && (language === "fr" ? "Enregistrement / Studio" : "Recording / Studio")}
+                                {item === "promotion" && (language === "fr" ? "Promotion / Communication" : "Promotion / Communication")}
                               </span>
                             </motion.label>
                           ))}
@@ -1355,7 +1411,7 @@ export default function FormWizard() {
                     transition={{ duration: 0.3 }}
                     className="space-y-3 px-6 pb-6"
                   >
-                    {["subvention", "pret", "bourse", "prix", "residence"].map((item) => (
+                    {["subvention", "pret", "bourse", "prix", "residence", "accompagnement", "appel-projets"].map((item) => (
                       <label
                         key={item}
                         className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
@@ -1376,6 +1432,8 @@ export default function FormWizard() {
                           {item === "bourse" && (language === "fr" ? "Bourse" : "Scholarship")}
                           {item === "prix" && (language === "fr" ? "Prix" : "Award")}
                           {item === "residence" && (language === "fr" ? "Résidence" : "Residency")}
+                          {item === "accompagnement" && (language === "fr" ? "Accompagnement / Mentorat" : "Mentoring / Coaching")}
+                          {item === "appel-projets" && (language === "fr" ? "Appel à projets" : "Call for projects")}
                         </span>
                       </label>
                     ))}
