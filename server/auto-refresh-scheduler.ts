@@ -17,6 +17,7 @@ interface RefreshStatus {
     organismsScraped: number;
     newGrantsFound: number;
     expiredArchived: number;
+    recurringBumped: number;
     errors: string[];
   } | null;
 }
@@ -67,6 +68,7 @@ class AutoRefreshScheduler {
       organismsScraped: 0,
       newGrantsFound: 0,
       expiredArchived: 0,
+      recurringBumped: 0,
       errors: []
     };
     
@@ -80,7 +82,8 @@ class AutoRefreshScheduler {
         if (deadlineCheck.expired.length > 0) {
           const archiveResult = await archiveExpiredGrants();
           result.expiredArchived = archiveResult.archived;
-          console.log(`   ✅ ${archiveResult.archived} subventions archivées`);
+          result.recurringBumped = archiveResult.bumped;
+          console.log(`   ✅ ${archiveResult.archived} ponctuelles archivées, ${archiveResult.bumped} récurrentes bumpées`);
         }
       } catch (error: any) {
         console.error('   ❌ Erreur vérification deadlines:', error.message);
@@ -109,7 +112,8 @@ class AutoRefreshScheduler {
       console.log(`\n✅ Rafraîchissement terminé en ${duration.toFixed(1)}s`);
       console.log(`   - Organismes scrapés: ${result.organismsScraped}`);
       console.log(`   - Nouvelles subventions: ${result.newGrantsFound}`);
-      console.log(`   - Expirées archivées: ${result.expiredArchived}`);
+      console.log(`   - Ponctuelles archivées: ${result.expiredArchived}`);
+      console.log(`   - Récurrentes bumpées: ${result.recurringBumped}`);
       if (result.errors.length > 0) {
         console.log(`   - Erreurs: ${result.errors.length}`);
       }

@@ -69,32 +69,64 @@ async function callOpenRouter(messages: OpenRouterMessage[]): Promise<string> {
 }
 
 /**
- * Filter grants by deadline - keep only grants that are open or recurring
+ * Determine if a grant is recurring based on isRecurring flag or frequency text.
+ * isRecurring (boolean from DB) is the source of truth when set.
+ * Falls back to heuristic on frequency text for older data not yet backfilled.
+ */
+function isGrantRecurring(grant: GrantResult): boolean {
+  // Explicit flag takes priority
+  if (grant.isRecurring === true) return true;
+  if (grant.isRecurring === false) return false;
+
+  // Fallback: infer from frequency text (for grants not yet backfilled)
+  if (!grant.frequency || grant.frequency.trim() === '') return false;
+
+  const freq = grant.frequency.toLowerCase();
+  const recurringKeywords = [
+    'annuel', 'récurrent', 'permanent', 'régulier',
+    'chaque année', 'toute l\'année', 'sessions',
+    'appels à projets réguliers', 'variable selon',
+  ];
+  const oneOffKeywords = ['ponctuel', 'unique', 'one-shot', 'exceptionnel'];
+
+  if (oneOffKeywords.some(k => freq.includes(k))) return false;
+  if (recurringKeywords.some(k => freq.includes(k))) return true;
+
+  // Unknown frequency text — assume non-recurring to be safe
+  return false;
+}
+
+/**
+ * Filter grants by deadline - keep only grants that are open or recurring.
+ *
+ * Recurring grants whose deadline has passed are KEPT — the UI shows
+ * "Prochaine session" and the deadline-checker will bump their deadline
+ * forward instead of archiving them.
+ *
+ * One-shot (ponctuel) grants whose deadline has passed are EXCLUDED.
  */
 function filterGrantsByDeadline(grants: GrantResult[]): GrantResult[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   return grants.filter(grant => {
-    // If no deadline specified, keep it (recurring grants without specific dates)
+    // No deadline specified — keep (permanent / always open)
     if (!grant.deadline || grant.deadline.trim() === '') {
       return true;
     }
 
-    // If grant has frequency info, it's recurring - keep it even if deadline passed
-    // We'll show "Prochaine session" in the UI
-    if (grant.frequency && grant.frequency.trim() !== '') {
+    // Recurring grants are always kept — even with a past deadline
+    if (isGrantRecurring(grant)) {
       return true;
     }
 
     try {
       const deadlineDate = new Date(grant.deadline);
       deadlineDate.setHours(23, 59, 59, 999);
-      
-      // For non-recurring grants, keep only if deadline is in the future
+
+      // One-shot grants: keep only if deadline is in the future
       return deadlineDate >= today;
     } catch (e) {
-      // If date parsing fails, keep the grant to be safe
       console.warn(`⚠️ Could not parse deadline for grant ${grant.id}: ${grant.deadline}`);
       return true;
     }

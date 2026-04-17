@@ -102,7 +102,8 @@ function transformArtsCouncilToGrant(grant: ArtsCouncilGrant): InsertGrant {
     deadline: null, // Les deadlines ne sont pas dans les données historiques
     nextSession: "Vérifier sur le site Arts Council England",
     frequency: "Variable selon le programme",
-    
+    isRecurring: true, // Arts Council programmes run on recurring cycles
+
     description: grant.description || `Programme ${grant.artform} - ${grant.projectName}`,
     eligibility: "⚠️ IMPORTANT : Vérifier les critères d'éligibilité spécifiques sur le site Arts Council England. Certains programmes sont ouverts aux artistes internationaux, d'autres réservés aux résidents UK.",
     requirements: "Dossier de candidature en anglais. Vérifier les documents requis sur le site Arts Council England.",

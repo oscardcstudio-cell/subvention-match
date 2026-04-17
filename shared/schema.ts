@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, jsonb, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, jsonb, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -96,7 +96,8 @@ export const grants = pgTable("grants", {
   deadline: text("deadline"), // Date limite de soumission
   nextSession: text("next_session"), // Prochaine session si récurrent
   frequency: text("frequency"), // Fréquence des appels (annuel, permanent, etc.)
-  
+  isRecurring: boolean("is_recurring").default(false), // true = annuel/récurrent, false = ponctuel (one-shot)
+
   // Description
   description: text("description"), // Nature de l'aide
   eligibility: text("eligibility").notNull(), // Critères d'éligibilité
@@ -224,6 +225,7 @@ export const grantResultSchema = z.object({
   amount: z.string(),
   deadline: z.string(),
   frequency: z.string().optional(),
+  isRecurring: z.boolean().optional(),
   nextSession: z.string().optional(),
   
   // Description et éligibilité

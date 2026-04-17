@@ -115,7 +115,8 @@ function transformEUProjectToGrant(project: EUFundingProject): InsertGrant {
     deadline: null, // Les deadlines ne sont pas dans les résultats de recherche
     nextSession: "Consulter le portail EU Funding & Tenders pour les prochaines deadlines",
     frequency: "Appels à projets réguliers - généralement 1-2 fois par an",
-    
+    isRecurring: true,
+
     description,
     eligibility: "⚠️ STRUCTURE OBLIGATOIRE : Creative Europe finance uniquement les organisations (associations, entreprises, collectifs, institutions). Les artistes individuels doivent candidater via une structure légale (association loi 1901, SARL, SAS, collectif avec SIRET). États membres UE et pays associés uniquement. Les artistes français sont éligibles s'ils ont une structure juridique.",
     requirements: "Dossier de candidature en anglais via le portail EU Funding & Tenders. Partenariat européen souvent requis (minimum 3 partenaires de 3 pays UE différents). Budget détaillé et plan de travail obligatoires.",

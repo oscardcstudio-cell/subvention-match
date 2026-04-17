@@ -107,7 +107,8 @@ function transformAidToGrant(aid: any): InsertGrant {
     deadline: aid.submission_deadline || null,
     nextSession: aid.recurrence === "recurring" ? "Voir le site" : null,
     frequency,
-    
+    isRecurring: aid.recurrence !== "oneoff",
+
     description: aid.description || null,
     eligibility: aid.eligibility || "Non spécifié",
     requirements: aid.project_examples || null,

@@ -110,7 +110,8 @@ function mapAideToGrant(aide: AidesTerritoriesAid): any {
     deadline: aide.submission_deadline || null,
     nextSession: aide.start_date || null,
     frequency: aide.recurrence || null,
-    
+    isRecurring: aide.recurrence !== "oneoff" && aide.recurrence != null,
+
     description: aide.description || null,
     eligibility: aide.eligibility || "Voir le site web de l'aide pour les critères d'éligibilité",
     requirements: null,
