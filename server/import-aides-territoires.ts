@@ -122,7 +122,7 @@ function mapAideToGrant(aide: AidesTerritoriesAid): any {
     requirements: null,
     obligatoryDocuments: null,
     
-    url: aide.url || aide.origin_url || null,
+    url: aide.origin_url || (aide.url?.startsWith("/") ? `https://aides-territoires.beta.gouv.fr${aide.url}` : aide.url) || null,
     contactEmail: aide.contact_email || null,
     contactPhone: aide.contact_phone || null,
     
