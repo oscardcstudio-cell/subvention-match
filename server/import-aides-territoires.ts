@@ -31,6 +31,9 @@ interface AidesTerritoriesAid {
   contact_phone?: string;
   subvention_rate_lower_bound?: number;
   subvention_rate_upper_bound?: number;
+  subvention_comment?: string;
+  loan_amount?: number;
+  recoverable_advance_amount?: number;
   status?: string;
   categories?: string[];
 }
@@ -104,9 +107,11 @@ function mapAideToGrant(aide: AidesTerritoriesAid): any {
   return {
     title: aide.name || aide.name_initial || "Sans titre",
     organization: aide.financers?.[0]?.name || "Non spécifié",
-    amount: null, // Les montants sont souvent variables
+    amount: aide.loan_amount || aide.recoverable_advance_amount || null,
     amountMin: null,
     amountMax: null,
+    // Note: subvention_comment souvent contient des montants textuels (ex: "plafonné à 5000€")
+    // qui seront extraits par le script enrich-amounts.ts
     deadline: aide.submission_deadline || null,
     nextSession: aide.start_date || null,
     frequency: aide.recurrence || null,
