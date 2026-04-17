@@ -251,8 +251,14 @@ async function analyzeDataQuality(): Promise<QualityReport> {
         severity: 'warning'
       });
       fieldStats.amount.empty++;
+      fieldStats.amountMin.empty++;
+      fieldStats.amountMax.empty++;
     } else {
       fieldStats.amount.filled++;
+      if (grant.amountMin) fieldStats.amountMin.filled++;
+      else fieldStats.amountMin.empty++;
+      if (grant.amountMax) fieldStats.amountMax.filled++;
+      else fieldStats.amountMax.empty++;
     }
     
     // Analyse de la deadline

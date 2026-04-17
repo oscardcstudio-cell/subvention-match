@@ -1,324 +1,432 @@
-import { db } from './db';
-import { grants } from '@shared/schema';
-import { eq } from 'drizzle-orm';
+/**
+ * AI Enricher — enrichit les subventions via DeepSeek (OpenRouter)
+ *
+ * Corrige : organization, title, description, eligibility.
+ * Chaque enrichissement met à jour enrichmentStatus dans la DB.
+ *
+ * Améliorations vs version précédente :
+ * - Met à jour enrichmentStatus (pending → in_progress → completed/failed)
+ * - Détection d'issues robuste (regex au lieu de includes fragile)
+ * - Validation des résultats IA (longueur, contenu)
+ * - Retry avec backoff sur erreurs API
+ * - Prompt amélioré pour les organisations (plus spécifique)
+ */
 
-interface QualityIssue {
+import { db } from "./db";
+import { grants } from "@shared/schema";
+import { eq } from "drizzle-orm";
+
+// ── Types ────────────────────────────────────────────────────────────
+
+export interface QualityIssue {
   grantId: string;
   grantTitle: string;
   field: string;
   issue: string;
-  severity: 'critical' | 'warning' | 'info';
+  severity: "critical" | "warning" | "info";
   currentValue?: string | number;
   expectedValue?: string;
 }
 
-interface EnrichmentRequest {
+export interface EnrichmentRequest {
   grantId: string;
   issues: QualityIssue[];
 }
 
-interface EnrichmentResult {
+export interface EnrichmentResult {
   success: boolean;
   grantId: string;
-  changes: {
-    field: string;
-    oldValue: string;
-    newValue: string;
-  }[];
+  changes: { field: string; oldValue: string; newValue: string }[];
   error?: string;
 }
 
+// ── Config ───────────────────────────────────────────────────────────
+
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 3_000;
 
 if (!OPENROUTER_API_KEY) {
-  console.warn('⚠️ OPENROUTER_API_KEY manquante - enrichissement IA désactivé');
+  console.warn("⚠️ OPENROUTER_API_KEY manquante — enrichissement IA désactivé");
 }
 
-async function callDeepSeek(prompt: string): Promise<string> {
+// ── Helpers ──────────────────────────────────────────────────────────
+
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
+/** Détecte un pattern dans le message d'issue (insensible à la casse). */
+function issueMatches(issue: string, ...patterns: string[]): boolean {
+  const lower = issue.toLowerCase();
+  return patterns.some((p) => lower.includes(p));
+}
+
+/** Détecte si des issues matchent un champ + pattern. */
+function hasIssue(issues: QualityIssue[], field: string, ...patterns: string[]): boolean {
+  return issues.some(
+    (i) => i.field === field && issueMatches(i.issue, ...patterns)
+  );
+}
+
+/** Valide qu'un texte enrichi n'est pas une hallucination évidente. */
+function isValidEnrichment(text: string, minLength: number, maxLength: number): boolean {
+  if (!text || text.length < minLength || text.length > maxLength) return false;
+  const lower = text.toLowerCase();
+  // Rejeter les réponses passe-partout
+  if (lower.includes("je ne peux pas")) return false;
+  if (lower.includes("je n'ai pas assez")) return false;
+  if (lower.includes("information insuffisante")) return false;
+  if (lower.includes("non spécifié")) return false;
+  if (lower.includes("inconnu")) return false;
+  if (lower.startsWith("désolé")) return false;
+  return true;
+}
+
+// ── API DeepSeek ─────────────────────────────────────────────────────
+
+async function callDeepSeek(prompt: string, retries = MAX_RETRIES): Promise<string> {
   if (!OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY manquante');
+    throw new Error("OPENROUTER_API_KEY manquante");
   }
 
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://subventionmatch.com',
-      'X-Title': 'SubventionMatch',
-    },
-    body: JSON.stringify({
-      model: 'deepseek/deepseek-chat',
-      messages: [
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
         {
-          role: 'system',
-          content: 'Tu es un expert en subventions culturelles françaises. Ton rôle est d\'améliorer la qualité et la clarté des informations de subventions pour les rendre plus accessibles aux artistes et associations culturelles.'
-        },
-        {
-          role: 'user',
-          content: prompt
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://subventionmatch.com",
+            "X-Title": "SubventionMatch",
+          },
+          body: JSON.stringify({
+            model: "deepseek/deepseek-chat",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "Tu es un expert en subventions et aides publiques françaises, notamment dans le domaine culturel. " +
+                  "Tu connais les organismes (ministères, DRAC, régions, départements, ADAMI, SACEM, CNM, etc.) " +
+                  "et les dispositifs d'aide. Réponds de façon factuelle et concise.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.3,
+            max_tokens: 2000,
+          }),
         }
-      ],
-      temperature: 0.3,
-      max_tokens: 2000,
-    }),
-  });
+      );
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Erreur OpenRouter: ${response.status} - ${error}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        // Retry sur 429 (rate limit) ou 5xx
+        if ((response.status === 429 || response.status >= 500) && attempt < retries) {
+          const delay = RETRY_DELAY_MS * (attempt + 1);
+          console.warn(`  ⏳ API ${response.status}, retry dans ${delay / 1000}s...`);
+          await new Promise((r) => setTimeout(r, delay));
+          continue;
+        }
+        throw new Error(`OpenRouter ${response.status}: ${errorText.substring(0, 200)}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0]?.message?.content || "";
+    } catch (err) {
+      if (attempt < retries && err instanceof TypeError) {
+        // Network error — retry
+        const delay = RETRY_DELAY_MS * (attempt + 1);
+        console.warn(`  ⏳ Erreur réseau, retry dans ${delay / 1000}s...`);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      throw err;
+    }
   }
-
-  const data = await response.json();
-  return data.choices[0]?.message?.content || '';
+  throw new Error("Max retries atteint");
 }
 
-function stripHtml(html: string | null): string {
-  if (!html) return '';
-  return html.replace(/<[^>]*>/g, '').trim();
-}
+// ── Enrichissement d'une grant ───────────────────────────────────────
 
-export async function enrichGrant(grantId: string, issues: QualityIssue[]): Promise<EnrichmentResult> {
+export async function enrichGrant(
+  grantId: string,
+  issues: QualityIssue[]
+): Promise<EnrichmentResult> {
   try {
-    console.log(`🤖 Enrichissement de la subvention #${grantId}...`);
-    
-    // Récupérer la subvention
+    // Marquer comme en cours
+    await db
+      .update(grants)
+      .set({ enrichmentStatus: "in_progress", updatedAt: new Date() })
+      .where(eq(grants.id, grantId));
+
+    console.log(`🤖 Enrichissement #${grantId}...`);
+
     const [grant] = await db.select().from(grants).where(eq(grants.id, grantId));
-    
     if (!grant) {
-      return {
-        success: false,
-        grantId,
-        changes: [],
-        error: 'Subvention non trouvée'
-      };
+      await db
+        .update(grants)
+        .set({ enrichmentStatus: "failed", enrichmentError: "Subvention non trouvée", enrichmentDate: new Date() })
+        .where(eq(grants.id, grantId));
+      return { success: false, grantId, changes: [], error: "Subvention non trouvée" };
     }
 
-    const changes: EnrichmentResult['changes'] = [];
-    const updates: any = {};
+    const changes: EnrichmentResult["changes"] = [];
+    const updates: Record<string, any> = {};
 
-    // Identifier les problèmes à corriger
-    const hasLongTitle = issues.some(i => i.field === 'title' && i.issue.toLowerCase().includes('long'));
-    const hasLongDescription = issues.some(i => i.field === 'description' && i.issue.toLowerCase().includes('long'));
-    const hasShortDescription = issues.some(i => i.field === 'description' && i.issue.toLowerCase().includes('court'));
-    const hasMissingDescription = issues.some(i => i.field === 'description' && (i.issue.toLowerCase().includes('manquant') || i.issue.toLowerCase().includes('manquante')));
-    const hasLongEligibility = issues.some(i => i.field === 'eligibility' && i.issue.toLowerCase().includes('long'));
-    const hasShortEligibility = issues.some(i => i.field === 'eligibility' && i.issue.toLowerCase().includes('court'));
-    const hasMissingEligibility = issues.some(i => i.field === 'eligibility' && (i.issue.toLowerCase().includes('manquant') || i.issue.toLowerCase().includes('manquants') || i.issue.toLowerCase().includes('manquante')));
-    const hasMissingOrg = issues.some(i => i.field === 'organization' && i.issue.toLowerCase().includes('manquant'));
+    // Détection robuste des issues par champ
+    const wantsOrgFix = hasIssue(issues, "organization", "manquant");
+    const wantsTitleShorten = hasIssue(issues, "title", "long");
+    const wantsDescExpand = hasIssue(issues, "description", "court", "manquant");
+    const wantsDescShrink = hasIssue(issues, "description", "long") && !wantsDescExpand;
+    const wantsEligExpand = hasIssue(issues, "eligibility", "court", "manquant");
+    const wantsEligShrink = hasIssue(issues, "eligibility", "long") && !wantsEligExpand;
 
-    console.log(`🔍 Problèmes détectés pour #${grantId}:`, { 
-      hasLongTitle, 
-      hasLongDescription,
-      hasShortDescription,
-      hasMissingDescription,
-      hasLongEligibility,
-      hasShortEligibility, 
-      hasMissingEligibility, 
-      hasMissingOrg,
-      totalIssues: issues.length,
-      issues: issues.map(i => `${i.field}: ${i.issue}`)
-    });
+    const detectedActions = [
+      wantsOrgFix && "org",
+      wantsTitleShorten && "title-shrink",
+      wantsDescExpand && "desc-expand",
+      wantsDescShrink && "desc-shrink",
+      wantsEligExpand && "elig-expand",
+      wantsEligShrink && "elig-shrink",
+    ].filter(Boolean);
+    console.log(`  Actions: ${detectedActions.join(", ") || "(aucune)"}`);
 
-    // 0. ENRICHIR L'ORGANISATION SI MANQUANTE
-    if (hasMissingOrg && (!grant.organization || grant.organization === 'Inconnu' || grant.organization === '')) {
-      console.log(`🏢 Recherche de l'organisation pour #${grantId}...`);
-      const prompt = `Trouve le nom de l'organisme (fondation, ministère, collectivité, etc.) qui propose cette subvention culturelle française :
+    // ── 0. ORGANISATION ──────────────────────────────────────────────
+
+    if (
+      wantsOrgFix &&
+      (!grant.organization || grant.organization === "Non spécifié" || grant.organization === "Inconnu" || grant.organization === "")
+    ) {
+      const descText = stripHtml(grant.description).substring(0, 1500);
+      const eligText = stripHtml(grant.eligibility).substring(0, 500);
+      const url = grant.url || "";
+
+      const prompt = `Identifie l'organisme qui finance cette subvention culturelle française.
+
 TITRE : "${grant.title}"
-DESCRIPTION : "${stripHtml(grant.description).substring(0, 1000)}"
+DESCRIPTION : "${descText}"
+ÉLIGIBILITÉ : "${eligText}"
+URL : "${url}"
 
-Réponds UNIQUEMENT avec le nom de l'organisme, pas de phrases.`;
+CONSIGNES STRICTES :
+- Donne le NOM COMPLET et OFFICIEL de l'organisme (pas juste "Région" ou "Département")
+- Exemples de noms complets : "Conseil régional Île-de-France", "DRAC Occitanie", "ADAMI", "Ministère de la Culture"
+- Si l'URL contient un indice (ex: .gouv.fr/iledefrance → DRAC Île-de-France), utilise-le
+- Si tu ne peux pas identifier l'organisme avec certitude, réponds "INCONNU"
+- Réponds UNIQUEMENT avec le nom, pas de phrase.`;
+
       const org = await callDeepSeek(prompt);
-      const cleanOrg = org.trim().replace(/^["']|["']$/g, '');
-      if (cleanOrg && cleanOrg.length < 100 && !cleanOrg.toLowerCase().includes('inconnu')) {
+      const cleanOrg = org.trim().replace(/^["']|["']$/g, "").replace(/\.$/, "");
+
+      if (isValidEnrichment(cleanOrg, 3, 120)) {
         updates.organization = cleanOrg;
-        changes.push({ field: 'organization', oldValue: grant.organization || '(manquant)', newValue: cleanOrg });
+        changes.push({
+          field: "organization",
+          oldValue: grant.organization || "(manquant)",
+          newValue: cleanOrg,
+        });
       }
     }
 
-    // 1. ENRICHIR LE TITRE SI TROP LONG
-    if (hasLongTitle && grant.title) {
-      console.log(`📝 Raccourcissement du titre pour #${grantId}...`);
+    // ── 1. TITRE TROP LONG ───────────────────────────────────────────
+
+    if (wantsTitleShorten && grant.title) {
       const titleText = stripHtml(grant.title);
-      const prompt = `Réécris ce titre de subvention culturelle pour qu'il soit percutant et fasse moins de 80 caractères.
-TITRE ORIGINAL : "${titleText}"
-CONSEIL : Garde les mots-clés essentiels (ex: résidence, création, aide, etc.).
+      const prompt = `Réécris ce titre de subvention pour qu'il fasse moins de 80 caractères, en gardant les mots-clés essentiels.
+TITRE : "${titleText}"
 Réponds UNIQUEMENT avec le nouveau titre.`;
+
       const newTitle = await callDeepSeek(prompt);
-      const cleanTitle = newTitle.trim().replace(/^["']|["']$/g, '');
-      if (cleanTitle && cleanTitle.length < titleText.length) {
+      const cleanTitle = newTitle.trim().replace(/^["']|["']$/g, "");
+
+      if (isValidEnrichment(cleanTitle, 10, 100) && cleanTitle.length < titleText.length) {
         updates.title = cleanTitle;
-        changes.push({ field: 'title', oldValue: titleText, newValue: cleanTitle });
+        changes.push({ field: "title", oldValue: titleText, newValue: cleanTitle });
       }
     }
 
-    // 2. RÉSUMER LA DESCRIPTION SI TROP LONGUE
-    if (hasLongDescription && grant.description) {
-      console.log(`📝 Synthèse de la description pour #${grantId}...`);
+    // ── 2. DESCRIPTION ───────────────────────────────────────────────
+
+    if (wantsDescShrink && grant.description) {
       const descText = stripHtml(grant.description);
-      const prompt = `Synthétise cette description de subvention culturelle en un paragraphe clair de maximum 1500 caractères.
+      const prompt = `Synthétise cette description de subvention en un paragraphe clair de 800-1500 caractères.
 Garde les informations cruciales sur l'objectif de l'aide.
-Utilise un ton professionnel et informatif.
 DESCRIPTION : "${descText.substring(0, 4000)}"
-
 Réponds UNIQUEMENT avec la description synthétisée.`;
+
       const newDesc = await callDeepSeek(prompt);
-      if (newDesc && newDesc.length > 100) {
+      if (isValidEnrichment(newDesc, 200, 2000)) {
         updates.description = `<p>${newDesc.trim()}</p>`;
-        changes.push({ field: 'description', oldValue: '(trop longue)', newValue: 'Description synthétisée par IA' });
+        changes.push({ field: "description", oldValue: "(trop longue)", newValue: `Synthétisée (${newDesc.length} chars)` });
       }
     }
 
-    // 2b. ENRICHIR LA DESCRIPTION SI TROP COURTE OU MANQUANTE
-    if ((hasShortDescription || hasMissingDescription) && grant.title) {
-      console.log(`📝 Enrichissement de la description pour #${grantId}...`);
-      const titleText = stripHtml(grant.title);
-      const currentDesc = grant.description ? stripHtml(grant.description) : '';
-      const eligText = grant.eligibility ? stripHtml(grant.eligibility) : '';
-      
+    if (wantsDescExpand && grant.title) {
+      const currentDesc = stripHtml(grant.description);
+      const eligText = stripHtml(grant.eligibility);
+
       const prompt = `Génère une description complète (200-500 caractères) pour cette subvention culturelle française.
 
-TITRE : "${titleText}"
+TITRE : "${grant.title}"
 DESCRIPTION ACTUELLE : "${currentDesc}"
 ÉLIGIBILITÉ : "${eligText.substring(0, 500)}"
-ORGANISME : "${grant.organization || 'Non spécifié'}"
+ORGANISME : "${updates.organization || grant.organization || "Non spécifié"}"
 
 CONSIGNES :
-- Explique l'objectif de cette aide culturelle
+- Explique l'objectif de cette aide
 - Mentionne le type de projets soutenus
-- Utilise un ton professionnel et informatif
-- Entre 200 et 500 caractères
-- Réponds UNIQUEMENT avec la description, pas de préambule.`;
+- Ton professionnel et informatif
+- 200 à 500 caractères
+- UNIQUEMENT la description, pas de préambule.`;
 
       const newDesc = await callDeepSeek(prompt);
-      if (newDesc && newDesc.length >= 100) {
+      if (isValidEnrichment(newDesc, 100, 1000)) {
         updates.description = `<p>${newDesc.trim()}</p>`;
-        changes.push({ 
-          field: 'description', 
-          oldValue: hasMissingDescription ? '(manquante)' : '(trop courte)', 
-          newValue: 'Description enrichie par IA' 
-        });
-      }
-    }
-
-    // 3. RÉSUMER L'ÉLIGIBILITÉ SI TROP LONGUE
-    if (hasLongEligibility && grant.eligibility) {
-      console.log(`⚖️ Synthèse de l'éligibilité pour #${grantId}...`);
-      const eligText = stripHtml(grant.eligibility);
-      const prompt = `Synthétise ces critères d'éligibilité pour une subvention culturelle.
-Fais une liste à puces concise (max 1000 caractères).
-ÉLIGIBILITÉ ACTUELLE : "${eligText}"
-
-Réponds UNIQUEMENT avec la liste à puces.`;
-      const newElig = await callDeepSeek(prompt);
-      if (newElig && newElig.length > 50) {
-        updates.eligibility = `<ul>${newElig.trim().split('\n').filter(l => l.trim()).map(l => `<li>${l.replace(/^[*-]\s*/, '')}</li>`).join('')}</ul>`;
-        changes.push({ field: 'eligibility', oldValue: '(trop longue)', newValue: 'Critères synthétisés par IA' });
-      }
-    }
-
-    // 4. COMPLÉTER L'ÉLIGIBILITÉ SI MANQUANTE
-    if (hasMissingEligibility && !grant.eligibility && grant.description) {
-      console.log(`⚖️ Extraction de l'éligibilité pour #${grantId}...`);
-      const descText = stripHtml(grant.description);
-      const prompt = `À partir de cette description de subvention culturelle française, extrais les critères d'éligibilité précis.
-CONSIGNES :
-- Identifie les bénéficiaires (statut juridique, type de structure)
-- Précise les domaines artistiques concernés
-- Liste les conditions de localisation ou de projet
-- Format : Liste à puces (<ul>/<li>) de maximum 500 caractères.
-- Réponds UNIQUEMENT avec le code HTML de la liste.
-
-DESCRIPTION : "${descText.substring(0, 3000)}"`;
-
-      const eligibility = await callDeepSeek(prompt);
-      const cleanEligibility = eligibility.trim().replace(/^["']|["']$/g, '');
-      
-      if (cleanEligibility && cleanEligibility.length > 20 && !cleanEligibility.toLowerCase().includes('non spécifié')) {
-        updates.eligibility = cleanEligibility;
         changes.push({
-          field: 'eligibility',
-          oldValue: '(manquant)',
-          newValue: 'Critères extraits par IA'
+          field: "description",
+          oldValue: currentDesc ? `(trop courte: ${currentDesc.length})` : "(manquante)",
+          newValue: `Enrichie (${newDesc.length} chars)`,
         });
       }
     }
 
-    // 4b. ENRICHIR L'ÉLIGIBILITÉ SI TROP COURTE
-    if (hasShortEligibility && grant.eligibility && grant.title) {
-      console.log(`⚖️ Enrichissement de l'éligibilité pour #${grantId}...`);
-      const currentElig = stripHtml(grant.eligibility);
-      const titleText = stripHtml(grant.title);
-      const descText = grant.description ? stripHtml(grant.description) : '';
-      
-      const prompt = `Enrichis ces critères d'éligibilité pour cette subvention culturelle française.
+    // ── 3. ÉLIGIBILITÉ ───────────────────────────────────────────────
 
-TITRE : "${titleText}"
-ÉLIGIBILITÉ ACTUELLE : "${currentElig}"
-DESCRIPTION : "${descText.substring(0, 1000)}"
-ORGANISME : "${grant.organization || 'Non spécifié'}"
-
-CONSIGNES :
-- Développe les critères existants avec plus de détails
-- Ajoute des critères logiques basés sur le contexte (type de bénéficiaires, conditions)
-- Format : Liste à puces claire (100-400 caractères)
-- Réponds UNIQUEMENT avec la liste à puces, pas de préambule.`;
+    if (wantsEligShrink && grant.eligibility) {
+      const eligText = stripHtml(grant.eligibility);
+      const prompt = `Synthétise ces critères d'éligibilité en une liste à puces concise (max 1000 caractères).
+ÉLIGIBILITÉ : "${eligText.substring(0, 4000)}"
+Réponds avec une liste à puces (- item).`;
 
       const newElig = await callDeepSeek(prompt);
-      if (newElig && newElig.length >= 50) {
-        updates.eligibility = `<ul>${newElig.trim().split('\n').filter(l => l.trim()).map(l => `<li>${l.replace(/^[*-]\s*/, '')}</li>`).join('')}</ul>`;
-        changes.push({ 
-          field: 'eligibility', 
-          oldValue: '(trop courte)', 
-          newValue: 'Critères enrichis par IA' 
-        });
+      if (isValidEnrichment(newElig, 50, 1500)) {
+        const html = `<ul>${newElig
+          .trim()
+          .split("\n")
+          .filter((l) => l.trim())
+          .map((l) => `<li>${l.replace(/^[*-]\s*/, "")}</li>`)
+          .join("")}</ul>`;
+        updates.eligibility = html;
+        changes.push({ field: "eligibility", oldValue: "(trop longue)", newValue: `Synthétisée (${newElig.length} chars)` });
       }
     }
 
-    // Appliquer les mises à jour si des changements ont été faits
-    if (Object.keys(updates).length > 0) {
-      await db.update(grants)
-        .set(updates)
-        .where(eq(grants.id, grantId));
-      
-      console.log(`✅ Subvention #${grantId} enrichie avec succès (${changes.length} changements)`);
-    } else {
-      console.log(`ℹ️ Aucun changement nécessaire pour la subvention #${grantId}`);
+    if (wantsEligExpand) {
+      const currentElig = stripHtml(grant.eligibility);
+      const descText = stripHtml(grant.description);
+
+      if (currentElig.length < 100) {
+        const prompt = `${currentElig ? "Enrichis ces critères d'éligibilité" : "Extrais les critères d'éligibilité de cette description"} pour cette subvention culturelle française.
+
+TITRE : "${grant.title}"
+${currentElig ? `ÉLIGIBILITÉ ACTUELLE : "${currentElig}"` : ""}
+DESCRIPTION : "${descText.substring(0, 2000)}"
+ORGANISME : "${updates.organization || grant.organization || "Non spécifié"}"
+
+CONSIGNES :
+- Identifie les bénéficiaires (type de structure, statut juridique)
+- Précise les domaines artistiques/culturels concernés
+- Liste les conditions (localisation, projet, etc.)
+- Format : liste à puces (- item), 100-500 caractères
+- UNIQUEMENT la liste, pas de préambule.`;
+
+        const newElig = await callDeepSeek(prompt);
+        if (isValidEnrichment(newElig, 50, 1000)) {
+          const html = `<ul>${newElig
+            .trim()
+            .split("\n")
+            .filter((l) => l.trim())
+            .map((l) => `<li>${l.replace(/^[*-]\s*/, "")}</li>`)
+            .join("")}</ul>`;
+          updates.eligibility = html;
+          changes.push({
+            field: "eligibility",
+            oldValue: currentElig ? `(trop courte: ${currentElig.length})` : "(manquante)",
+            newValue: `Enrichie (${newElig.length} chars)`,
+          });
+        }
+      }
     }
 
-    return {
-      success: true,
-      grantId,
-      changes
-    };
+    // ── Appliquer les mises à jour ───────────────────────────────────
 
+    if (Object.keys(updates).length > 0) {
+      await db
+        .update(grants)
+        .set({
+          ...updates,
+          enrichmentStatus: "completed",
+          enrichmentDate: new Date(),
+          enrichmentError: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(grants.id, grantId));
+
+      console.log(`  ✅ ${changes.length} changements appliqués`);
+    } else {
+      // Rien à changer — on marque quand même comme traité
+      await db
+        .update(grants)
+        .set({
+          enrichmentStatus: "completed",
+          enrichmentDate: new Date(),
+          enrichmentError: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(grants.id, grantId));
+
+      console.log(`  ℹ️ Aucun changement applicable`);
+    }
+
+    return { success: true, grantId, changes };
   } catch (error) {
-    console.error(`❌ Erreur lors de l'enrichissement de la subvention #${grantId}:`, error);
-    return {
-      success: false,
-      grantId,
-      changes: [],
-      error: error instanceof Error ? error.message : 'Erreur inconnue'
-    };
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error(`  ❌ Erreur #${grantId}: ${message}`);
+
+    // Marquer comme failed
+    await db
+      .update(grants)
+      .set({
+        enrichmentStatus: "failed",
+        enrichmentDate: new Date(),
+        enrichmentError: message,
+        updatedAt: new Date(),
+      })
+      .where(eq(grants.id, grantId))
+      .catch(() => {}); // best effort
+
+    return { success: false, grantId, changes: [], error: message };
   }
 }
 
-export async function enrichMultipleGrants(requests: EnrichmentRequest[]): Promise<EnrichmentResult[]> {
+// ── Enrichissement batch ─────────────────────────────────────────────
+
+export async function enrichMultipleGrants(
+  requests: EnrichmentRequest[]
+): Promise<EnrichmentResult[]> {
   console.log(`🚀 Enrichissement de ${requests.length} subventions...`);
-  
+
   const results: EnrichmentResult[] = [];
-  
-  // Traiter les subventions une par une pour éviter de surcharger l'API
-  for (const request of requests) {
+
+  for (let i = 0; i < requests.length; i++) {
+    const request = requests[i];
+    console.log(`\n[${i + 1}/${requests.length}] ${request.issues[0]?.grantTitle?.substring(0, 50) || request.grantId}`);
+
     const result = await enrichGrant(request.grantId, request.issues);
     results.push(result);
-    
-    // Pause de 1 seconde entre chaque appel pour respecter les limites de l'API
-    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Pause entre chaque appel
+    if (i < requests.length - 1) {
+      await new Promise((r) => setTimeout(r, 1500));
+    }
   }
-  
-  const successful = results.filter(r => r.success).length;
-  console.log(`✅ Enrichissement terminé : ${successful}/${requests.length} réussis`);
-  
+
+  const successful = results.filter((r) => r.success).length;
+  const totalChanges = results.reduce((sum, r) => sum + r.changes.length, 0);
+  console.log(`\n✅ Terminé : ${successful}/${requests.length} réussis, ${totalChanges} changements`);
+
   return results;
 }

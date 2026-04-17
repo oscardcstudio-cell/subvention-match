@@ -8,7 +8,8 @@ import { generateGrantsPDF, generateAndSaveGrantsPDF, submissionToPdfFormData } 
 import { sendGrantsEmail, sendGrantsEmailFallback } from "./email-service";
 import { testApiConnection, fetchAides } from "./aides-territoires-api";
 import { getGrantsStatistics, getOverallStats } from "./stats";
-import { enrichmentService } from "./enrichment-service";
+import { enrichMultipleGrants } from "./ai-enricher";
+import { analyzeDataQuality } from "./data-quality-analyzer";
 import Stripe from "stripe";
 import express from "express";
 import rateLimit from "express-rate-limit";
@@ -1313,8 +1314,13 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   // GET /api/enrichment/status - Statut du service d'enrichissement
   app.get("/api/enrichment/status", async (req, res) => {
     try {
-      const status = enrichmentService.getStatus();
-      res.json(status);
+      const stats = await grantStorage.getEnrichmentStats();
+      res.json({
+        isRunning: stats.inProgress > 0,
+        pending: stats.pending,
+        completed: stats.completed,
+        failed: stats.failed,
+      });
     } catch (error: any) {
       console.error("❌ Erreur statut enrichissement:", error);
       res.status(500).json({ error: error.message });
@@ -1324,17 +1330,39 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   // POST /api/enrichment/start - Lancer l'enrichissement automatique
   app.post("/api/enrichment/start", requireAdmin, async (req, res) => {
     try {
-      const { limit } = req.body;
-      
-      // Lancer l'enrichissement en arrière-plan
-      enrichmentService.enrichAll().catch(err => {
-        console.error("❌ Erreur dans enrichissement:", err);
+      const { limit: maxGrants } = req.body;
+
+      // Analyser la qualité et grouper les issues
+      const report = await analyzeDataQuality();
+      const grantIssuesMap = new Map<string, any[]>();
+      report.issuesFound
+        .filter((i) => i.severity === "critical" || i.severity === "warning")
+        .forEach((issue) => {
+          const existing = grantIssuesMap.get(issue.grantId) || [];
+          grantIssuesMap.set(issue.grantId, [...existing, issue]);
+        });
+
+      let requests = Array.from(grantIssuesMap.entries()).map(
+        ([grantId, issues]) => ({ grantId, issues })
+      );
+
+      if (maxGrants && maxGrants > 0) {
+        requests = requests.slice(0, maxGrants);
+      }
+
+      if (requests.length === 0) {
+        return res.json({ success: true, message: "Aucune subvention à enrichir", count: 0 });
+      }
+
+      // Lancer en arrière-plan
+      enrichMultipleGrants(requests).catch((err) => {
+        console.error("❌ Erreur enrichissement batch:", err);
       });
-      
-      res.json({ 
+
+      res.json({
         success: true,
-        message: "Enrichissement démarré en arrière-plan",
-        limit 
+        message: `Enrichissement démarré pour ${requests.length} subventions`,
+        count: requests.length,
       });
     } catch (error: any) {
       console.error("❌ Erreur démarrage enrichissement:", error);
@@ -1529,7 +1557,6 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   // GET /api/data-quality - Analyse de qualité des données
   app.get("/api/data-quality", async (req, res) => {
     try {
-      const { analyzeDataQuality } = await import('./data-quality-analyzer');
       const report = await analyzeDataQuality();
       res.json(report);
     } catch (error: any) {
