@@ -34,8 +34,8 @@ function transformAidToGrant(aid: any): InsertGrant {
     geographicZone.push(aid.perimeter.scale);
   }
 
-  const organization = (aid.financers && aid.financers.length > 0) 
-    ? aid.financers.join(", ") 
+  const organization = (aid.financers && aid.financers.length > 0)
+    ? aid.financers.map((f: any) => typeof f === "string" ? f : f.name).join(", ")
     : "Non spécifié";
 
   return {

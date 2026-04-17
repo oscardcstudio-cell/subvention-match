@@ -109,11 +109,11 @@ function transformEUProjectToGrant(project: EUFundingProject): InsertGrant {
   return {
     title: projectTitle.substring(0, 200), // Limiter la longueur
     organization: "Commission Européenne - Creative Europe",
-    amount: null, // Montant variable selon l'appel
-    amountMin: 50000, // Estimation minimum typique pour Creative Europe
-    amountMax: 500000, // Estimation maximum typique
-    deadline: null, // Les deadlines ne sont pas dans les résultats de recherche
-    nextSession: "Consulter le portail EU Funding & Tenders pour les prochaines deadlines",
+    amount: null,
+    amountMin: null,
+    amountMax: null,
+    deadline: project.metadata?.callDeadline?.[0] || null,
+    nextSession: project.metadata?.callDeadline?.[1] || "Consulter le portail EU Funding & Tenders",
     frequency: "Appels à projets réguliers - généralement 1-2 fois par an",
     isRecurring: true,
 
@@ -138,7 +138,7 @@ function transformEUProjectToGrant(project: EUFundingProject): InsertGrant {
     geographicZone: ["Union Européenne", "Europe", "International"],
     structureSize: ["PME", "Associations", "Organisations culturelles", "Collectifs"],
     
-    maxFundingRate: 60, // 60% pour la plupart des actions Creative Europe
+    maxFundingRate: 60, // Standard Creative Europe — 80% pour petite coopération
     coFundingRequired: "oui",
     cumulativeAllowed: "oui",
     
