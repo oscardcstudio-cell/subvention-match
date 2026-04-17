@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Loader2, ExternalLink } from "lucide-react";
+import { safeExternalUrl } from "@/lib/safe-url";
 
 interface SampleAid {
   id: string;
@@ -132,9 +133,9 @@ export default function ApiTest() {
                               )}
                             </div>
 
-                            {aid.url && (
+                            {safeExternalUrl(aid.url) && (
                               <a
-                                href={aid.url}
+                                href={safeExternalUrl(aid.url)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 text-xs text-[#118AB2] hover:underline"

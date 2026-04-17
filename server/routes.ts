@@ -11,6 +11,7 @@ import { getGrantsStatistics, getOverallStats } from "./stats";
 import { enrichMultipleGrants } from "./ai-enricher";
 import { analyzeDataQuality } from "./data-quality-analyzer";
 import { createPdfToken, verifyPdfToken } from "./pdf-token";
+import { isEuropeanGrant } from "@shared/grant-classification";
 import Stripe from "stripe";
 import express from "express";
 import rateLimit from "express-rate-limit";
@@ -925,10 +926,11 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
     try {
       const allGrants = await grantStorage.getAllActiveGrants();
       
+      const euCount = allGrants.filter(isEuropeanGrant).length;
       const stats = {
         total: allGrants.length,
-        euGrants: allGrants.filter(g => g.organization?.includes("Commission Européenne") || g.organization?.includes("European")).length,
-        frenchGrants: allGrants.filter(g => !g.organization?.includes("Commission Européenne") && !g.organization?.includes("European")).length,
+        euGrants: euCount,
+        frenchGrants: allGrants.length - euCount,
         withDeadline: allGrants.filter(g => g.deadline).length,
         withUrl: allGrants.filter(g => g.url).length,
       };

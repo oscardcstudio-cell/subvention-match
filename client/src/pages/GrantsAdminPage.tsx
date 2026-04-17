@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, RefreshCw, Search, ExternalLink, Euro, MapPin, Building2, Calendar, Users, TrendingUp } from "lucide-react";
 import type { Grant } from "@shared/schema";
+import { isEuropeanGrant } from "@shared/grant-classification";
+import { safeExternalUrl } from "@/lib/safe-url";
 import { useState } from "react";
 
 export default function GrantsAdminPage() {
@@ -30,8 +32,8 @@ export default function GrantsAdminPage() {
   // Statistiques
   const totalGrants = grants?.length || 0;
   const organizations = grants ? Array.from(new Set(grants.map(g => g.organization))).sort() : [];
-  const euGrants = grants?.filter(g => g.organization.includes("Commission Européenne")).length || 0;
-  const frenchGrants = grants?.filter(g => !g.organization.includes("Commission Européenne")).length || 0;
+  const euGrants = grants?.filter(isEuropeanGrant).length ?? 0;
+  const frenchGrants = grants ? grants.length - euGrants : 0;
 
   if (isLoading) {
     return (
@@ -170,7 +172,7 @@ export default function GrantsAdminPage() {
 }
 
 function GrantCard({ grant }: { grant: Grant }) {
-  const isEU = grant.organization.includes("Commission Européenne");
+  const isEU = isEuropeanGrant(grant);
   
   return (
     <Card className="hover-elevate" data-testid={`card-grant-${grant.id}`}>
@@ -190,7 +192,15 @@ function GrantCard({ grant }: { grant: Grant }) {
           </div>
           {grant.url && (
             <Button variant="outline" size="sm" asChild>
-              <a href={grant.url} target="_blank" rel="noopener noreferrer" data-testid={`button-view-${grant.id}`}>
+              <a
+                href={safeExternalUrl(grant.url) ?? "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid={`button-view-${grant.id}`}
+                onClick={(e) => {
+                  if (!safeExternalUrl(grant.url)) e.preventDefault();
+                }}
+              >
                 <ExternalLink className="h-4 w-4" />
               </a>
             </Button>

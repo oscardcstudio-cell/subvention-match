@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ExternalLink, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
+import { safeExternalUrl } from "@/lib/safe-url";
 
 interface ApiStatus {
   name: string;
@@ -227,9 +228,9 @@ export default function ApiMonitoring() {
 
                 {/* Links */}
                 <div className="flex flex-wrap gap-3">
-                  {api.url && (
+                  {safeExternalUrl(api.url) && (
                     <a
-                      href={api.url}
+                      href={safeExternalUrl(api.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"

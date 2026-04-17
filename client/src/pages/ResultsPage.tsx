@@ -13,6 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import type { GrantResult } from "@shared/schema";
 import { ChatRefinement } from "@/components/ChatRefinement";
 import { trackResultsViewed, trackCheckoutStarted, trackPdfDownloaded, trackMatchFeedback } from "@/lib/analytics";
+import { safeExternalUrl } from "@/lib/safe-url";
 
 // Fonction pour extraire les emails propres du HTML brut
 function extractCleanEmail(rawContact: string): string {
@@ -890,10 +891,13 @@ function GrantCard({ grant, index, language, t, sessionId }: {
                   {language === "fr" ? "Ressources d'aide" : "Help resources"}
                 </h4>
                 <div className="space-y-2 sm:space-y-3">
-                  {grant.helpResources.map((resource, idx) => (
+                  {grant.helpResources.map((resource, idx) => {
+                    const safeUrl = safeExternalUrl(resource.url);
+                    if (!safeUrl) return null;
+                    return (
                     <a
                       key={idx}
-                      href={resource.url}
+                      href={safeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-start gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-shadow group"
@@ -923,7 +927,8 @@ function GrantCard({ grant, index, language, t, sessionId }: {
                       </div>
                       <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
                     </a>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -988,15 +993,15 @@ function GrantCard({ grant, index, language, t, sessionId }: {
             )}
 
             {/* BOUTON CANDIDATER - En bas de la section dépliable */}
-            {grant.url && grant.url !== "#" && (
+            {safeExternalUrl(grant.url) && grant.url !== "#" && (
               <div className="pt-4 sm:pt-6 border-t border-gray-200">
-                <Button 
+                <Button
                   size="lg"
-                  className="w-full bg-black text-white hover:bg-gray-800 rounded-full py-5 sm:py-6 group text-sm sm:text-base" 
-                  asChild 
+                  className="w-full bg-black text-white hover:bg-gray-800 rounded-full py-5 sm:py-6 group text-sm sm:text-base"
+                  asChild
                   data-testid={`button-apply-${grant.id}`}
                 >
-                  <a href={grant.url} target="_blank" rel="noopener noreferrer">
+                  <a href={safeExternalUrl(grant.url)} target="_blank" rel="noopener noreferrer">
                     {language === "fr" ? "Candidater maintenant" : "Apply now"}
                     <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
                   </a>

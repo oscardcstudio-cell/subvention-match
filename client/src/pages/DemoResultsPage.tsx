@@ -7,6 +7,7 @@ import { Calendar, ArrowRight, MapPin, ChevronDown, Mail, Phone, FileText, Trend
 import { motion } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { GrantResult } from "@shared/schema";
+import { safeExternalUrl } from "@/lib/safe-url";
 
 // Données simulées pour la démo
 const DEMO_RESULTS: GrantResult[] = [
@@ -410,14 +411,14 @@ function GrantCard({ grant, index, language, t }: {
             )}
 
             {/* BOUTON CANDIDATER */}
-            {grant.url && (
+            {safeExternalUrl(grant.url) && (
               <div className="pt-4 sm:pt-6 border-t border-gray-200">
-                <Button 
+                <Button
                   size="lg"
-                  className="w-full bg-black text-white hover:bg-gray-800 rounded-full py-5 sm:py-6 group text-sm sm:text-base" 
-                  asChild 
+                  className="w-full bg-black text-white hover:bg-gray-800 rounded-full py-5 sm:py-6 group text-sm sm:text-base"
+                  asChild
                 >
-                  <a href={grant.url} target="_blank" rel="noopener noreferrer">
+                  <a href={safeExternalUrl(grant.url)} target="_blank" rel="noopener noreferrer">
                     Candidater maintenant
                     <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
                   </a>

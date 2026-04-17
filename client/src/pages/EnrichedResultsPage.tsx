@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import type { GrantResult } from "@shared/schema";
 import { useState } from "react";
+import { safeExternalUrl } from "@/lib/safe-url";
 
 export default function EnrichedResultsPage() {
   const [, setLocation] = useLocation();
@@ -104,10 +105,13 @@ export default function EnrichedResultsPage() {
                       Ressources d'aide ({grant.helpResources.length})
                     </h3>
                     <div className="space-y-3">
-                      {displayedResources.map((resource, idx) => (
+                      {displayedResources.map((resource, idx) => {
+                        const safeUrl = safeExternalUrl(resource.url);
+                        if (!safeUrl) return null;
+                        return (
                         <a
                           key={idx}
-                          href={resource.url}
+                          href={safeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-start gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-shadow group"
@@ -145,7 +149,8 @@ export default function EnrichedResultsPage() {
                           </div>
                           <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
                         </a>
-                      ))}
+                        );
+                      })}
                       
                       {hasMore && (
                         <button
@@ -173,9 +178,9 @@ export default function EnrichedResultsPage() {
 
               {/* URLs */}
               <div className="mt-4 flex flex-wrap gap-3">
-                {grant.improvedUrl && (
+                {safeExternalUrl(grant.improvedUrl) && (
                   <a
-                    href={grant.improvedUrl}
+                    href={safeExternalUrl(grant.improvedUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex flex-col items-center gap-1 px-8 py-3 bg-green-100 text-green-700 rounded-xl hover:bg-green-200 hover:shadow-md transition-all"
@@ -186,9 +191,9 @@ export default function EnrichedResultsPage() {
                   </a>
                 )}
                 
-                {grant.url && (
+                {safeExternalUrl(grant.url) && (
                   <a
-                    href={grant.url}
+                    href={safeExternalUrl(grant.url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex flex-col items-center gap-1 px-5 py-3 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 hover:shadow-md transition-all"

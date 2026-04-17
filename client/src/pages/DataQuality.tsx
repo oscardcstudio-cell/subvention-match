@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { safeExternalUrl } from "@/lib/safe-url";
 
 // Token admin via variable d'environnement (défini dans Replit Secrets)
 const ADMIN_TOKEN = import.meta.env.VITE_ADMIN_TOKEN || "";
@@ -947,9 +948,9 @@ export default function DataQuality() {
                           </Badge>
                         </div>
                         <div className="flex flex-col gap-2 items-end">
-                          {grant.url !== '(manquante)' && (
-                            <a 
-                              href={grant.url} 
+                          {grant.url !== '(manquante)' && safeExternalUrl(grant.url) && (
+                            <a
+                              href={safeExternalUrl(grant.url)}
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="text-xs text-blue-600 hover:underline flex items-center gap-1"

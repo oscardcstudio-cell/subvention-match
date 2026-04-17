@@ -7,6 +7,7 @@
 import { fetchAides, testApiConnection } from "./aides-territoires-api";
 import { grantStorage } from "./grant-storage";
 import type { InsertGrant } from "@shared/schema";
+import { isEuropeanGrant } from "@shared/grant-classification";
 
 /**
  * Transforme une aide de l'API vers notre schéma
@@ -219,11 +220,7 @@ async function importTargetedGrants() {
 
     // Statistiques par type
     const allGrants = await grantStorage.getAllActiveGrants();
-    const euCount = allGrants.filter(g => 
-      g.organization?.includes("Commission Européenne") || 
-      g.organization?.includes("European") ||
-      g.organization?.includes("Creative Europe")
-    ).length;
+    const euCount = allGrants.filter(isEuropeanGrant).length;
     const frCount = allGrants.length - euCount;
 
     console.log("📈 Répartition:");
