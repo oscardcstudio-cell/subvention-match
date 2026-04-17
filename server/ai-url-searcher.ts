@@ -38,7 +38,7 @@ CONSIGNES :
         headers: {
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           "HTTP-Referer": "https://replit.com",
-          "X-Title": "Mecene",
+          "X-Title": "SubventionMatch",
         },
       }
     );

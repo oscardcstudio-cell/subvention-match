@@ -19,7 +19,7 @@ async function run() {
   const startTime = Date.now();
 
   console.log("=".repeat(60));
-  console.log("  ENRICHISSEMENT MASSIF — Mecene");
+  console.log("  ENRICHISSEMENT MASSIF — SubventionMatch");
   console.log("=".repeat(60));
   console.log();
 

@@ -144,7 +144,7 @@ export default function Notes() {
                 <FileText className="h-8 w-8 text-[#118AB2]" />
                 <h1 className="text-3xl font-bold tracking-tight">Notes & TODO</h1>
               </div>
-              <p className="text-gray-600 mt-1">Idées et améliorations pour Mécène</p>
+              <p className="text-gray-600 mt-1">Idées et améliorations pour SubventionMatch</p>
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500">Progression</div>

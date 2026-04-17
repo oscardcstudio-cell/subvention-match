@@ -32,8 +32,8 @@ async function callDeepSeek(prompt: string): Promise<string> {
     headers: {
       Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://mecene.fr",
-      "X-Title": "Mecene",
+      "HTTP-Referer": "https://subventionmatch.com",
+      "X-Title": "SubventionMatch",
     },
     body: JSON.stringify({
       model: "deepseek/deepseek-chat",

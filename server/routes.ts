@@ -341,7 +341,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
         headers: {
           "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://mecene.fr",
+          "HTTP-Referer": "https://subventionmatch.fr",
         },
         body: JSON.stringify({
           model: "deepseek/deepseek-chat",
@@ -1554,7 +1554,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
     try {
       const path = await import("path");
       const filePath = path.resolve(process.cwd(), "database_export.sql");
-      res.download(filePath, "mecene_database.sql");
+      res.download(filePath, "subventionmatch_database.sql");
     } catch (error: any) {
       console.error("❌ Error downloading database:", error);
       res.status(500).json({ error: error.message });

@@ -264,7 +264,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Vos Subventions - Mécène</title>
+      <title>Vos Subventions - SubventionMatch</title>
       <style>
         * {
           margin: 0;
@@ -1179,7 +1179,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
 
         <!-- Beta feedback box -->
         <div class="beta-feedback">
-          <h3>🧪 Mécène est en beta</h3>
+          <h3>🧪 SubventionMatch est en beta</h3>
           <p>
             Un résultat pertinent ? Une subvention mal matchée ? Une idée ?<br/>
             Votre retour nous aide à améliorer le matching pour tous les artistes.
@@ -1189,7 +1189,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
 
         <!-- Footer -->
         <div class="footer">
-          <div>© ${new Date().getFullYear()} Mécène - Tous droits réservés</div>
+          <div>© ${new Date().getFullYear()} SubventionMatch - Tous droits réservés</div>
           <div class="footer-email">Document généré pour: ${userEmail}</div>
         </div>
       </div>

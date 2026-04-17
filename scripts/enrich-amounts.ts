@@ -38,8 +38,8 @@ async function callDeepSeek(prompt: string): Promise<string> {
         headers: {
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://mecene.fr",
-          "X-Title": "Mecene",
+          "HTTP-Referer": "https://subventionmatch.com",
+          "X-Title": "SubventionMatch",
         },
         body: JSON.stringify({
           model: "deepseek/deepseek-chat",
@@ -145,7 +145,7 @@ async function scrapeAmountFromUrl(url: string): Promise<string | null> {
     const resp = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; Mecene/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; SubventionMatch/1.0)",
         Accept: "text/html",
       },
     });
@@ -284,7 +284,7 @@ async function run() {
   const startTime = Date.now();
 
   console.log("=".repeat(60));
-  console.log("  ENRICHISSEMENT MONTANTS — Mecene");
+  console.log("  ENRICHISSEMENT MONTANTS — SubventionMatch");
   if (DRY_RUN) console.log("  (DRY RUN — pas d'écriture en DB)");
   console.log("=".repeat(60));
   console.log();

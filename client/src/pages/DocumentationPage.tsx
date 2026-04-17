@@ -221,7 +221,7 @@ export default function DocumentationPage() {
         </Card>
 
         <div className="text-center text-sm text-muted-foreground pt-8">
-          Mécène - Base de données de subventions culturelles françaises
+          SubventionMatch - Base de données de subventions culturelles françaises
         </div>
       </div>
     </div>

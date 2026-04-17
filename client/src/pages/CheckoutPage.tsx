@@ -143,7 +143,7 @@ export default function CheckoutPage() {
         <div className="flex items-center justify-between max-w-3xl mx-auto">
           <a href="/" data-testid="link-home">
             <span className="font-bold text-2xl text-white/95" style={{ fontFamily: 'serif' }}>
-              Mécène
+              SubventionMatch
             </span>
           </a>
           <LanguageToggle language={language} onLanguageChange={setLanguage} />
