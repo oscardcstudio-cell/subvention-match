@@ -1,0 +1,667 @@
+[
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/jeu-video/fonds-daide-au-jeu-video-fajv_191468",
+    "title": "Fonds d&#39;aide au jeu vidéo (FAJV)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aides-aux-moyens-techniques-de-production-et-de-diffusion_1938392",
+    "title": "Aides aux moyens techniques de production et de diffusion",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/creation-numerique/fonds-daide-a-la-creation-immersive_1725797",
+    "title": "Fonds d’aide à la création immersive",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/fonds-daide-a-la-creation-pour-les-plateformes-sociales_2509048",
+    "title": "Fonds d&#39;aide à la création pour les plateformes sociales",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/Distribution/acm-distribution_191831",
+    "title": "ACM Distribution",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/agrement-de-production-pour-les-films-dont-lagrement-des-investissements-a-ete-demande-a-compter-du-1er-decembre-2021-ou-pour-les-films-sans-agrement-des-investissements_1571213",
+    "title": "Agrément de production",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/agrement-des-investissements-a-compter-du-1er-decembre-2021_1571115",
+    "title": "Agrément des investissements",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/agrement-des-investissements-demande-a-compter-du-1er-janvier-2018_190964",
+    "title": "Agrément des investissements avant le 1er décembre 2021",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-au-codeveloppement-et-a-la-coproduction-doeuvres-cinematographiques-et-audiovisuelles-francoitaliennes_1380304",
+    "title": "Aide au codéveloppement et à la coproduction d’œuvres cinématographiques et audiovisuelles franco-italiennes",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/exploitation/aide-au-developpement-de-lemploi-pour-lexploitation-itinerante_2282760",
+    "title": "Aide au développement de l’emploi pour l’exploitation itinérante",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/ecriture-et-developpement/aide-au-developpement-doeuvres-cinematographiques-de-longue-duree_191036",
+    "title": "Aide au développement d’œuvres cinématographiques de longue durée",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-au-parcours-dauteur_1390838",
+    "title": "Aide au parcours d&#39;auteur",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/aide-automatique-ou-allocation-directe-aux-effets-visuels-numeriques-anciennement-cvsa_1664125",
+    "title": "Aide automatique ou allocation directe aux effets visuels numériques (anciennement CVSA)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/aide-aux-cinemas-du-monde_190862",
+    "title": "Aide aux cinémas du monde",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/Livre-edition/aide-aux-revues-de-cinema_1037164",
+    "title": "Aide aux revues de cinéma",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/exploitation/aide-aux-salles-maintenant-une-programmation-difficile-face-a-la-concurrence_191108",
+    "title": "Aide aux salles maintenant une programmation difficile face à la concurrence",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/aides-aux-techniques-danimation-anciennement-cvs_1664116",
+    "title": "Aide aux techniques d’animation (anciennement CVS)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/diffusion/aide-financiere-automatique-a-la-diffusion-en-video-a-la-demande-vad_191728",
+    "title": "Aide financière automatique à la diffusion en ligne",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/ecriture-et-developpement/aides-selective-aux-effets-visuels-numeriques-anciennement-cvs_1664203",
+    "title": "Aide sélective aux effets visuels numériques (anciennement CVS)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/aide-selective-pour-les-oeuvres-cinematographiques-interessant-les-cultures-doutremer_191124",
+    "title": "Aide sélective pour les œuvres cinématographiques intéressant les cultures d’outre-mer",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/diffusion/aide-selective-a-la-diffusion-en-ligne_2512116",
+    "title": "Aide sélective à la diffusion en ligne",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/Distribution/aide-selective-a-la-distribution--1er-college-films-inedits_191140",
+    "title": "Aide sélective à la distribution - 1er collège (films inédits)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/Distribution/aide-selective-a-la-distribution--2e-college-films-de-repertoire_191132",
+    "title": "Aide sélective à la distribution - 2e collège (films de répertoire)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/Distribution/aide-selective-a-la-distribution--3e-college-films-pour-le-jeune-public_191172",
+    "title": "Aide sélective à la distribution - 3e collège (films pour le jeune public)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/exploitation/aide-selective-a-la-petite-et-moyenne-exploitation_1578881",
+    "title": "Aide sélective à la petite et moyenne exploitation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/scenario/soutien-au-scenario-aide-a-la-conception_191696",
+    "title": "Aide à la conception",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/aides-a-la-creation-de-musiques-originales_190988",
+    "title": "Aide à la création de musiques originales",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/aide-a-la-preparation-pour-les-films-danimation-de-long-metrage-cinema-passerelle_191712",
+    "title": "Aide à la préparation pour les films d&#39;animation de long métrage cinéma (passerelle)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aides-aux-moyens-techniques--college--production-numerique_1938411",
+    "title": "Aides aux moyens techniques : collège «&amp;nbsp;production numérique&amp;nbsp; »",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/diffusion/aides-a-la-diffusion-en-ligne_2511433",
+    "title": "Aides à la diffusion numérique",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/appel-a-projet-france-2030--la-grande-fabrique-de-limage--sur-les-studios-et-la-formation_1672282",
+    "title": "Appel à projet France 2030 « La grande fabrique de l’image » sur les studios et la formation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/appel-a-projet--les-uns-et-les-autres_1931228",
+    "title": "Appel à projets « Les Uns et les Autres »",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/appel-a-projets--accompagner-les-createurs-dans-des-usages-exploratoires-des-iag-intelligences-artificielles-generatives_2474214",
+    "title": "Appel à projets « Accompagner les créateurs dans des usages exploratoires des IAG (intelligences artificielles génératives) »",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/scenario/soutien-au-scenario-aide-a-lecriture_191516",
+    "title": "Soutien au scénario, aide à l&#39;écriture",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/scenario/soutien-au-scenario-aide-a-la-reecriture_191508",
+    "title": "Soutien au scénario, aide à la réécriture",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/appel-a-projets--atelier-de-mentoring_1435539",
+    "title": "Appel à projets « Atelier de Mentoring »",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-a-l-innovation/appel-a-projets--transparence-de-la-remontee-de-recettes-dans-le-secteur-cinema-et-audiovisuel_1753348",
+    "title": "Appel à projets « Transparence de la remontée de recettes dans le secteur cinéma et audiovisuel »",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/avance-sur-recettes-apres-realisation_191252",
+    "title": "Avance sur recettes après réalisation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/avance-sur-recettes-avant-realisation_191260",
+    "title": "Avance sur recettes avant réalisation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/cannes-remakes_2321736",
+    "title": "Cannes remakes 2026",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/credit-dimpot-cinema_132769",
+    "title": "Crédit d&#39;impôt cinéma",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/credit-dimpot-international_778354",
+    "title": "Crédit d&#39;impôt international",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/diffusion/fonds-images-de-la-diversite_191484",
+    "title": "Fonds Images de la diversité",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/investissement-pour-la-preparation-pour-les-oeuvres-cinematographiques-de-long-metrage_191004",
+    "title": "Investissement pour la préparation pour les oeuvres cinématographiques de long métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/les-sofica_759536",
+    "title": "Les SOFICA",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/ecriture-et-developpement/programme-deental--acp_1300821",
+    "title": "Programme DEENTAL - ACP",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/soutien-antenne-pour-la-diffusion-des-oeuvres-cinematographiques-de-long-metrage_190686",
+    "title": "Soutien antenne pour la diffusion des œuvres cinématographiques de long métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/soutien-automatique-a-la-production-de-long-metrage_191532",
+    "title": "Soutien automatique à la production de long métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/production/soutien-a-la-realisation-de-fichiers-daudiodescription-et-de-soustitrage-pour-les-publics-atteints-de-handicaps-sensoriels_191627",
+    "title": "Soutien à la réalisation de fichiers d’audiodescription et de sous-titrage pour les publics atteints de handicaps sensoriels",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/diffusion/visas-et-classification--procedures-dobtention-dun-visa_142880",
+    "title": "Visas et classification : procédures d&#39;obtention d&#39;un visa",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/alliance-4-development--a4d_1431290",
+    "title": "« Alliance 4 Development » (A4D)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/aide-avant-realisation-a-la-production-de-films-de-court-metrage_191116",
+    "title": "Aide avant réalisation à la production de films de court métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/aide-selective-pour-la-production-doeuvres-audiovisuelles-de-courte-duree_1595416",
+    "title": "Aide sélective à la production d’œuvres audiovisuelles de courte durée",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/aide-au-programme-de-production-de-films-de-court-metrage_191052",
+    "title": "Aide au programme de production de films de court métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/aide-apres-realisation-aux-films-de-court-metrage_191028",
+    "title": "Aide après réalisation aux films de court métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/investissement-de-soutien-automatique-dans-la-production-de-films-de-court-metrage_191704",
+    "title": "Investissement de soutien automatique dans la production de films de court métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/creation-numerique/fonds-daide-aux-createurs-video-sur-internet-cnc-talent_190814",
+    "title": "Fonds d&#39;aide aux créateurs vidéo sur Internet (CNC Talent)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/production/aides-selective-aux-effets-visuels-numeriques-anciennement-cvs_1664203",
+    "title": "Aide sélective aux effets visuels numériques (anciennement CVS)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/fonds-pour-la-jeune-creation-francophone_1151039",
+    "title": "Fonds pour la jeune création francophone",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/allocations-directes-a-la-programmation-en-salles-de-films-de-court-metrage_1107639",
+    "title": "Allocations directes à la programmation en salles de films de court métrage",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/cinema/exploitation/aide-selective-a-la-petite-et-moyenne-exploitation_191556",
+    "title": "Page 404",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-a-ledition-en-video-physique_191180",
+    "title": "Aide à l&#39;édition en vidéo physique",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/allocation-directe-aux-courts-metrages_563151",
+    "title": "Allocation directe aux courts métrages",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-a-l-innovation/aide-a-la-numerisation-et-a-la-diffusion-des-oeuvres-cinematographiques-du-patrimoine-en-video-et-en-vad_191863",
+    "title": "Page 404",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/animation--aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-au-pre-concept_2142037",
+    "title": "Animation : aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au concept littéraire ou graphique)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/animation--aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-au-concept_2141899",
+    "title": "Animation : aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au concept)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/aide-a-l-innovation/animation--fonds-daide-a-linnovation-audiovisuelle-aide-a-la-creation_191220",
+    "title": "Animation : aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide à l’écriture)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-a-l-innovation/fonds-daide-a-linnovation-en-documentaire-de-creation_2198824",
+    "title": "Fonds d’aide à l’innovation en documentaire de création",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/aides-a-lelaboration-et-au-developpement-de-series-documentaires_2147339",
+    "title": "Aides à l’élaboration et au développement de séries documentaires",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/fiction--les-aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-au-concept_2142225",
+    "title": "Fiction : Aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au concept)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/aide-a-l-innovation/fiction--fonds-daide-a-linnovation-audiovisuelle-aide-a-la-creation_190932",
+    "title": "Fiction : Aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide à l’écriture)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/fiction--aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-a-la-creation-de-series_2142075",
+    "title": "Fiction : Aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide à la création de séries)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aide-a-l-innovation/cocoi-aide-a-la-coecriture-de-coproductions-internationales--fonds-daide-a-linnovation-audiovisuelle_190798",
+    "title": "COCO-I Aide à la co-écriture de coproductions internationales &#x2013; Aides à l’écriture et au développement de projets d’œuvres audiovisuelles",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/aide-a-l-innovation/animation--fonds-daide-a-linnovation-audiovisuelle-aide-au-developpement_191228",
+    "title": "Animation : aides à l’élaboration et au développement de projets d’œuvres audiovisuelles (aides au développement et pilote)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/animation--aide-selective-a-la-preparation_191204",
+    "title": "Animation : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/animation--compte-automatique-aide-a-la-preparation_191188",
+    "title": "Animation : Compte automatique - Aide à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/documentaire--aide-selective-a-la-preparation_191736",
+    "title": "Documentaire : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/documentaire--compte-automatique-aide-a-la-preparation_191340",
+    "title": "Documentaire : compte automatique (aide à la préparation)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/aide-a-l-innovation/fiction--fonds-daide-a-linnovation-audiovisuelle-aide-au-developpement_191436",
+    "title": "Fiction : Aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au développement)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/fiction--aide-selective-a-la-preparation_191420",
+    "title": "Fiction : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/fiction--compte-automatique-aide-a-la-preparation_191412",
+    "title": "Fiction : compte automatique (aide à la préparation)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/spectacle-vivant--aide-selective-a-la-preparation_191572",
+    "title": "Spectacle vivant : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/spectacle-vivant--compte-automatique-aide-a-la-preparation_191564",
+    "title": "Spectacle vivant : compte automatique (aide à la préparation)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/animation-aide-selective-a-la-production_191244",
+    "title": "Animation : aide sélective à la production",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/animation--compte-automatique_191212",
+    "title": "Animation : Compte automatique - Aide à la production",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/documentaire-aide-selective-a-la-production_191388",
+    "title": "Documentaire : aide sélective à la production",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/documentaire--compte-automatique_191348",
+    "title": "Documentaire : compte automatique",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/fiction-aide-selective-a-la-production_191452",
+    "title": "Fiction : aide sélective à la production",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/fiction-compte-automatique-aide-a-la-production_191460",
+    "title": "Fiction : compte automatique (aide à la production)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/spectacle-vivant-aide-selective_191588",
+    "title": "Spectacle vivant : aide sélective",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/spectacle-vivant--soutien-automatique_191580",
+    "title": "Spectacle vivant : soutien automatique",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/videomusique--aide-avant-realisation_190854",
+    "title": "Vidéomusique : aide avant réalisation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/magazine-aide-selective_191492",
+    "title": "Magazine : aide sélective",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/credit-dimpot-audiovisuel_778316",
+    "title": "Crédit d&#39;impôt audiovisuel",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/images-de-la-diversite/fonds-images-de-la-diversite_191484",
+    "title": "Fonds Images de la diversité",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/exportation/aides-a-la-promotion-et-a-la-vente-a-letranger-des-programmes-audiovisuels_190726",
+    "title": "Aides à la promotion et à la vente à l’étranger des programmes audiovisuels",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/animation--aide-selective-a-la-preparation_191204",
+    "title": "Animation : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/animation--aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-au-pre-concept_2142037",
+    "title": "Animation : aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au concept littéraire ou graphique)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/animation--aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-au-concept_2141899",
+    "title": "Animation : aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au concept)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/animation--fonds-daide-a-linnovation-audiovisuelle-aide-a-la-creation_191220",
+    "title": "Animation : aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide à l’écriture)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/animation--fonds-daide-a-linnovation-audiovisuelle-aide-au-developpement_191228",
+    "title": "Animation : aides à l’élaboration et au développement de projets d’œuvres audiovisuelles (aides au développement et pilote)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/ecriture-et-developpement/aide-a-la-coecriture-de-coproductions-internationales--fonds-daide-a-linnovation-audiovisuelle_190798",
+    "title": "COCO-I Aide à la co-écriture de coproductions internationales &#x2013; Aides à l’écriture et au développement de projets d’œuvres audiovisuelles",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/documentaire--aide-selective-a-la-preparation_191736",
+    "title": "Documentaire : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/documentaire--compte-automatique-aide-a-la-preparation_191340",
+    "title": "Documentaire : compte automatique (aide à la préparation)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/fiction--aide-selective-a-la-preparation_191420",
+    "title": "Fiction : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/fiction--les-aides-a-lecriture-et-au-developpement-de-projets-doeuvres-audiovisuelles-aide-au-concept_2142225",
+    "title": "Fiction : Aides à l’écriture et au développement de projets d’œuvres audiovisuelles (aide au concept)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/fiction--compte-automatique-aide-a-la-preparation_191412",
+    "title": "Fiction : compte automatique (aide à la préparation)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/ecriture-et-developpement/fonds-daide-a-linnovation-en-documentaire-de-creation_2198824",
+    "title": "Fonds d’aide à l’innovation en documentaire de création",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/going-european-formation-a-la-coproduction-internationale-pour-les-scenaristes_1943763",
+    "title": "Going European, formation à la coproduction internationale pour les scénaristes",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/spectacle-vivant--aide-selective-a-la-preparation_191572",
+    "title": "Spectacle vivant : aide sélective à la préparation",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/ecriture-et-developpement/spectacle-vivant--compte-automatique-aide-a-la-preparation_191564",
+    "title": "Spectacle vivant : compte automatique (aide à la préparation)",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/production/documentaire--compte-automatique_191348",
+    "title": "Documentaire : compte automatique",
+    "sector": "cinema"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/aide-a-l-innovation/animation--fonds-daide-a-linnovation-audiovisuelle-aide-a-la-reecriture_190948",
+    "title": "Animation : fonds d&#39;aide à l&#39;innovation audiovisuelle (aide à la réécriture)",
+    "sector": "audiovisuel"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/audiovisuel/appel-a-candidatures--residence-decriture-de-series-a-los-angeles_1439853",
+    "title": "Appel à candidatures : résidence d’écriture de séries à Los Angeles",
+    "sector": "audiovisuel"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/appel-a-projets--business-tour--20242025_2205002",
+    "title": "Appel à projets « Business Tour VFX » 2026",
+    "sector": "audiovisuel"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/appel-a-projets--fabricaction_2181319",
+    "title": "Appel à projets « Fabric’ACTION »",
+    "sector": "audiovisuel"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/appel-a-projets-inspiration-tour_2204711",
+    "title": "Appel à projets « Inspiration Tour » 2026",
+    "sector": "audiovisuel"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/aide-complementaire-pour-la-musique-originale-des-films-de-court-metrage_190924",
+    "title": "Aide complémentaire à la création de musiques originales des films de court métrage",
+    "sector": "court-metrage"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/allocations-directes-pour-la-production-doeuvres-audiovisuelles-de-courte-duree_1199645",
+    "title": "Allocations directes pour la production d’œuvres audiovisuelles de courte durée",
+    "sector": "court-metrage"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/court-metrage/production/bourse-des-festivals_191268",
+    "title": "Bourse des festivals",
+    "sector": "court-metrage"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/jeu-video/credit-dimpot-jeu-video_121078",
+    "title": "Crédit d&#39;impôt jeu vidéo",
+    "sector": "jeu-video"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aides-aux-moyens-techniques--college--diffusion_1939026",
+    "title": "Aides aux moyens techniques : collège «&amp;nbsp;diffusion&amp;nbsp;»",
+    "sector": "industries-techniques"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/aides-aux-moyens-techniques--college--tournage_1938252",
+    "title": "Aides aux moyens techniques : collège «&amp;nbsp;tournage&amp;nbsp;»",
+    "sector": "industries-techniques"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/ecriture-et-developpement/camera-libre_1812991",
+    "title": "Caméra libre",
+    "sector": "international"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/exportation/fonds-daide-a-la-promotion-a-letranger-des-oeuvres-cinematographiques_190734",
+    "title": "Fonds d&#39;aide à la promotion à l&#39;étranger des œuvres cinématographiques",
+    "sector": "international"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/fonds-europeen-de-solidarite-pour-les-films-ukrainiens-esfuf_1896866",
+    "title": "Fonds européen de solidarité pour les films ukrainiens (ESFUF)",
+    "sector": "international"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/le--minitraite--aide-au-developpement-et-a-la-coproduction-de-projets-cinematographiques-francoallemands_1039906",
+    "title": "Le « Mini-traité » Aide au développement et à la coproduction de projets cinématographiques franco-allemands",
+    "sector": "international"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/multi-sectoriel/diffusion/selection-du-film-francais-pour-les-oscars_1710716",
+    "title": "Sélection du film représentant la France à l’Oscar du meilleur film international",
+    "sector": "international"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/patrimoine-cinematographique/aide-selective-a-la-numerisation-des-oeuvres-cinematographiques-du-patrimoine_190901",
+    "title": "Aide sélective à la numérisation des œuvres cinématographiques du patrimoine",
+    "sector": "patrimoine-cinematographique"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/patrimoine-cinematographique/commission-du-patrimoine-cinematographique_191292",
+    "title": "Commission du patrimoine cinématographique",
+    "sector": "patrimoine-cinematographique"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/patrimoine-cinematographique/dispositif-mecenat-pour-la-numerisation-et-la-restauration-doeuvres-cinematographiques-du-patrimoine_1026750",
+    "title": "Dispositif mécénat pour la numérisation et la restauration d’œuvres cinématographiques du patrimoine",
+    "sector": "patrimoine-cinematographique"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/video-et-vad/soutien-selectif-a-lexploitation-en-video-a-la-demande-vad_191020",
+    "title": "Aide sélective à la diffusion en vidéo à la demande (VàD)",
+    "sector": "video-et-vad"
+  },
+  {
+    "url": "https://www.cnc.fr/professionnels/aides-et-financements/video-et-vad/soutien-automatique-a-ledition-en-video-physique_191076",
+    "title": "Soutien automatique à l’édition en vidéo physique",
+    "sector": "video-et-vad"
+  }
+]

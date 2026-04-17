@@ -228,9 +228,9 @@ export default function Home() {
   });
 
   // Utiliser les valeurs de la DB si disponibles, sinon valeurs par défaut
-  const grantsCount = statsData?.total ?? 274;
+  const grantsCount = statsData?.total ?? 473;
   const euGrantsCount = statsData?.euGrants ?? 0;
-  const frenchGrantsCount = statsData?.frenchGrants ?? 21;
+  const frenchGrantsCount = statsData?.frenchGrants ?? 473;
 
   return (
     <div className="min-h-screen bg-white">
@@ -305,7 +305,7 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4 max-w-3xl mx-auto">
               {/* Total subventions */}
               <div className="col-span-2 p-6 sm:p-8 bg-gradient-to-br from-[#06D6A0]/10 to-[#06D6A0]/5 rounded-lg border-2 border-[#06D6A0]/30">
-                <div className="text-5xl sm:text-6xl font-bold tracking-tighter text-[#06D6A0]">274</div>
+                <div className="text-5xl sm:text-6xl font-bold tracking-tighter text-[#06D6A0]">{grantsCount}</div>
                 <div className="text-xs sm:text-sm text-gray-600 uppercase tracking-wide mt-2 font-medium">
                   {language === "fr" ? "Subventions disponibles" : "Available grants"}
                 </div>
@@ -313,7 +313,7 @@ export default function Home() {
 
               {/* Organismes partenaires */}
               <div className="p-5 sm:p-6 bg-white rounded-lg border-2 border-gray-200">
-                <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-[#073B4C]">24</div>
+                <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-[#073B4C]">30+</div>
                 <div className="text-xs text-gray-600 uppercase tracking-wide mt-2 font-medium leading-tight">
                   {language === "fr" ? "Organismes" : "Partner organizations"}
                 </div>
@@ -321,7 +321,7 @@ export default function Home() {
 
               {/* Budget total */}
               <div className="p-5 sm:p-6 bg-white rounded-lg border-2 border-gray-200">
-                <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-[#073B4C]">€6.3M</div>
+                <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-[#073B4C]">€30M+</div>
                 <div className="text-xs text-gray-600 uppercase tracking-wide mt-2 font-medium">
                   {language === "fr" ? "Budget total accessible" : "Total accessible budget"}
                 </div>
@@ -329,9 +329,9 @@ export default function Home() {
 
               {/* Montant moyen */}
               <div className="p-5 sm:p-6 bg-white rounded-lg border-2 border-gray-200">
-                <div className="text-2xl sm:text-3xl font-bold tracking-tighter text-[#073B4C]">€24K</div>
+                <div className="text-2xl sm:text-3xl font-bold tracking-tighter text-[#073B4C]">€60K</div>
                 <div className="text-xs text-gray-600 uppercase tracking-wide mt-2 font-medium">
-                  {language === "fr" ? "Montant moyen" : "Average amount"}
+                  {language === "fr" ? "Montant médian" : "Median amount"}
                 </div>
               </div>
             </div>
