@@ -47,8 +47,8 @@ async function callOpenRouter(messages: OpenRouterMessage[]): Promise<string> {
       "Content-Type": "application/json",
       "HTTP-Referer": process.env.RAILWAY_PUBLIC_DOMAIN
       ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-      : "https://subventionmatch.fr",
-      "X-Title": "SubventionMatch",
+      : "https://mecene.fr",
+      "X-Title": "Mecene",
     },
     body: JSON.stringify(request),
   });
@@ -95,6 +95,123 @@ function isGrantRecurring(grant: GrantResult): boolean {
 
   // Unknown frequency text — assume non-recurring to be safe
   return false;
+}
+
+/**
+ * Mots-clés utilisés pour présélectionner les grants par domaine artistique
+ * AVANT l'envoi à DeepSeek (sinon le prompt dépasse les 32k tokens).
+ *
+ * Chaque grant est testée : si son titre/description/secteurs contient un mot-clé
+ * du domaine de l'utilisateur → gardée. Si elle ne matche aucun mot-clé de
+ * QUELCONQUE domaine (= aide culturelle générique/transversale) → gardée aussi.
+ * Si elle matche exclusivement un AUTRE domaine → rejetée.
+ */
+const DOMAIN_KEYWORDS: Record<string, string[]> = {
+  "musique": [
+    "musique", "musical", "musicien", "phonograph", "chanson", "concert",
+    "album", "tournée", "tournee", "festival", "spectacle vivant",
+    "artiste-interprète", "artiste-interprete", "cnm", "sacem", "spedidam", "adami",
+    "musiques actuelles", "enregistrement", "compositeur", "interprète",
+    // événementiel / programmation / lieux (pour orgas de soirées, festivals,
+    // programmateurs, salles) : ces aides touchent au domaine musical même
+    // quand le mot "musique" n'est pas dans le titre.
+    "programmation", "programmateur", "lieu de diffusion", "salle de concert",
+    "smac", "scène de musique", "scenes de musique", "club", "manifestation",
+    "tremplin", "showcase", "diffusion musicale", "booking",
+  ],
+  "audiovisuel": [
+    "audiovisuel", "cinéma", "cinema", "cinématograph", "cinematograph",
+    "film", "court métrage", "court-métrage", "court metrage",
+    "long métrage", "long-métrage", "long metrage",
+    "cnc", "documentaire", "série", "serie", "vfx", "animation",
+  ],
+  "spectacle-vivant": [
+    "spectacle vivant", "théâtre", "theatre", "danse", "cirque",
+    "chorégraph", "choregraph", "compagnie", "dramatique", "marionnette",
+    "festival", "diffusion", "artiste-interprète", "spedidam", "scène",
+    "scene nationale", "arts de la rue", "arts du mouvement",
+  ],
+  "arts-plastiques": [
+    "arts plastiques", "arts visuels", "plasticien", "sculpt",
+    "peinture", "peintre", "exposition", "galerie", "artiste visuel",
+    "centre d'art", "fondation d'art",
+  ],
+  "arts-numeriques": [
+    "numérique", "numerique", "digital", "multimedia", "multimédia",
+    "interactif", "jeu vidéo", "jeu video", "gaming", "arts numériques",
+    "arts numeriques", "nouvelles technologies", "réalité virtuelle",
+    "immersion",
+  ],
+  "ecriture": [
+    "écriture", "ecriture", "écrivain", "ecrivain", "auteur", "autrice",
+    "littér", "litter", "roman", "édition", "edition", "livre", "cnl",
+    "manuscrit", "poésie", "poesie", "bande dessinée", "bd",
+    "bourse d'écriture", "résidence d'écriture",
+  ],
+  "patrimoine": [
+    "patrimoine", "monument", "restauration", "musée", "musee",
+    "archéo", "archeo", "conservation", "bâtiment culturel",
+    "batiment culturel", "historique", "architectural",
+  ],
+};
+
+/**
+ * Indique qu'une grant est "transversale" (culture générique, pas rattachée
+ * à un domaine précis). On garde ces grants dans le pool pour laisser l'IA
+ * décider de leur pertinence.
+ */
+function hasAnyDomainSignal(haystack: string): boolean {
+  for (const keywords of Object.values(DOMAIN_KEYWORDS)) {
+    if (keywords.some((kw) => haystack.includes(kw))) return true;
+  }
+  return false;
+}
+
+/**
+ * Présélectionne les grants compatibles avec le(s) domaine(s) artistique(s)
+ * de l'utilisateur via keyword matching sur title/description/secteurs.
+ * Réduit le prompt envoyé à DeepSeek de 60-70% (évite dépassement 32k tokens).
+ *
+ * Logique :
+ * - Utilisateur sans domaine spécifié → on garde tout.
+ * - Grant matche un keyword d'un domaine de l'utilisateur → gardée.
+ * - Grant ne matche AUCUN domaine (transversale) → gardée.
+ * - Grant matche uniquement des domaines non-utilisateur → rejetée.
+ */
+function preselectByDomain(
+  grants: GrantResult[],
+  userDomains: string[] | null | undefined
+): GrantResult[] {
+  if (!userDomains || userDomains.length === 0) return grants;
+
+  const userKeywords = userDomains
+    .flatMap((d) => DOMAIN_KEYWORDS[d] ?? [])
+    .map((k) => k.toLowerCase());
+
+  if (userKeywords.length === 0) return grants;
+
+  return grants.filter((g) => {
+    const haystack = [
+      g.title ?? "",
+      g.description ?? "",
+      g.eligibility ?? "",
+      (g.eligibleSectors ?? []).join(" "),
+      (g.grantType ?? []).join(" "),
+    ]
+      .join(" ")
+      .toLowerCase()
+      .replace(/<[^>]*>/g, " ");
+
+    // Match positif : keyword d'un domaine de l'utilisateur
+    if (userKeywords.some((kw) => haystack.includes(kw))) return true;
+
+    // Transversale : aucun keyword de domaine présent → on garde
+    if (!hasAnyDomainSignal(haystack)) return true;
+
+    // Sinon : la grant est clairement dans un domaine qui n'est pas celui
+    // de l'utilisateur → on l'éjecte.
+    return false;
+  });
 }
 
 /**
@@ -181,6 +298,20 @@ export async function matchGrantsWithAI(
     );
   }
 
+  // 2c. Présélection par domaine artistique — keyword matching léger pour
+  // réduire le pool envoyé à DeepSeek sous la limite de 32k tokens.
+  // Les grants transversales (aides culture générique) passent aussi.
+  const domainFilteredGrants = preselectByDomain(
+    regionCompatibleGrants,
+    submission.artisticDomain
+  );
+  const rejectedByDomain = regionCompatibleGrants.length - domainFilteredGrants.length;
+  if (rejectedByDomain > 0) {
+    console.log(
+      `🎨 Présélection domaine (${submission.artisticDomain?.join(", ") ?? "aucun"}) : ${rejectedByDomain} aides hors domaine rejetées → ${domainFilteredGrants.length} restantes`
+    );
+  }
+
   // Build user profile summary (gérer les champs vides)
   const hasStatus = submission.status && submission.status.length > 0;
   const hasArtisticDomain = submission.artisticDomain && submission.artisticDomain.length > 0;
@@ -210,12 +341,12 @@ Critères :
   // Format enrichi : on inclut désormais un snippet de description ET le
   // grantType pour que l'IA puisse filtrer par secteur/domaine réel, pas
   // juste par éligibilité administrative.
-  const grantsDatabase = regionCompatibleGrants.map((grant) => {
-    const eligShort = (grant.eligibility || "").replace(/<[^>]*>/g, "").substring(0, 120).trim();
-    const descShort = (grant.description || "").replace(/<[^>]*>/g, "").substring(0, 100).trim();
-    const sectors = grant.eligibleSectors?.slice(0, 3).join(",") || "";
-    const types = grant.grantType?.slice(0, 3).join(",") || "";
-    const geo = grant.geographicZone?.slice(0, 3).join(",") || "";
+  const grantsDatabase = domainFilteredGrants.map((grant) => {
+    const eligShort = (grant.eligibility || "").replace(/<[^>]*>/g, "").substring(0, 100).trim();
+    const descShort = (grant.description || "").replace(/<[^>]*>/g, "").substring(0, 130).trim();
+    const sectors = grant.eligibleSectors?.slice(0, 2).join(",") || "";
+    const types = grant.grantType?.slice(0, 2).join(",") || "";
+    const geo = grant.geographicZone?.slice(0, 2).join(",") || "";
     return `${grant.id}|${grant.title}|${grant.organization}|${descShort}|${eligShort}|${sectors}|${types}|${geo}`;
   }).join("\n");
 
@@ -230,6 +361,19 @@ Critères :
   le domaine artistique de l'utilisateur.
 - En cas de doute sur la compatibilité sectorielle, NE PAS inclure la subvention.
 - Mieux vaut renvoyer 3 résultats vraiment pertinents que 10 vaguement liés.
+
+⚠️ RÈGLE N°1 BIS — COMPATIBILITÉ TYPE DE PROJET / TYPE D'AIDE :
+- Une aide à la CRÉATION (produire une œuvre originale) n'est PAS pour un projet
+  de DIFFUSION, de PROGRAMMATION ou d'ÉVÉNEMENTIEL, et inversement.
+- Exemple concret : "Aide à la création musicale" du CNM n'est PAS pour un
+  organisateur de soirées / programmateur / DJ set / festival — c'est pour
+  composer/écrire/enregistrer de la musique originale.
+- Exemple concret : une aide à l'organisation d'événements culturels n'est PAS
+  pour un artiste qui veut financer la production de son album.
+- Lire le TITRE et la DESCRIPTION de l'aide pour identifier son intention réelle
+  (créer / diffuser / programmer / résidence / formation / équipement / structuration).
+- Croiser avec le TYPE DE PROJET de l'utilisateur. Si l'intention de l'aide ne
+  matche pas l'intention du projet → EXCLURE, même si le domaine artistique colle.
 
 ⚠️ RÈGLE N°2 — STATUT JURIDIQUE :
 - Les aides "Creative Europe" (Commission Européenne) nécessitent une STRUCTURE LÉGALE (association, micro-entreprise, collectif avec SIRET).
@@ -250,10 +394,49 @@ CRITÈRES DE SÉLECTION (par ordre de priorité) :
 6. Montant adapté
 7. Urgence vs délais de l'aide
 
+📌 GUIDE POSITIF — PATTERNS TYPIQUES PAR TYPE DE PROJET :
+Balaye activement la base à la recherche de ces patterns, ne te contente pas
+d'exclure les mauvais matches — il faut AUSSI repérer les bons :
+
+- Projet ÉVÉNEMENTIEL / ORGANISATION DE SOIRÉES / PROGRAMMATION / FESTIVAL :
+  → "Aide aux festivals", "Soutenir les manifestations", "Aide à la diffusion",
+     "Bourse des festivals", aides aux organisateurs d'événements culturels,
+     aides aux programmateurs, aides aux lieux de diffusion.
+  → Spedidam "Aide aux festivals", CNM "Aide à la diffusion", aides régionales
+     aux manifestations culturelles sont typiques.
+
+- Projet de CRÉATION MUSICALE / ENREGISTREMENT / COMPOSITION :
+  → "Aide à la création", CNM "Aide à la création musicale", Sacem aides
+     création, résidences de composition.
+
+- Projet de TOURNÉE / CONCERTS / SPECTACLE VIVANT :
+  → Spedidam "Aide au spectacle musical" / "Aide aux projets", aides à la
+     tournée, aides aux artistes-interprètes, aides au spectacle vivant.
+
+- Projet de RÉSIDENCE ARTISTIQUE :
+  → "Aide à la résidence", DRAC résidences, aides régionales résidences.
+
+- Projet ÉDITION / LIVRE / LITTÉRATURE :
+  → CNL, aides à l'édition, bourses auteurs, manifestations littéraires.
+
+- Projet AUDIOVISUEL / CINÉMA :
+  → CNC aides production / diffusion / VàD / festivals cinéma.
+
+Quand un mot-clé du projet utilisateur (festival, soirée, album, tournée,
+résidence, etc.) apparaît dans le TITRE d'une aide → c'est un signal fort.
+
 FORMAT DE RÉPONSE :
 - Retourne UNIQUEMENT les IDs séparés par des virgules, du plus pertinent au moins pertinent.
 - Minimum 1, maximum 10.
-- Si moins de 3 subventions sont vraiment pertinentes, n'en retourne que 1, 2 ou 3. NE REMPLIS PAS avec des résultats médiocres.
+- Vise 4 à 7 résultats vraiment pertinents. Si moins de 3 sont vraiment
+  pertinents, n'en retourne que 1 ou 2 — NE REMPLIS PAS avec des médiocres.
+- 🎪 CAS SPÉCIAL — projets ÉVÉNEMENTIEL / FESTIVAL / PROGRAMMATION / DIFFUSION :
+  ces profils ont de nombreuses aides candidates (festivals régionaux,
+  manifestations culturelles, aides diffusion, aides aux organisateurs).
+  Vise 5 à 8 résultats dans ce cas — balaie largement les aides à la
+  diffusion / festivals / manifestations compatibles avec la région.
+- À l'inverse, ne sois pas trop restrictif : s'il existe 5-6 aides typiques
+  pour le profil (voir guide positif), retourne-les toutes.
 - Format : id1,id2,id3`;
 
   const userPrompt = `${userProfile}
@@ -287,9 +470,9 @@ Analyse ce profil et retourne UNIQUEMENT les IDs des subventions pertinentes (pa
 
     console.log(`✅ IDs sélectionnés par l'IA: ${grantIds.join(", ")}`);
 
-    // Find matched grants (from region-compatible grants only)
+    // Find matched grants (from domain-filtered grants only)
     const matchedGrants = grantIds
-      .map(id => regionCompatibleGrants.find(grant => grant.id === id))
+      .map(id => domainFilteredGrants.find(grant => grant.id === id))
       .filter((grant): grant is GrantResult => grant !== undefined);
 
     console.log(`✅ ${matchedGrants.length} subventions matchées avec succès`);
@@ -304,7 +487,33 @@ Analyse ce profil et retourne UNIQUEMENT les IDs des subventions pertinentes (pa
     console.log("🔍 Enrichissement personnalisé des subventions avec l'IA...");
     const enrichedGrants = await enrichGrantsWithAI(refreshedGrants, submission);
 
-    return enrichedGrants;
+    // 6. Post-filtre qualité : l'étape d'enrichissement génère un matchScore par
+    //    grant. Si l'IA elle-même a reconnu un faible fit (< MATCH_SCORE_THRESHOLD),
+    //    on éjecte — mieux vaut 1 résultat vraiment pertinent que 5 médiocres.
+    //    Fallback : si TOUT est filtré, on garde le meilleur pour ne pas renvoyer 0.
+    const MATCH_SCORE_THRESHOLD = 65;
+    const highQuality = enrichedGrants.filter(
+      (g) => (g.matchScore ?? 0) >= MATCH_SCORE_THRESHOLD
+    );
+    const filtered = enrichedGrants.length - highQuality.length;
+    if (filtered > 0) {
+      console.log(
+        `🎯 Post-filtre matchScore ≥ ${MATCH_SCORE_THRESHOLD} : ${filtered} résultats médiocres écartés`
+      );
+    }
+    if (highQuality.length === 0 && enrichedGrants.length > 0) {
+      const best = [...enrichedGrants].sort(
+        (a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0)
+      )[0];
+      console.log(
+        `⚠️ Aucune grant au-dessus du seuil ${MATCH_SCORE_THRESHOLD} — on renvoie la meilleure (score ${best.matchScore})`
+      );
+      return [best];
+    }
+
+    // Re-trier par matchScore décroissant au cas où l'ordre IA initial diverge
+    highQuality.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
+    return highQuality;
   } catch (error: any) {
     console.error("❌ Erreur matching IA:", error.message);
     throw error;
