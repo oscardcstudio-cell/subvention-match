@@ -1,6 +1,8 @@
-# SubventionMatch
+# Mécène
 
 Plateforme de matching IA entre artistes / associations culturelles et subventions françaises.
+
+> Ancien nom : SubventionMatch (rebrandé en avril 2026).
 
 - **Frontend** : React + TypeScript + Vite + Tailwind + shadcn/ui + wouter
 - **Backend** : Node.js + Express + TypeScript (ESM)

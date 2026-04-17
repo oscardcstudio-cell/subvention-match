@@ -403,8 +403,8 @@ export default function Home() {
       <header className="fixed top-9 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 bg-white/80 backdrop-blur-sm border-b border-gray-100">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <a href="/" data-testid="link-home" className="group flex items-center gap-2">
-            <span className="text-lg sm:text-xl font-light tracking-tight text-[#073B4C]">
-              Subvention<span className="font-bold">Match</span>
+            <span className="text-lg sm:text-xl font-bold tracking-tight text-[#073B4C]">
+              Mécène
             </span>
             <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-[#FFD166] text-[#073B4C] bg-[#FFD166]/20">
               BETA
@@ -714,7 +714,7 @@ export default function Home() {
                 <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
                   <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
-                    SubventionMatch
+                    Mécène
                   </div>
                   <p className="text-base text-gray-800 leading-relaxed font-medium">
                     {language === "fr"
@@ -748,7 +748,7 @@ export default function Home() {
                 <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
                   <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
-                    SubventionMatch
+                    Mécène
                   </div>
                   <p className="text-base text-gray-800 leading-relaxed font-medium">
                     {language === "fr"
@@ -782,7 +782,7 @@ export default function Home() {
                 <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
                   <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
-                    SubventionMatch
+                    Mécène
                   </div>
                   <p className="text-base text-gray-800 leading-relaxed font-medium">
                     {language === "fr"
@@ -802,13 +802,13 @@ export default function Home() {
                 <>
                   Utilisez <span className="font-bold">ChatGPT</span> pour rédiger votre dossier.
                   <br className="hidden sm:block" />
-                  {" "}Utilisez <span className="font-bold">SubventionMatch</span> pour savoir lequel remplir.
+                  {" "}Utilisez <span className="font-bold">Mécène</span> pour savoir lequel remplir.
                 </>
               ) : (
                 <>
                   Use <span className="font-bold">ChatGPT</span> to draft your application.
                   <br className="hidden sm:block" />
-                  {" "}Use <span className="font-bold">SubventionMatch</span> to know which one to fill.
+                  {" "}Use <span className="font-bold">Mécène</span> to know which one to fill.
                 </>
               )}
             </p>
@@ -942,8 +942,8 @@ export default function Home() {
 
             <p className="text-lg text-gray-600 mb-8 max-w-2xl leading-relaxed">
               {language === "fr"
-                ? "Une subvention finance votre projet. Mais il vous faut aussi les bonnes personnes pour le representer et le diffuser. Bientot, SubventionMatch vous connectera directement avec les professionnels de votre secteur."
-                : "A grant funds your project. But you also need the right people to represent and distribute it. Soon, SubventionMatch will connect you directly with professionals in your field."
+                ? "Une subvention finance votre projet. Mais il vous faut aussi les bonnes personnes pour le representer et le diffuser. Bientot, Mécène vous connectera directement avec les professionnels de votre secteur."
+                : "A grant funds your project. But you also need the right people to represent and distribute it. Soon, Mécène will connect you directly with professionals in your field."
               }
             </p>
 
@@ -1087,7 +1087,7 @@ export default function Home() {
       <footer className="py-16 px-8 border-t border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-sm text-gray-600">
-            © 2026 SubventionMatch
+            © 2026 Mécène
           </div>
           <div className="flex flex-wrap gap-6 sm:gap-8 text-sm text-gray-600 items-center">
             <button

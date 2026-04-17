@@ -57,7 +57,7 @@ function checkUrl(url) {
 async function run() {
   const startTime = Date.now();
   console.log("=".repeat(60));
-  console.log("  AUDIT & FIX URLs — SubventionMatch");
+  console.log("  AUDIT & FIX URLs — Mecene");
   if (DRY_RUN) console.log("  (DRY RUN)");
   console.log("=".repeat(60));
   console.log();

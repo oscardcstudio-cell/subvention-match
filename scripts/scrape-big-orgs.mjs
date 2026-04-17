@@ -21,7 +21,7 @@ const ONLY = onlyArg ? onlyArg.split("=")[1] : null;
 const OUT_DIR = "scripts/scrape-results";
 mkdirSync(OUT_DIR, { recursive: true });
 
-const UA = "Mozilla/5.0 (compatible; SubventionMatchBot/1.0)";
+const UA = "Mozilla/5.0 (compatible; MeceneBot/1.0)";
 
 function curl(url, timeoutS = 15) {
   try {

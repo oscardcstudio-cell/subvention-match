@@ -1,4 +1,7 @@
-# SubventionMatch — Instructions Claude Code
+# Mécène — Instructions Claude Code
+
+> Ancien nom : SubventionMatch. Rebrandé en avril 2026.
+> Le dossier / repo GitHub garde encore le nom `subvention-match` pour l'instant.
 
 ## Philosophie
 

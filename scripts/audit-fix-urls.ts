@@ -46,7 +46,7 @@ async function checkUrl(url: string): Promise<CheckResult> {
 
   try {
     const result = execSync(
-      `curl -sI -L -o /dev/null -w "%{http_code} %{url_effective}" --max-time 10 --user-agent "Mozilla/5.0 (compatible; SubventionMatch/1.0)" "${url}"`,
+      `curl -sI -L -o /dev/null -w "%{http_code} %{url_effective}" --max-time 10 --user-agent "Mozilla/5.0 (compatible; Mecene/1.0)" "${url}"`,
       { timeout: 15_000, encoding: "utf-8" }
     ).trim();
 
@@ -71,7 +71,7 @@ async function run() {
   const startTime = Date.now();
 
   console.log("=".repeat(60));
-  console.log("  AUDIT & FIX URLs — SubventionMatch");
+  console.log("  AUDIT & FIX URLs — Mecene");
   if (DRY_RUN) console.log("  (DRY RUN)");
   console.log("=".repeat(60));
   console.log();

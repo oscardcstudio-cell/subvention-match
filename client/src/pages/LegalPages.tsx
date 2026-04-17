@@ -34,9 +34,9 @@ export function MentionsLegales() {
     <LegalLayout title="Mentions legales">
       <h2>Editeur du site</h2>
       <p>
-        SubventionMatch est edite par Oscar DC Studio.<br />
+        Mécène est edite par Oscar DC Studio.<br />
         Statut : Micro-entreprise<br />
-        Email de contact : <a href="mailto:contact@subventionmatch.fr">contact@subventionmatch.fr</a>
+        Email de contact : <a href="mailto:contact@odcstudio.fr">contact@odcstudio.fr</a>
       </p>
 
       <h2>Hebergement</h2>
@@ -48,18 +48,18 @@ export function MentionsLegales() {
       <h2>Propriete intellectuelle</h2>
       <p>
         L'ensemble du contenu du site (textes, graphismes, logiciels, mise en page) est la propriete
-        exclusive de SubventionMatch, sauf mention contraire. Toute reproduction, meme partielle, est
+        exclusive de Mécène, sauf mention contraire. Toute reproduction, meme partielle, est
         soumise a autorisation prealable.
       </p>
       <p>
         Les informations relatives aux subventions proviennent de sources publiques et sont fournies
-        a titre indicatif. SubventionMatch ne saurait etre tenu responsable d'eventuelles erreurs ou
+        a titre indicatif. Mécène ne saurait etre tenu responsable d'eventuelles erreurs ou
         omissions.
       </p>
 
       <h2>Responsabilite</h2>
       <p>
-        SubventionMatch propose un service d'aide a l'identification de subventions culturelles via
+        Mécène propose un service d'aide a l'identification de subventions culturelles via
         intelligence artificielle. Les resultats ne constituent ni un conseil juridique, ni une garantie
         d'obtention de financement. L'utilisateur reste seul responsable de ses demarches de candidature.
       </p>
@@ -75,7 +75,7 @@ export function CGV() {
 
       <h2>1. Objet</h2>
       <p>
-        Les presentes CGV regissent la vente du service SubventionMatch, qui consiste en un
+        Les presentes CGV regissent la vente du service Mécène, qui consiste en un
         rapport personnalise de subventions culturelles identifiees par intelligence artificielle,
         delivre sous forme de document PDF envoye par email.
       </p>
@@ -102,7 +102,7 @@ export function CGV() {
 
       <h2>5. Limitation de responsabilite</h2>
       <p>
-        SubventionMatch s'engage a fournir un service de qualite mais ne garantit pas l'exactitude
+        Mécène s'engage a fournir un service de qualite mais ne garantit pas l'exactitude
         ni l'exhaustivite des informations fournies. Les resultats sont generes par intelligence
         artificielle a partir de donnees publiques. Ils ne constituent pas un conseil professionnel.
       </p>
@@ -129,8 +129,8 @@ export function PolitiqueConfidentialite() {
 
       <h2>1. Responsable du traitement</h2>
       <p>
-        Le responsable du traitement est Oscar DC Studio, editeur de SubventionMatch.<br />
-        Contact : <a href="mailto:contact@subventionmatch.fr">contact@subventionmatch.fr</a>
+        Le responsable du traitement est Oscar DC Studio, editeur de Mécène.<br />
+        Contact : <a href="mailto:contact@odcstudio.fr">contact@odcstudio.fr</a>
       </p>
 
       <h2>2. Donnees collectees</h2>
@@ -188,13 +188,13 @@ export function PolitiqueConfidentialite() {
       </ul>
       <p>
         Pour exercer ces droits, contactez-nous a{" "}
-        <a href="mailto:contact@subventionmatch.fr">contact@subventionmatch.fr</a>.
+        <a href="mailto:contact@odcstudio.fr">contact@odcstudio.fr</a>.
         Nous nous engageons a repondre sous 30 jours.
       </p>
 
       <h2>8. Cookies</h2>
       <p>
-        SubventionMatch utilise des cookies strictement necessaires au fonctionnement du site.
+        Mécène utilise des cookies strictement necessaires au fonctionnement du site.
         Les cookies d'analytics (PostHog) et de monitoring (Sentry) ne sont actives qu'avec
         votre consentement explicite via la banniere cookies.
       </p>

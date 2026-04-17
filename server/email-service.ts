@@ -41,7 +41,7 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
 
   try {
     const result = await getResend().emails.send({
-      from: 'SubventionMatch <noreply@send.odcstudio.fr>', // Change to your verified domain
+      from: 'Mécène <noreply@send.odcstudio.fr>', // Change to your verified domain
       to,
       subject: `Vos ${grantsCount} subventions culturelles personnalisées`,
       html: `
@@ -90,7 +90,7 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
 
           <div style="background: #FFF4D6; border: 1px solid #FFD166; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
             <p style="font-size: 14px; color: #073B4C; margin: 0 0 10px; font-weight: 600;">
-              🧪 SubventionMatch est en beta
+              🧪 Mécène est en beta
             </p>
             <p style="font-size: 13px; color: #4a4a4a; margin: 0 0 12px;">
               Votre avis nous aide à améliorer l'outil. Un résultat qui ne colle pas ? Une idée ?
@@ -105,7 +105,7 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
               Besoin d'aide ? Nous sommes là pour vous accompagner.
             </p>
             <p style="font-size: 12px; color: #999;">
-              © ${new Date().getFullYear()} SubventionMatch - Tous droits réservés
+              © ${new Date().getFullYear()} Mécène - Tous droits réservés
             </p>
           </div>
         </body>
@@ -165,7 +165,7 @@ export async function sendGrantsEmailFallback(data: FallbackEmailData): Promise<
 
   try {
     const result = await getResend().emails.send({
-      from: 'SubventionMatch <noreply@send.odcstudio.fr>',
+      from: 'Mécène <noreply@send.odcstudio.fr>',
       to,
       subject: `Vos ${grants.length} subventions culturelles personnalisees`,
       html: `
@@ -186,7 +186,7 @@ export async function sendGrantsEmailFallback(data: FallbackEmailData): Promise<
           </div>
           ${grantsHtml}
           <div style="text-align:center;margin-top:40px;padding-top:30px;border-top:1px solid #e5e5e5;">
-            <p style="font-size:12px;color:#999;">&copy; ${new Date().getFullYear()} SubventionMatch</p>
+            <p style="font-size:12px;color:#999;">&copy; ${new Date().getFullYear()} Mécène</p>
           </div>
         </body>
         </html>

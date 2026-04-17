@@ -105,7 +105,7 @@ export default function FormPage() {
         <div className="container flex h-16 items-center justify-between px-6 md:px-8">
           <a href="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-md bg-primary" />
-            <span className="font-serif text-xl font-bold">SubventionMatch</span>
+            <span className="font-serif text-xl font-bold">Mécène</span>
           </a>
           <LanguageToggle language={language} onLanguageChange={setLanguage} />
         </div>

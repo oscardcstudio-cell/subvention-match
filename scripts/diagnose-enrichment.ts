@@ -9,7 +9,7 @@ import { calculateQualityScore, QUALITY_GATE_THRESHOLD, ENRICHMENT_THRESHOLD } f
 
 async function diagnose() {
   console.log("=".repeat(70));
-  console.log("  DIAGNOSTIC ENRICHISSEMENT — SubventionMatch");
+  console.log("  DIAGNOSTIC ENRICHISSEMENT — Mecene");
   console.log("=".repeat(70));
   console.log();
 
