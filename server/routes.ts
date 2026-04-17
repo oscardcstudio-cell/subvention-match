@@ -49,6 +49,22 @@ const emailLimiter = rateLimit({
   message: { error: "Limite d'envoi d'emails atteinte. Réessayez plus tard." },
 });
 
+// Le sessionId (UUID v4 random) sert de capacité d'accès au PDF. L'entropie
+// (122 bits) rend la devinette infaisable, mais on ajoute un rate limit pour
+// bloquer tout balayage anormal et détecter les tentatives.
+// TODO: fix plus solide = tokens signés à courte durée (JWT) au lieu d'exposer
+// le sessionId dans les URLs.
+const pdfDownloadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 min
+  max: 30,                    // 30 téléchargements / 15 min / IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Trop de téléchargements. Réessayez dans quelques minutes." },
+});
+
+// Valide qu'une string ressemble à un UUID v4 (défense en profondeur).
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 // Utilitaires pour masquer les données sensibles dans les logs
 const DEBUG_MODE = process.env.NODE_ENV === "development";
 function maskEmail(email: string): string {
@@ -1038,9 +1054,15 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * GET /api/pdf/:sessionId - Servir le PDF généré
    */
-  app.get("/api/pdf/:sessionId", async (req, res) => {
+  app.get("/api/pdf/:sessionId", pdfDownloadLimiter, async (req, res) => {
     try {
       const { sessionId } = req.params;
+
+      // Défense en profondeur: rejeter tout sessionId malformé avant de toucher la DB.
+      if (!UUID_RE.test(sessionId)) {
+        return res.status(400).json({ error: "Invalid session ID format." });
+      }
+
       const submission = await storage.getFormSubmission(sessionId);
 
       if (!submission) {
