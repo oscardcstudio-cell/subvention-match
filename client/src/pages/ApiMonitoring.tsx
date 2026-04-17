@@ -6,6 +6,20 @@ import { ExternalLink, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-r
 import { Link } from "wouter";
 import { safeExternalUrl } from "@/lib/safe-url";
 
+/**
+ * Cette page liste les APIs de subventions intégrées (ou pas) dans l'app.
+ *
+ * IMPORTANT: ce n'est PAS un monitoring live. Les statuts et la date de
+ * dernière vérification sont documentés manuellement par l'équipe. Un vrai
+ * monitoring ferait des health-checks serveur et afficherait des réponses
+ * HTTP réelles — ce n'est pas le cas ici, donc on affiche clairement la page
+ * comme "Sources APIs documentées".
+ *
+ * Pour mettre à jour un statut: éditer le tableau `apis` + bumper
+ * `LAST_MANUAL_REVIEW` ci-dessous.
+ */
+const LAST_MANUAL_REVIEW = "2026-04-17";
+
 interface ApiStatus {
   name: string;
   description: string;
@@ -14,7 +28,7 @@ interface ApiStatus {
   docUrl?: string;
   notes: string;
   keyRequired: boolean;
-  lastChecked?: string;
+  lastVerifiedManually?: string;
 }
 
 export default function ApiMonitoring() {
@@ -29,7 +43,7 @@ export default function ApiMonitoring() {
       docUrl: "https://aides-territoires.beta.gouv.fr/data/",
       notes: "Demande de clé API envoyée. En attente de réponse de l'équipe Aides-Territoires.",
       keyRequired: true,
-      lastChecked: new Date().toLocaleDateString("fr-FR"),
+      lastVerifiedManually: LAST_MANUAL_REVIEW,
     },
     {
       name: "EU Funding & Tenders API (Creative Europe)",
@@ -39,7 +53,7 @@ export default function ApiMonitoring() {
       docUrl: "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/programmes/crea",
       notes: "✅ ACCÈS LIBRE : Clé API publique 'SEDIA' disponible sans inscription. Programme Creative Europe (culture + média). Format JSON. Endpoint : POST /search-api/prod/rest/search. Permet de rechercher tous les appels à projets et subventions culturelles de l'UE. Budget 2,44 milliards €.",
       keyRequired: false,
-      lastChecked: new Date().toLocaleDateString("fr-FR"),
+      lastVerifiedManually: LAST_MANUAL_REVIEW,
     },
     {
       name: "Arts Council England Open Data",
@@ -49,7 +63,7 @@ export default function ApiMonitoring() {
       docUrl: "https://www.artscouncil.org.uk/ProjectGrants/project-grants-data",
       notes: "✅ ACCÈS LIBRE : Données téléchargeables en CSV/JSON depuis data.gov.uk. Contient : montants, bénéficiaires, projets, régions, artforms. National Lottery Project Grants (£1,000-£100,000). Pas d'API temps réel mais exports réguliers.",
       keyRequired: false,
-      lastChecked: new Date().toLocaleDateString("fr-FR"),
+      lastVerifiedManually: LAST_MANUAL_REVIEW,
     },
     {
       name: "API Data.Subvention",
@@ -59,7 +73,7 @@ export default function ApiMonitoring() {
       docUrl: "https://geode-chipmunk-29c.notion.site/Documentation-API-Guide-d-int-gration-1511788663a380a8b199cc98864b4dfd",
       notes: "❌ ACCÈS IMPOSSIBLE : Strictement réservé aux agents publics du gouvernement français. Nécessite un SIRET d'administration publique. ProConnect refuse les structures de droit privé. Validation manuelle requise (api@datasubvention.beta.gouv.fr). Compte consommateur avec token illimité pour intégrations. Limite : 80 requêtes/minute.",
       keyRequired: true,
-      lastChecked: new Date().toLocaleDateString("fr-FR"),
+      lastVerifiedManually: LAST_MANUAL_REVIEW,
     },
     {
       name: "API Démarches Ministère Culture",
@@ -69,7 +83,7 @@ export default function ApiMonitoring() {
       docUrl: "https://www.culture.gouv.fr/api/doc",
       notes: "Utilise l'API Aides-Territoires en backend. Documentation technique disponible mais dépend de la clé Aides-Territoires.",
       keyRequired: true,
-      lastChecked: new Date().toLocaleDateString("fr-FR"),
+      lastVerifiedManually: LAST_MANUAL_REVIEW,
     },
   ];
 
@@ -128,17 +142,20 @@ export default function ApiMonitoring() {
           {/* Title */}
           <div className="mb-12">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter leading-tight mb-4">
-              {language === "fr" ? "MONITORING" : "MONITORING"}
+              {language === "fr" ? "SOURCES" : "DATA"}
               <br />
               <span className="text-indigo-600">
-                {language === "fr" ? "APIs" : "APIs"}
+                {language === "fr" ? "APIs" : "SOURCES"}
               </span>
             </h1>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl">
-              {language === "fr" 
-                ? "Suivi des APIs de subventions culturelles françaises pour alimenter notre base de données."
-                : "Tracking French cultural grant APIs to populate our database."
-              }
+              {language === "fr"
+                ? "Inventaire des APIs de subventions culturelles que nous surveillons pour alimenter notre base. Statuts documentés manuellement par l'équipe — pas un monitoring temps réel."
+                : "Inventory of cultural grant APIs we track to feed our database. Statuses are documented manually — this is not a live health check."}
+            </p>
+            <p className="text-xs text-gray-400 mt-2">
+              {language === "fr" ? "Dernière revue manuelle : " : "Last manual review: "}
+              {LAST_MANUAL_REVIEW}
             </p>
           </div>
 
@@ -216,11 +233,14 @@ export default function ApiMonitoring() {
                       </>
                     )}
                   </div>
-                  {api.lastChecked && (
+                  {api.lastVerifiedManually && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-4 w-4" />
                       <span>
-                        {language === "fr" ? "Vérifié le" : "Checked on"} {api.lastChecked}
+                        {language === "fr"
+                          ? "Documenté manuellement le"
+                          : "Documented manually on"}{" "}
+                        {api.lastVerifiedManually}
                       </span>
                     </div>
                   )}
@@ -240,9 +260,9 @@ export default function ApiMonitoring() {
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   )}
-                  {api.docUrl && (
+                  {safeExternalUrl(api.docUrl) && (
                     <a
-                      href={api.docUrl}
+                      href={safeExternalUrl(api.docUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-700 transition-colors"
