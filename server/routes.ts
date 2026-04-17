@@ -4,7 +4,7 @@ import { insertFormSubmissionSchema, userFormInputSchema, type InsertGrant, type
 import { storage } from "./storage";
 import { grantStorage } from "./grant-storage";
 import { matchGrantsWithAI } from "./ai-matcher";
-import { generateGrantsPDF, generateAndSaveGrantsPDF } from "./pdf-generator";
+import { generateGrantsPDF, generateAndSaveGrantsPDF, submissionToPdfFormData } from "./pdf-generator";
 import { sendGrantsEmail } from "./email-service";
 import { testApiConnection, fetchAides } from "./aides-territoires-api";
 import { getGrantsStatistics, getOverallStats } from "./stats";
@@ -155,7 +155,8 @@ export function registerRoutes(app: Express): Server {
           const { buffer, path } = await generateAndSaveGrantsPDF(
             {
               grants: validGrants,
-              userEmail: submission.email
+              userEmail: submission.email,
+              formData: submissionToPdfFormData(submission),
             },
             submission.sessionId
           );
@@ -565,17 +566,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
         const { buffer: pdfBuffer, path: pdfPath } = await generateAndSaveGrantsPDF({
           grants: validGrants,
           userEmail: submission.email,
-          formData: {
-            status: submission.status || undefined,
-            artisticDomain: submission.artisticDomain || undefined,
-            region: submission.region,
-            projectDescription: submission.projectDescription || undefined,
-            projectType: submission.projectType || undefined,
-            projectStage: submission.projectStage || undefined,
-            isInternational: submission.isInternational || undefined,
-            urgency: submission.urgency || undefined,
-            email: submission.email,
-          },
+          formData: submissionToPdfFormData(submission),
         }, sessionId);
         console.log(`✅ PDF generated and saved (${pdfBuffer.length} bytes) at ${pdfPath}`);
         
@@ -837,7 +828,11 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
           return res.status(404).json({ error: "No valid grants resolvable from cached results." });
         }
         const { path: freshPath } = await generateAndSaveGrantsPDF(
-          { grants: validGrants, userEmail: submission.email },
+          {
+            grants: validGrants,
+            userEmail: submission.email,
+            formData: submissionToPdfFormData(submission),
+          },
           sessionId,
         );
         await storage.savePdfPath(sessionId, freshPath);
@@ -909,8 +904,9 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
         const { buffer, path: pdfPath } = await generateAndSaveGrantsPDF({
           grants: validGrants,
           userEmail: submission.email,
+          formData: submissionToPdfFormData(submission),
         }, sessionId);
-        
+
         pdfBuffer = buffer;
         await storage.savePdfPath(sessionId, pdfPath);
         console.log(`✅ [send-email] PDF generated and saved at ${pdfPath}`);
@@ -1006,6 +1002,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
         const { buffer: pdfBuffer, path: pdfPath } = await generateAndSaveGrantsPDF({
           grants: validGrants,
           userEmail: submission.email,
+          formData: submissionToPdfFormData(submission),
         }, submission.sessionId);
         console.log(`✅ PDF generated and saved (${pdfBuffer.length} bytes) at ${pdfPath}`);
         

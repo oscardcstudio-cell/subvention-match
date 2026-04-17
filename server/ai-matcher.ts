@@ -1,4 +1,13 @@
 import type { FormSubmission, GrantResult } from "@shared/schema";
+import { db } from "./db";
+import { grants as grantsTable } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import {
+  filterByQualityGate,
+  calculateQualityScore,
+  needsEnrichment,
+} from "./quality-gate";
+import { enrichGrant } from "./ai-enricher";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "deepseek/deepseek-chat"; // DeepSeek-v3.1-terminus
@@ -92,14 +101,37 @@ function filterGrantsByDeadline(grants: GrantResult[]): GrantResult[] {
 
 /**
  * Match user profile with grants using AI
+ *
+ * Pipeline :
+ *   1. Filtre par deadline (grants ouvertes ou récurrentes)
+ *   2. Quality gate : éjecte les grants sans titre/orga ou trop incomplètes
+ *      (économise des tokens DeepSeek + garantit que l'utilisateur ne reçoit
+ *      que des fiches actionnables)
+ *   3. Matching IA sur les grants restantes → top 5-10 IDs
+ *   4. Enrichissement à la volée des matches dont le score qualité < 80
+ *      (description, éligibilité, organisme manquants → comblés via DeepSeek
+ *      et persistés en DB pour les futurs utilisateurs)
+ *   5. Enrichissement métadonnées (amount/difficulty/advice) personnalisées
+ *      pour le profil de l'utilisateur courant
  */
 export async function matchGrantsWithAI(
   submission: FormSubmission,
   allGrants: GrantResult[]
 ): Promise<GrantResult[]> {
-  // Filter out grants with passed deadlines
+  // 1. Filter out grants with passed deadlines
   const openGrants = filterGrantsByDeadline(allGrants);
-  console.log(`🤖 Démarrage du matching IA pour ${openGrants.length} subventions ouvertes (${allGrants.length - openGrants.length} deadline passée)...`);
+  console.log(
+    `🤖 Pipeline matching IA : ${allGrants.length} grants → ${openGrants.length} ouvertes (${allGrants.length - openGrants.length} deadline passée)`
+  );
+
+  // 2. Quality gate — éjecte les grants trop incomplètes pour être proposées
+  const { passed: qualifiedGrants } = filterByQualityGate(openGrants);
+  if (qualifiedGrants.length === 0) {
+    console.warn(
+      "⚠️ Aucune grant ne passe le quality gate. Vérifier la qualité des données en DB."
+    );
+    return [];
+  }
 
   // Build user profile summary (gérer les champs vides)
   const hasStatus = submission.status && submission.status.length > 0;
@@ -126,10 +158,9 @@ Critères :
 - Périmètre géographique : ${submission.geographicScope?.join(", ") || "Non spécifié"}
 `.trim();
 
-  // Build grants database for AI (using only open grants) - COMPACT FORMAT
-  // Limit info per grant to stay under token limit
-  const grantsDatabase = openGrants.map((grant) => {
-    // Ultra-compact format: ID | Title | Org | Eligibility (first 150 chars)
+  // Build grants database for AI (only grants that passed the quality gate)
+  // Ultra-compact format to stay under token limit
+  const grantsDatabase = qualifiedGrants.map((grant) => {
     const eligibilityShort = grant.eligibility?.substring(0, 150) || "";
     const sectorsShort = grant.eligibleSectors?.slice(0, 3).join(",") || "";
     return `${grant.id}|${grant.title}|${grant.organization}|${eligibilityShort}|${sectorsShort}`;
@@ -197,22 +228,123 @@ Analyse ce profil et retourne les IDs des 5-10 subventions les plus pertinentes,
 
     console.log(`✅ IDs sélectionnés par l'IA: ${grantIds.join(", ")}`);
 
-    // Find and return the matched grants (from open grants only)
+    // Find matched grants (from qualified grants only)
     const matchedGrants = grantIds
-      .map(id => openGrants.find(grant => grant.id === id))
+      .map(id => qualifiedGrants.find(grant => grant.id === id))
       .filter((grant): grant is GrantResult => grant !== undefined);
 
     console.log(`✅ ${matchedGrants.length} subventions matchées avec succès`);
 
-    // Enrichir chaque subvention avec montant, difficulté et conseils
-    console.log("🔍 Enrichissement des subventions avec l'IA...");
-    const enrichedGrants = await enrichGrantsWithAI(matchedGrants, submission);
+    // 4. Enrichissement à la volée des grants dont le score qualité < 80
+    //    (description, éligibilité, organisme manquants/courts → comblés via DeepSeek)
+    //    Persisté en DB pour profiter aux futurs utilisateurs.
+    const refreshedGrants = await enrichLowQualityMatches(matchedGrants);
+
+    // 5. Enrichir chaque subvention avec montant, difficulté et conseils PERSONNALISÉS
+    //    pour le profil de l'utilisateur courant (pas persisté car spécifique au user)
+    console.log("🔍 Enrichissement personnalisé des subventions avec l'IA...");
+    const enrichedGrants = await enrichGrantsWithAI(refreshedGrants, submission);
 
     return enrichedGrants;
   } catch (error: any) {
     console.error("❌ Erreur matching IA:", error.message);
     throw error;
   }
+}
+
+/**
+ * Pour chaque grant matchée dont le score qualité est sous le seuil
+ * d'enrichissement (80), tente de combler les champs manquants via DeepSeek
+ * (`enrichGrant` de ai-enricher.ts). Les données enrichies sont PERSISTÉES
+ * en DB et bénéficient à tous les futurs utilisateurs.
+ *
+ * Tourne en parallèle (Promise.all) pour rester sous la barre des 30s d'attente.
+ */
+async function enrichLowQualityMatches(matched: GrantResult[]): Promise<GrantResult[]> {
+  const candidates = matched.filter((g) => needsEnrichment(g));
+  if (candidates.length === 0) {
+    console.log("✅ Toutes les grants matchées sont déjà bien renseignées");
+    return matched;
+  }
+
+  console.log(
+    `🔧 Enrichissement à la volée de ${candidates.length}/${matched.length} grants sous le seuil qualité 80`
+  );
+
+  // Lancer tous les enrichissements en parallèle
+  await Promise.all(
+    candidates.map(async (grant) => {
+      const breakdown = calculateQualityScore(grant);
+      // Construire les "issues" attendues par enrichGrant() (format de ai-enricher.ts)
+      const issues: Array<{
+        grantId: string;
+        grantTitle: string;
+        field: string;
+        issue: string;
+        severity: "critical" | "warning" | "info";
+      }> = [];
+
+      if (!breakdown.hasOrganization) {
+        issues.push({
+          grantId: grant.id,
+          grantTitle: grant.title,
+          field: "organization",
+          issue: "Organisme manquant",
+          severity: "critical",
+        });
+      }
+      if (!breakdown.hasDescription) {
+        issues.push({
+          grantId: grant.id,
+          grantTitle: grant.title,
+          field: "description",
+          issue: "Description manquante",
+          severity: "critical",
+        });
+      }
+      if (!breakdown.hasEligibility) {
+        issues.push({
+          grantId: grant.id,
+          grantTitle: grant.title,
+          field: "eligibility",
+          issue: "Éligibilité manquante",
+          severity: "critical",
+        });
+      }
+
+      if (issues.length > 0) {
+        try {
+          await enrichGrant(grant.id, issues);
+        } catch (e: any) {
+          // On ne bloque pas le pipeline si l'enrichissement échoue
+          console.warn(`⚠️ Enrichissement à la volée échoué pour ${grant.id}: ${e.message}`);
+        }
+      }
+    })
+  );
+
+  // Re-fetch les grants enrichies depuis la DB pour récupérer les valeurs à jour
+  const refreshed = await Promise.all(
+    matched.map(async (g) => {
+      try {
+        const [fresh] = await db.select().from(grantsTable).where(eq(grantsTable.id, g.id));
+        if (!fresh) return g;
+        // Merger les champs enrichissables tout en gardant les enrichissements
+        // user-specifiques (matchScore, matchReason) qui n'existent pas en DB
+        return {
+          ...g,
+          title: fresh.title,
+          organization: fresh.organization,
+          description: fresh.description ?? g.description,
+          eligibility: fresh.eligibility ?? g.eligibility,
+        } as GrantResult;
+      } catch {
+        return g;
+      }
+    })
+  );
+
+  return refreshed;
 }
 
 /**
