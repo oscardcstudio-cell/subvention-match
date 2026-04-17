@@ -1,8 +1,16 @@
 {
-  "name": "rest-express",
+  "name": "subvention-match",
   "version": "1.0.0",
   "type": "module",
-  "license": "CRI",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oscardcstudio-cell/subvention-match.git"
+  },
+  "homepage": "https://subvention-match-production.up.railway.app",
+  "bugs": {
+    "url": "https://github.com/oscardcstudio-cell/subvention-match/issues"
+  },
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",

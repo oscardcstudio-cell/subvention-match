@@ -1,12 +1,18 @@
 # SubventionMatch
 
-Plateforme de matching IA entre artistes / associations culturelles et subventions françaises.
+Plateforme open source de matching IA entre artistes / associations culturelles
+et subventions françaises.
+
+- **Site** : https://subvention-match-production.up.railway.app
+- **Licence** : [AGPL-3.0-or-later](LICENSE)
+
+## Stack
 
 - **Frontend** : React + TypeScript + Vite + Tailwind + shadcn/ui + wouter
 - **Backend** : Node.js + Express + TypeScript (ESM)
 - **Base de données** : PostgreSQL via Drizzle ORM (hébergé sur Supabase)
 - **IA** : DeepSeek via OpenRouter pour le matching et l'enrichissement
-- **Paiement** : Stripe (€8 pour débloquer les résultats)
+- **Paiement** : Stripe (mode beta gratuit actuellement)
 - **Emails** : Resend
 - **PDF** : Puppeteer (Chromium headless)
 
@@ -18,6 +24,7 @@ subvention_match/
 ├── server/            # Express (sert l'API + les fichiers statiques)
 │   ├── index.ts       # Bootstrap serveur
 │   ├── routes.ts      # Toutes les routes /api/*
+│   ├── ai-matcher.ts  # Pipeline de matching IA (quality gate + DeepSeek)
 │   ├── db.ts          # Pool Postgres (pg) + Drizzle
 │   └── scrapers/      # Scrapers Puppeteer par organisme
 ├── shared/schema.ts   # Schéma Drizzle partagé client + serveur
@@ -33,7 +40,7 @@ npm install
 
 # 2. Variables d'environnement
 cp .env.example .env
-# → renseigne DATABASE_URL (Supabase), STRIPE_*, RESEND_API_KEY, OPENROUTER_API_KEY, ADMIN_TOKEN
+# → renseigne DATABASE_URL, STRIPE_*, RESEND_API_KEY, OPENROUTER_API_KEY, ADMIN_TOKEN
 
 # 3. Pousse le schéma en base
 npm run db:push
@@ -58,10 +65,6 @@ L'app est conçue pour tourner sur [Railway](https://railway.com) via le `Docker
 4. Pousse le schéma depuis ta machine :
    ```bash
    DATABASE_URL="<uri>" npm run db:push
-   ```
-5. Importe les données (dump fourni hors-repo) :
-   ```bash
-   psql "<uri>" < database_export.sql
    ```
 
 ### 2. Railway
@@ -100,6 +103,21 @@ npm run check   # tsc (type check, pas bloquant)
 npm run db:push # drizzle-kit push vers DATABASE_URL
 ```
 
+## Contribuer
+
+Les issues et PR sont les bienvenues. Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les
+conventions du projet (stack, commits, pipeline de matching).
+
+Pour signaler une faille de sécurité, voir [SECURITY.md](SECURITY.md).
+
 ## Licence
 
-CRI (All rights reserved).
+Ce projet est distribué sous licence **GNU Affero General Public License v3.0 ou
+ultérieure** (AGPL-3.0-or-later). Voir [LICENSE](LICENSE).
+
+En pratique : tu peux utiliser, modifier et redistribuer ce code librement, **y
+compris pour un usage commercial**. En contrepartie, si tu héberges une version
+modifiée accessible via un réseau (SaaS), tu dois rendre publiques tes modifications
+sous la même licence.
+
+Copyright © 2026 Oscar DC Studio

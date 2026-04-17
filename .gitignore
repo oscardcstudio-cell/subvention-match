@@ -34,6 +34,14 @@ EXEMPLE_JSON_N8N.md
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Claude Code local config
+.claude/settings.local.json
+
+# Local test artifacts
+test-*.pdf
+*.bak
 
 # Editor
 .vscode/
