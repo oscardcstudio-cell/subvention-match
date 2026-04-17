@@ -22,6 +22,9 @@ import DataQuality from "@/pages/DataQuality";
 import Notes from "@/pages/Notes";
 import TestFormWithResults from "@/pages/TestFormWithResults";
 import DocumentationPage from "@/pages/DocumentationPage";
+import { MentionsLegales, CGV, PolitiqueConfidentialite } from "@/pages/LegalPages";
+import { CookieBanner } from "@/components/CookieBanner";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -45,6 +48,9 @@ function Router() {
       <Route path="/notes" component={Notes} />
       <Route path="/test-form" component={TestFormWithResults} />
       <Route path="/documentation" component={DocumentationPage} />
+      <Route path="/mentions-legales" component={MentionsLegales} />
+      <Route path="/cgv" component={CGV} />
+      <Route path="/confidentialite" component={PolitiqueConfidentialite} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -57,6 +63,8 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <FeedbackWidget />
+          <CookieBanner />
         </TooltipProvider>
       </LanguageProvider>
     </QueryClientProvider>

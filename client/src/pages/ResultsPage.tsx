@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { GrantResult } from "@shared/schema";
 import { ChatRefinement } from "@/components/ChatRefinement";
+import { trackResultsViewed, trackCheckoutStarted, trackPdfDownloaded, trackMatchFeedback } from "@/lib/analytics";
 
 // Fonction pour extraire les emails propres du HTML brut
 function extractCleanEmail(rawContact: string): string {
@@ -269,14 +270,16 @@ export default function ResultsPage() {
   const visibleResults = isPaid ? results : results.slice(0, 1);
   const hasLockedResults = !isPaid && results.length > 1;
 
-  // Initialiser le compteur au premier chargement
+  // Initialiser le compteur au premier chargement + analytics
   useEffect(() => {
     if (results.length > 0 && grantsCount === 0) {
       setGrantsCount(results.length);
+      trackResultsViewed({ matchCount: results.length, sessionId });
     }
-  }, [results, grantsCount]);
+  }, [results, grantsCount, sessionId]);
 
   const handleUnlock = () => {
+    trackCheckoutStarted({ sessionId });
     setLocation(`/checkout?sessionId=${sessionId}`);
   };
 
@@ -460,7 +463,7 @@ export default function ResultsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <GrantCard grant={grant} index={index} language={language} t={t} />
+                <GrantCard grant={grant} index={index} language={language} t={t} sessionId={sessionId} />
               </motion.div>
             ))}
           </div>
@@ -582,13 +585,15 @@ function SendEmailButton({ language }: { language: string }) {
   );
 }
 
-function GrantCard({ grant, index, language, t }: { 
-  grant: GrantResult; 
-  index: number; 
+function GrantCard({ grant, index, language, t, sessionId }: {
+  grant: GrantResult;
+  index: number;
   language: string;
   t: any;
+  sessionId: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [feedback, setFeedback] = useState<"relevant" | "not_relevant" | null>(null);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -665,6 +670,60 @@ function GrantCard({ grant, index, language, t }: {
               </p>
             </div>
           )}
+
+          {/* Feedback qualite du match (beta) */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xs text-gray-400">
+              {language === "fr" ? "Ce match est-il pertinent ?" : "Is this match relevant?"}
+            </span>
+            <button
+              onClick={() => {
+                setFeedback("relevant");
+                trackMatchFeedback({ grantId: grant.grantId || grant.id, sessionId, rating: "relevant" });
+                fetch("/api/feedback", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ sessionId, grantId: grant.grantId || grant.id, rating: "relevant" }),
+                }).catch(() => {});
+              }}
+              className={`p-1.5 rounded-full transition-all ${
+                feedback === "relevant"
+                  ? "bg-green-100 text-green-600 scale-110"
+                  : "text-gray-300 hover:text-green-500 hover:bg-green-50"
+              }`}
+              aria-label="Pertinent"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path d="M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM5.5 6v9.25a2.5 2.5 0 0 0 2.05 2.46l.41.07a14.4 14.4 0 0 0 5.6-.07l.31-.06a2 2 0 0 0 1.55-1.58l.78-4.67a1.5 1.5 0 0 0-1.48-1.75h-3.22V4.5a2.25 2.25 0 0 0-2.25-2.25.75.75 0 0 0-.67.42L5.5 6Z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => {
+                setFeedback("not_relevant");
+                trackMatchFeedback({ grantId: grant.grantId || grant.id, sessionId, rating: "not_relevant" });
+                fetch("/api/feedback", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ sessionId, grantId: grant.grantId || grant.id, rating: "not_relevant" }),
+                }).catch(() => {});
+              }}
+              className={`p-1.5 rounded-full transition-all ${
+                feedback === "not_relevant"
+                  ? "bg-red-100 text-red-500 scale-110"
+                  : "text-gray-300 hover:text-red-400 hover:bg-red-50"
+              }`}
+              aria-label="Pas pertinent"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path d="M18.905 12.75a1.25 1.25 0 0 1-2.5 0v-7.5a1.25 1.25 0 0 1 2.5 0v7.5ZM14.405 14.5V5.25a2.5 2.5 0 0 0-2.05-2.46l-.41-.07a14.4 14.4 0 0 0-5.6.07l-.31.06a2 2 0 0 0-1.55 1.58l-.78 4.67a1.5 1.5 0 0 0 1.48 1.75h3.22v5.25a2.25 2.25 0 0 0 2.25 2.25.75.75 0 0 0 .67-.42l2.58-5.13Z" />
+              </svg>
+            </button>
+            {feedback && (
+              <span className="text-xs text-gray-400 ml-1">
+                {language === "fr" ? "Merci !" : "Thanks!"}
+              </span>
+            )}
+          </div>
 
           {/* Bouton compact */}
           <CollapsibleTrigger asChild>

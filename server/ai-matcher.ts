@@ -44,7 +44,9 @@ async function callOpenRouter(messages: OpenRouterMessage[]): Promise<string> {
     headers: {
       "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": process.env.REPLIT_DOMAINS || "https://subventionmatch.replit.app",
+      "HTTP-Referer": process.env.RAILWAY_PUBLIC_DOMAIN
+      ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+      : "https://subventionmatch.fr",
       "X-Title": "SubventionMatch",
     },
     body: JSON.stringify(request),
@@ -140,14 +142,14 @@ export async function matchGrantsWithAI(
   
   const userProfile = `
 Profil de l'utilisateur :
-- Statut : ${hasStatus ? submission.status.join(", ") : "Non spécifié"}${submission.statusOther ? ` (${submission.statusOther})` : ""}
-- Domaine artistique : ${hasArtisticDomain ? submission.artisticDomain.join(", ") : "Non spécifié"}${submission.artisticDomainOther ? ` (${submission.artisticDomainOther})` : ""}
+- Statut : ${hasStatus ? submission.status!.join(", ") : "Non spécifié"}${submission.statusOther ? ` (${submission.statusOther})` : ""}
+- Domaine artistique : ${hasArtisticDomain ? submission.artisticDomain!.join(", ") : "Non spécifié"}${submission.artisticDomainOther ? ` (${submission.artisticDomainOther})` : ""}
 - Région : ${submission.region || "Non spécifiée"}
 - International : ${submission.isInternational || "Non spécifié"}
 
 Projet :
 - Description : ${submission.projectDescription || "Non spécifiée"}
-- Type : ${hasProjectType ? submission.projectType.join(", ") : "Non spécifié"}${submission.projectTypeOther ? ` (${submission.projectTypeOther})` : ""}
+- Type : ${hasProjectType ? submission.projectType!.join(", ") : "Non spécifié"}${submission.projectTypeOther ? ` (${submission.projectTypeOther})` : ""}
 - Stade : ${submission.projectStage || "Non spécifié"}
 
 Critères :
@@ -358,50 +360,48 @@ async function enrichLowQualityMatches(matched: GrantResult[]): Promise<GrantRes
 }
 
 /**
- * Enrich matched grants with AI-generated metadata
+ * Enrich matched grants with AI-generated metadata.
+ * Runs in parallel (Promise.allSettled) to stay under 15s.
+ * Generates: matchScore, matchReason, amount estimate, difficulty, advice.
  */
 async function enrichGrantsWithAI(
   grants: GrantResult[],
   submission: FormSubmission
 ): Promise<GrantResult[]> {
-  const enrichedGrants: GrantResult[] = [];
+  // Null-safe profile summary
+  const statusStr = submission.status?.join(", ") ?? "Non spécifié";
+  const domainStr = submission.artisticDomain?.join(", ") ?? "Non spécifié";
+  const typeStr = submission.projectType?.join(", ") ?? "Non spécifié";
+  const stageStr = submission.projectStage ?? "Non spécifié";
+  const descStr = submission.projectDescription ?? "Non spécifié";
 
-  for (const grant of grants) {
-    try {
-      const enrichmentPrompt = `Analyse cette subvention culturelle et fournis des métadonnées enrichies :
+  const results = await Promise.allSettled(
+    grants.map(async (grant, index) => {
+      const enrichmentPrompt = `Analyse cette subvention culturelle pour cet utilisateur :
 
 SUBVENTION :
 Titre: ${grant.title}
 Organisme: ${grant.organization}
-Description: ${grant.description || "Non spécifiée"}
-Éligibilité: ${grant.eligibility || "Non spécifiée"}
+Description: ${(grant.description || "Non spécifiée").substring(0, 500)}
+Éligibilité: ${(grant.eligibility || "Non spécifiée").substring(0, 300)}
 Montant actuel: ${grant.amount}
 
 PROFIL UTILISATEUR :
-- Statut : ${submission.status.join(", ")}
-- Domaine artistique : ${submission.artisticDomain.join(", ")}
-- Type de projet : ${submission.projectType.join(", ")}
-- Stade : ${submission.projectStage}
-- Description : ${submission.projectDescription}
+- Statut : ${statusStr}
+- Domaine artistique : ${domainStr}
+- Type de projet : ${typeStr}
+- Stade : ${stageStr}
+- Description : ${descStr}
 
-TÂCHE :
-Analyse cette subvention et génère :
+TÂCHE : Génère en JSON strict :
+1. "matchScore" (0-100) : pertinence de cette subvention pour CE profil
+2. "matchReason" (1-2 phrases en français) : pourquoi cette subvention correspond au profil. Sois spécifique sur les liens entre le profil et l'aide.
+3. "amount" : estimation du montant si non précisé, sinon garder l'existant
+4. "difficulty" : "facile"|"moyen"|"difficile"
+5. "advice" : 2-3 conseils personnalisés concrets (50-80 mots)
 
-1. **Montant estimé** : Si le montant n'est pas précisé ou est "Montant variable", estime-le basé sur la description (ex: "5 000 - 15 000 €", "Jusqu'à 50 000 €", "Variable selon projet"). Garde le montant actuel s'il semble correct.
-
-2. **Difficulté** : Évalue la difficulté du dossier (facile/moyen/difficile) basé sur :
-   - Complexité des critères d'éligibilité
-   - Documents requis
-   - Type d'organisme (EU = difficile, local = plus facile)
-
-3. **Conseils** : 2-3 conseils concrets et personnalisés pour ce profil spécifique (50-80 mots). Mentionne des éléments précis du projet de l'utilisateur.
-
-Format de réponse (JSON strict) :
-{
-  "amount": "montant estimé ici",
-  "difficulty": "facile|moyen|difficile",
-  "advice": "conseils personnalisés ici"
-}`;
+Format :
+{"matchScore":85,"matchReason":"...","amount":"...","difficulty":"moyen","advice":"..."}`;
 
       const messages: OpenRouterMessage[] = [
         { role: "system", content: "Tu es un expert en subventions culturelles françaises. Réponds UNIQUEMENT en JSON valide." },
@@ -409,29 +409,27 @@ Format de réponse (JSON strict) :
       ];
 
       const aiResponse = await callOpenRouter(messages);
-      
-      // Parse JSON response
       const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const enrichment = JSON.parse(jsonMatch[0]);
-        
-        enrichedGrants.push({
+        console.log(`✅ Enrichi: ${grant.title.substring(0, 40)}... (score: ${enrichment.matchScore})`);
+        return {
           ...grant,
+          matchScore: enrichment.matchScore ?? (95 - index * 5),
+          matchReason: enrichment.matchReason ?? undefined,
           amount: enrichment.amount || grant.amount,
           applicationDifficulty: enrichment.difficulty || undefined,
           preparationAdvice: enrichment.advice || undefined,
-        });
-        
-        console.log(`✅ Subvention enrichie: ${grant.title.substring(0, 40)}...`);
-      } else {
-        console.warn(`⚠️ Pas de JSON valide pour: ${grant.title}`);
-        enrichedGrants.push(grant);
+        } as GrantResult;
       }
-    } catch (error: any) {
-      console.warn(`⚠️ Erreur enrichissement pour ${grant.title}:`, error.message);
-      enrichedGrants.push(grant);
-    }
-  }
+      console.warn(`⚠️ Pas de JSON valide pour: ${grant.title}`);
+      return { ...grant, matchScore: 90 - index * 5 } as GrantResult;
+    })
+  );
 
-  return enrichedGrants;
+  return results.map((result, i) => {
+    if (result.status === "fulfilled") return result.value;
+    console.warn(`⚠️ Erreur enrichissement pour ${grants[i].title}:`, (result.reason as Error).message);
+    return { ...grants[i], matchScore: 85 - i * 5 } as GrantResult;
+  });
 }

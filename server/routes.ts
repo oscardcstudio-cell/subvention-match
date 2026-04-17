@@ -1,16 +1,52 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { insertFormSubmissionSchema, userFormInputSchema, type InsertGrant, type Grant, type GrantResult } from "@shared/schema";
+import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, type InsertGrant, type Grant, type GrantResult } from "@shared/schema";
 import { storage } from "./storage";
 import { grantStorage } from "./grant-storage";
 import { matchGrantsWithAI } from "./ai-matcher";
 import { generateGrantsPDF, generateAndSaveGrantsPDF, submissionToPdfFormData } from "./pdf-generator";
-import { sendGrantsEmail } from "./email-service";
+import { sendGrantsEmail, sendGrantsEmailFallback } from "./email-service";
 import { testApiConnection, fetchAides } from "./aides-territoires-api";
 import { getGrantsStatistics, getOverallStats } from "./stats";
 import { enrichmentService } from "./enrichment-service";
 import Stripe from "stripe";
 import express from "express";
+import rateLimit from "express-rate-limit";
+
+// --- Rate limiters ---
+// Protège les routes coûteuses (IA, Stripe, email) contre les abus.
+// windowMs = fenêtre glissante en ms, max = requêtes autorisées par fenêtre.
+const formSubmitLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 10,                   // 10 soumissions / 15 min / IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Trop de soumissions. Réessayez dans quelques minutes." },
+});
+
+const aiChatLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 30,                   // 30 messages chat / 5 min / IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Trop de requêtes. Attendez un moment." },
+});
+
+const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Trop de tentatives de paiement." },
+});
+
+const emailLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,  // 1 h
+  max: 5,                     // 5 emails / h / IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Limite d'envoi d'emails atteinte. Réessayez plus tard." },
+});
 
 // Utilitaires pour masquer les données sensibles dans les logs
 const DEBUG_MODE = process.env.NODE_ENV === "development";
@@ -91,7 +127,7 @@ function formatGrantToResult(grant: Grant): GrantResult {
 // Initialize Stripe only if key is available (optional for beta/free mode)
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeKey 
-  ? new Stripe(stripeKey, { apiVersion: "2025-09-30.clover" })
+  ? new Stripe(stripeKey, { apiVersion: "2025-10-29.clover" })
   : null;
 
 const isStripeEnabled = !!stripe;
@@ -108,8 +144,52 @@ export function registerRoutes(app: Express): Server {
     res.status(200).json({ status: "ok", uptime: process.uptime() });
   });
 
+  // Deep health check — vérifie que tous les services externes répondent.
+  // Utile pour alerter AVANT qu'un utilisateur tombe sur une erreur.
+  app.get("/api/health/deep", async (_req, res) => {
+    const checks: Record<string, { ok: boolean; ms?: number; error?: string }> = {};
+
+    // 1. Database (Supabase via pg pool)
+    const dbStart = Date.now();
+    try {
+      const { pool } = await import("./db");
+      await pool.query("SELECT 1");
+      checks.database = { ok: true, ms: Date.now() - dbStart };
+    } catch (e: any) {
+      checks.database = { ok: false, ms: Date.now() - dbStart, error: e.message };
+    }
+
+    // 2. OpenRouter (AI matching)
+    const aiStart = Date.now();
+    try {
+      if (!process.env.OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY missing");
+      const r = await fetch("https://openrouter.ai/api/v1/models", {
+        headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}` },
+        signal: AbortSignal.timeout(5000),
+      });
+      checks.openrouter = { ok: r.ok, ms: Date.now() - aiStart, ...(!r.ok && { error: `HTTP ${r.status}` }) };
+    } catch (e: any) {
+      checks.openrouter = { ok: false, ms: Date.now() - aiStart, error: e.message };
+    }
+
+    // 3. Stripe
+    checks.stripe = { ok: isStripeEnabled };
+    if (!isStripeEnabled) checks.stripe.error = "STRIPE_SECRET_KEY missing";
+
+    // 4. Resend (email)
+    checks.resend = { ok: !!process.env.RESEND_API_KEY };
+    if (!process.env.RESEND_API_KEY) checks.resend.error = "RESEND_API_KEY missing";
+
+    const allOk = Object.values(checks).every((c) => c.ok);
+    res.status(allOk ? 200 : 503).json({
+      status: allOk ? "ok" : "degraded",
+      uptime: process.uptime(),
+      checks,
+    });
+  });
+
   // Route pour soumettre le formulaire (MODE GRATUIT - BETA)
-  app.post("/api/submit-form", async (req, res) => {
+  app.post("/api/submit-form", formSubmitLimiter, async (req, res) => {
     try {
       const validatedData = userFormInputSchema.parse(req.body);
       
@@ -174,8 +254,23 @@ export function registerRoutes(app: Express): Server {
           });
           console.log("✅ Email envoyé avec succès");
         } catch (pdfError: any) {
-          console.error("⚠️  Erreur PDF/Email (non-bloquante):", pdfError.message);
-          // On ne bloque pas la réponse si le PDF échoue
+          console.error("⚠️  Erreur PDF/Email:", pdfError.message);
+          // Fallback : envoyer les matches en HTML dans le corps de l'email
+          try {
+            const grantsForFallback = await Promise.all(
+              matchedGrants.map(async (result: any) => {
+                const grant = await grantStorage.getGrantById(result.grantId);
+                return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
+              })
+            );
+            const validForFallback = grantsForFallback.filter((g): g is NonNullable<typeof g> => g !== null);
+            if (validForFallback.length > 0) {
+              await sendGrantsEmailFallback({ to: submission.email, grants: validForFallback });
+              console.log("📧 Fallback HTML email envoyé (sans PDF)");
+            }
+          } catch (fallbackError: any) {
+            console.error("❌ Fallback email aussi échoué:", fallbackError.message);
+          }
         }
       }
 
@@ -187,7 +282,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Route pour affiner les résultats via chat IA
-  app.post("/api/chat-refine", async (req, res) => {
+  app.post("/api/chat-refine", aiChatLimiter, async (req, res) => {
     try {
       const { sessionId, userMessage, conversationHistory } = req.body;
 
@@ -450,8 +545,107 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
     }
   });
 
+  // --- Match feedback (beta quality tracking) ---
+  // Les testeurs votent pertinent/pas pertinent sur chaque subvention proposée.
+  const feedbackLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 50,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Trop de feedbacks envoyés." },
+  });
+
+  app.post("/api/feedback", feedbackLimiter, async (req, res) => {
+    try {
+      const { sessionId, grantId, rating, comment } = req.body;
+      if (!sessionId || !grantId || !["relevant", "not_relevant"].includes(rating)) {
+        return res.status(400).json({ error: "sessionId, grantId et rating (relevant|not_relevant) requis." });
+      }
+      const { db } = await import("./db");
+      await db.insert(matchFeedback).values({ sessionId, grantId, rating, comment: comment || null });
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Erreur feedback:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Stats de feedback pour l'admin — taux de pertinence global + par subvention
+  app.get("/api/admin/feedback-stats", requireAdmin, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      const stats = await db.execute(sql`
+        SELECT
+          COUNT(*)::integer AS total,
+          SUM(CASE WHEN rating = 'relevant' THEN 1 ELSE 0 END)::integer AS relevant,
+          SUM(CASE WHEN rating = 'not_relevant' THEN 1 ELSE 0 END)::integer AS not_relevant,
+          ROUND(100.0 * SUM(CASE WHEN rating = 'relevant' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 1) AS relevance_rate
+        FROM match_feedback
+      `);
+      const perGrant = await db.execute(sql`
+        SELECT
+          grant_id,
+          COUNT(*)::integer AS votes,
+          SUM(CASE WHEN rating = 'relevant' THEN 1 ELSE 0 END)::integer AS relevant,
+          ROUND(100.0 * SUM(CASE WHEN rating = 'relevant' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 1) AS relevance_rate
+        FROM match_feedback
+        GROUP BY grant_id
+        ORDER BY votes DESC
+        LIMIT 50
+      `);
+      res.json({ overall: stats.rows[0], perGrant: perGrant.rows });
+    } catch (error: any) {
+      console.error("Erreur feedback stats:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // --- Beta feedback (bugs & suggestions du widget flottant) ---
+  const betaFeedbackLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Trop de feedbacks envoyés." },
+  });
+
+  app.post("/api/beta-feedback", betaFeedbackLimiter, async (req, res) => {
+    try {
+      const { type, message, page, userAgent } = req.body;
+      if (!type || !message) {
+        return res.status(400).json({ error: "type et message requis" });
+      }
+      const { db } = await import("./db");
+      await db.insert(betaFeedback).values({
+        type,
+        message: message.slice(0, 2000), // cap length
+        page: page || null,
+        userAgent: userAgent ? userAgent.slice(0, 500) : null,
+      });
+      console.log(`💬 Beta feedback (${type}): ${message.slice(0, 80)}...`);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Erreur beta-feedback:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin : consulter les feedbacks beta
+  app.get("/api/admin/beta-feedback", requireAdmin, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { desc } = await import("drizzle-orm");
+      const feedbacks = await db.select().from(betaFeedback).orderBy(desc(betaFeedback.createdAt)).limit(100);
+      res.json(feedbacks);
+    } catch (error: any) {
+      console.error("Erreur listing beta-feedback:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Route pour créer une session de paiement Stripe
-  app.post("/api/create-checkout-session", async (req, res) => {
+  app.post("/api/create-checkout-session", checkoutLimiter, async (req, res) => {
     try {
       if (!stripe) {
         return res.status(503).json({ error: "Paiement non disponible (mode gratuit)" });
@@ -596,7 +790,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * POST /api/grants - Créer une nouvelle subvention (pour votre agent Dust)
    */
-  app.post("/api/grants", async (req, res) => {
+  app.post("/api/grants", requireAdmin, async (req, res) => {
     try {
       const grantData: InsertGrant = req.body;
       
@@ -638,7 +832,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * GET /api/admin/grants - Route admin pour récupérer TOUTES les subventions
    */
-  app.get("/api/admin/grants", async (req, res) => {
+  app.get("/api/admin/grants", requireAdmin, async (req, res) => {
     try {
       const grants = await grantStorage.getAllActiveGrants();
       res.json(grants);
@@ -724,7 +918,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * PUT /api/grants/:id - Mettre à jour une subvention
    */
-  app.put("/api/grants/:id", async (req, res) => {
+  app.put("/api/grants/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updates: Partial<InsertGrant> = req.body;
@@ -749,7 +943,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * DELETE /api/grants/:id - Archiver une subvention
    */
-  app.delete("/api/grants/:id", async (req, res) => {
+  app.delete("/api/grants/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await grantStorage.deleteGrant(id);
@@ -855,7 +1049,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * POST /api/send-email/:sessionId - Envoyer le PDF par email (génère le PDF si nécessaire)
    */
-  app.post("/api/send-email/:sessionId", async (req, res) => {
+  app.post("/api/send-email/:sessionId", emailLimiter, async (req, res) => {
     try {
       const { sessionId } = req.params;
       console.log(`📧 [send-email] Recherche de la session: ${maskSessionId(sessionId)}`);
@@ -933,7 +1127,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   /**
    * GET /api/admin/submissions - Liste toutes les soumissions (Admin)
    */
-  app.get("/api/admin/submissions", async (req, res) => {
+  app.get("/api/admin/submissions", requireAdmin, async (req, res) => {
     try {
       const submissions = await storage.getAllSubmissions();
       res.json(submissions);
@@ -947,7 +1141,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
    * POST /api/test-submit-and-send - TEST MODE: Soumission + AI + PDF + Email
    * Permet de tester le flow complet sans payer
    */
-  app.post("/api/test-submit-and-send", async (req, res) => {
+  app.post("/api/test-submit-and-send", requireAdmin, async (req, res) => {
     try {
       console.log("🧪 TEST MODE: Starting full flow without payment...");
       
@@ -1060,7 +1254,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   });
 
   // Route pour envoyer un email de test
-  app.post("/api/test-email", async (req, res) => {
+  app.post("/api/test-email", requireAdmin, async (req, res) => {
     try {
       const { email } = req.body;
       const testEmail = email || "oscarinternship@gmail.com";
@@ -1128,7 +1322,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   });
 
   // POST /api/enrichment/start - Lancer l'enrichissement automatique
-  app.post("/api/enrichment/start", async (req, res) => {
+  app.post("/api/enrichment/start", requireAdmin, async (req, res) => {
     try {
       const { limit } = req.body;
       
@@ -1246,7 +1440,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   });
 
   // POST /api/organisms/scrape - Lancer le scraping automatique des organismes
-  app.post("/api/organisms/scrape", async (req, res) => {
+  app.post("/api/organisms/scrape", requireAdmin, async (req, res) => {
     try {
       const { organismScraperService } = await import("./organism-scraper");
       
@@ -1606,7 +1800,7 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   });
 
   // POST /api/scrape-organism/:id - Lancer le scraping d'un organisme
-  app.post("/api/scrape-organism/:id", async (req, res) => {
+  app.post("/api/scrape-organism/:id", requireAdmin, async (req, res) => {
     try {
       const organismId = req.params.id;
       

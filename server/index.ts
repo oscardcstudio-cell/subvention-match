@@ -1,6 +1,19 @@
+import * as Sentry from "@sentry/node";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+
+// --- Sentry (error tracking) ---
+// Crée un projet Node.js sur https://sentry.io, copie le DSN et ajoute-le
+// dans Railway : SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || "production",
+    tracesSampleRate: 0.2, // 20% des requêtes tracées (suffisant pour une beta)
+  });
+  log("Sentry initialized");
+}
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -43,8 +56,12 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    // Envoie l'erreur à Sentry si configuré
+    if (process.env.SENTRY_DSN) {
+      Sentry.captureException(err);
+    }
+
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after

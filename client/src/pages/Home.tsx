@@ -621,7 +621,7 @@ export default function Home() {
       <footer className="py-16 px-8 border-t border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-sm text-gray-600">
-            © 2025 SubventionMatch
+            © 2026 SubventionMatch
           </div>
           <div className="flex gap-8 text-sm text-gray-600 items-center">
             <Link href="/api-status" className="hover:text-[#118AB2] transition-colors" data-testid="link-api-status">
@@ -643,9 +643,9 @@ export default function Home() {
             >
               {language === "fr" ? "📊 Qualité des données" : "📊 Data Quality"}
             </Link>
-            <a href="#" className="hover:text-[#118AB2] transition-colors">{t.footerAbout}</a>
-            <a href="#" className="hover:text-[#118AB2] transition-colors">{t.footerContact}</a>
-            <a href="#" className="hover:text-[#118AB2] transition-colors">{t.footerPrivacy}</a>
+            <Link href="/mentions-legales" className="hover:text-[#118AB2] transition-colors">Mentions legales</Link>
+            <Link href="/cgv" className="hover:text-[#118AB2] transition-colors">CGV</Link>
+            <Link href="/confidentialite" className="hover:text-[#118AB2] transition-colors">{t.footerPrivacy}</Link>
           </div>
         </div>
       </footer>

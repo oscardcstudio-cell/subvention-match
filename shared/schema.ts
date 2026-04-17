@@ -182,6 +182,37 @@ export const insertOrganismTrackingSchema = createInsertSchema(organismsTracking
 export type InsertOrganismTracking = z.infer<typeof insertOrganismTrackingSchema>;
 export type OrganismTracking = typeof organismsTracking.$inferSelect;
 
+// Feedback qualité des matches — les beta testeurs votent pertinent/pas pertinent
+// sur chaque subvention proposée. Sert à tuner le prompt IA et mesurer la qualité.
+export const matchFeedback = pgTable("match_feedback", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").notNull(),
+  grantId: varchar("grant_id").notNull(),
+  rating: text("rating").notNull(), // 'relevant' | 'not_relevant'
+  comment: text("comment"), // commentaire libre optionnel
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertMatchFeedbackSchema = createInsertSchema(matchFeedback).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertMatchFeedback = z.infer<typeof insertMatchFeedbackSchema>;
+export type MatchFeedback = typeof matchFeedback.$inferSelect;
+
+// Feedback general des beta testeurs (bugs, suggestions)
+export const betaFeedback = pgTable("beta_feedback", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(), // 'bug' | 'suggestion'
+  message: text("message").notNull(),
+  page: text("page"), // page d'ou le feedback a ete envoye
+  userAgent: text("user_agent"),
+  resolved: text("resolved").default("false"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type BetaFeedback = typeof betaFeedback.$inferSelect;
+
 // Grant/Subvention result schema (from AI matching)
 export const grantResultSchema = z.object({
   id: z.string(),

@@ -15,6 +15,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackFormStarted, trackFormSubmitted } from "@/lib/analytics";
 
 const frenchRegions = [
   "Auvergne-Rhône-Alpes",
@@ -95,7 +96,10 @@ export default function FormWizard() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isExtended, setIsExtended] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
+  // Analytics: track que l'utilisateur a ouvert le formulaire
+  useEffect(() => { trackFormStarted(); }, []);
+
   // Extraire le paramètre domain de l'URL
   const urlParams = new URLSearchParams(window.location.search);
   const domainParam = urlParams.get('domain') || '';
@@ -261,6 +265,10 @@ export default function FormWizard() {
 
   const onSubmit = async (data: FormData) => {
     console.log("🚀 Soumission du formulaire:", data);
+    trackFormSubmitted({
+      artisticDomain: data.artisticDomain?.join(", "),
+      region: data.region,
+    });
     submitMutation.mutate(data);
   };
 

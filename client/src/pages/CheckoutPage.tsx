@@ -9,6 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Lock, Loader2, CheckCircle } from "lucide-react";
+import { trackPaymentCompleted } from "@/lib/analytics";
 
 // Use lazy initialization to ensure env vars are loaded
 let stripePromise: Promise<any> | null = null;
@@ -55,12 +56,13 @@ function CheckoutForm({ sessionId }: { sessionId: string }) {
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
       // Mark session as paid
       await apiRequest("POST", "/api/verify-payment", { sessionId });
-      
+      trackPaymentCompleted({ sessionId });
+
       toast({
         title: t.paymentSuccess,
         description: t.paymentDescription,
       });
-      
+
       // Redirect to results
       setLocation(`/results?sessionId=${sessionId}`);
     }
