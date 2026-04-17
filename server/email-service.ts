@@ -88,6 +88,18 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
             </p>
           </div>
 
+          <div style="background: #FFF4D6; border: 1px solid #FFD166; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+            <p style="font-size: 14px; color: #073B4C; margin: 0 0 10px; font-weight: 600;">
+              🧪 SubventionMatch est en beta
+            </p>
+            <p style="font-size: 13px; color: #4a4a4a; margin: 0 0 12px;">
+              Votre avis nous aide à améliorer l'outil. Un résultat qui ne colle pas ? Une idée ?
+            </p>
+            <a href="https://subvention-match-production.up.railway.app/?feedback=1" style="display: inline-block; background: #073B4C; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;">
+              💬 Donner un retour
+            </a>
+          </div>
+
           <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e5e5e5;">
             <p style="font-size: 14px; color: #666; margin-bottom: 8px;">
               Besoin d'aide ? Nous sommes là pour vous accompagner.

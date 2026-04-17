@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 
 export function FeedbackWidget() {
@@ -7,6 +7,16 @@ export function FeedbackWidget() {
   const [type, setType] = useState<"bug" | "suggestion">("bug");
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+
+  // Ouvre le widget automatiquement si ?feedback=1 dans l'URL
+  // (utilisé par les liens depuis l'email et le PDF)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("feedback") === "1") {
+      setIsOpen(true);
+    }
+  }, []);
 
   const handleSubmit = async () => {
     if (!message.trim()) return;

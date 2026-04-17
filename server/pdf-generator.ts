@@ -794,6 +794,39 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
           margin-top: 6px;
         }
 
+        /* Beta feedback box */
+        .beta-feedback {
+          margin-top: 50px;
+          padding: 24px;
+          background: #FFF4D6;
+          border: 2px solid #FFD166;
+          border-radius: 12px;
+          text-align: center;
+          page-break-inside: avoid;
+        }
+        .beta-feedback h3 {
+          font-size: 16px;
+          font-weight: 700;
+          color: #073B4C;
+          margin: 0 0 10px;
+        }
+        .beta-feedback p {
+          font-size: 13px;
+          color: #4a4a4a;
+          margin: 0 0 14px;
+          line-height: 1.5;
+        }
+        .beta-feedback a {
+          display: inline-block;
+          background: #073B4C;
+          color: white;
+          padding: 10px 22px;
+          border-radius: 8px;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 600;
+        }
+
         /* Transparence : champs manquants ou approximatifs */
         .info-missing {
           font-style: italic;
@@ -1144,9 +1177,19 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
           `;
         }).join('')}
 
+        <!-- Beta feedback box -->
+        <div class="beta-feedback">
+          <h3>🧪 SubventionMatch est en beta</h3>
+          <p>
+            Un résultat pertinent ? Une subvention mal matchée ? Une idée ?<br/>
+            Votre retour nous aide à améliorer le matching pour tous les artistes.
+          </p>
+          <a href="https://subvention-match-production.up.railway.app/?feedback=1">💬 Donner un retour</a>
+        </div>
+
         <!-- Footer -->
         <div class="footer">
-          <div>© 2025 SubventionMatch - Tous droits réservés</div>
+          <div>© ${new Date().getFullYear()} SubventionMatch - Tous droits réservés</div>
           <div class="footer-email">Document généré pour: ${userEmail}</div>
         </div>
       </div>

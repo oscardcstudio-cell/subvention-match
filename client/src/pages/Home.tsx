@@ -235,12 +235,22 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header Minimal */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+      {/* Beta banner */}
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-[#FFD166] text-[#073B4C] px-4 py-2 text-center text-xs sm:text-sm font-medium">
+        {language === "fr"
+          ? "🧪 Version beta — vos retours sont précieux, utilisez le bouton \"Retour\" en bas à droite"
+          : "🧪 Beta version — your feedback matters, use the \"Feedback\" button at the bottom right"}
+      </div>
+
+      <header className="fixed top-9 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 bg-white/80 backdrop-blur-sm border-b border-gray-100">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <a href="/" data-testid="link-home" className="group">
+          <a href="/" data-testid="link-home" className="group flex items-center gap-2">
             <span className="text-lg sm:text-xl font-light tracking-tight text-[#073B4C]">
               Subvention<span className="font-bold">Match</span>
             </span>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-[#FFD166] text-[#073B4C] bg-[#FFD166]/20">
+              BETA
+            </Badge>
           </a>
           <div className="flex items-center gap-3">
             <Link href="/notes">
@@ -562,7 +572,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Test Flow Section - Nouvelle palette */}
+      {/* Test Flow Section - Dev only (cachée en prod pour éviter que les users testent par hasard) */}
+      {import.meta.env.DEV && (
       <section className="py-32 px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -668,6 +679,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Footer Minimal - Nouvelle palette */}
       <footer className="py-16 px-8 border-t border-gray-200 bg-white">
@@ -675,7 +687,18 @@ export default function Home() {
           <div className="text-sm text-gray-600">
             © 2026 SubventionMatch
           </div>
-          <div className="flex gap-8 text-sm text-gray-600 items-center">
+          <div className="flex flex-wrap gap-6 sm:gap-8 text-sm text-gray-600 items-center">
+            <button
+              onClick={() => {
+                // Ouvre le widget feedback existant (bouton flottant)
+                const btn = document.querySelector('[aria-label="Donner un retour"]') as HTMLElement | null;
+                btn?.click();
+              }}
+              className="hover:text-[#EF476F] transition-colors font-medium"
+              data-testid="link-feedback"
+            >
+              {language === "fr" ? "💬 Donner un retour" : "💬 Give feedback"}
+            </button>
             <Link href="/api-status" className="hover:text-[#118AB2] transition-colors" data-testid="link-api-status">
               {language === "fr" ? "Monitoring APIs" : "API Monitoring"}
             </Link>
