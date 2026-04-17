@@ -219,6 +219,164 @@ interface GrantsStats {
   withUrl: number;
 }
 
+function BetaWaitlistSection({ language }: { language: string }) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (status === "loading" || status === "success") return;
+    setStatus("loading");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "homepage-pricing" }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Erreur");
+      }
+      setStatus("success");
+    } catch (err: any) {
+      setStatus("error");
+      setErrorMsg(err.message || (language === "fr" ? "Erreur" : "Error"));
+    }
+  };
+
+  return (
+    <section className="py-20 sm:py-24 px-4 sm:px-8 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        {/* Badge beta */}
+        <div className="flex justify-center mb-6">
+          <span className="inline-flex items-center gap-2 bg-[#FFD166] text-[#073B4C] px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide">
+            🧪 {language === "fr" ? "Version beta" : "Beta version"}
+          </span>
+        </div>
+
+        {/* Titre principal */}
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter leading-[0.95] text-[#073B4C] mb-6 text-center">
+          {language === "fr" ? (
+            <>100 % GRATUIT<br /><span className="text-[#06D6A0]">PENDANT LA BETA.</span></>
+          ) : (
+            <>100% FREE<br /><span className="text-[#06D6A0]">DURING THE BETA.</span></>
+          )}
+        </h2>
+
+        {/* Explication honnête */}
+        <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed text-center mb-10">
+          {language === "fr"
+            ? "Le matching s'améliore de jour en jour avec chaque projet testé. Tant qu'on n'atteint pas 80 % de résultats vraiment pertinents, tout reste gratuit — aucune carte bancaire, aucun piège."
+            : "Matching improves every day with each project tested. Until we reach 80% truly relevant results, everything stays free — no credit card, no catch."
+          }
+        </p>
+
+        {/* Ce que vous obtenez */}
+        <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 mb-12">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-[#06D6A0]/30">
+            <div className="text-3xl mb-3">🎯</div>
+            <div className="font-bold text-[#073B4C] mb-1">
+              {language === "fr" ? "Tous vos matches" : "All your matches"}
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {language === "fr"
+                ? "Aucun résultat flouté. Tout est débloqué."
+                : "No blurred results. Everything unlocked."
+              }
+            </p>
+          </div>
+          <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-[#06D6A0]/30">
+            <div className="text-3xl mb-3">📄</div>
+            <div className="font-bold text-[#073B4C] mb-1">
+              {language === "fr" ? "Votre rapport PDF" : "Your PDF report"}
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {language === "fr"
+                ? "Téléchargeable, partageable avec votre équipe."
+                : "Downloadable, shareable with your team."
+              }
+            </p>
+          </div>
+          <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-[#06D6A0]/30">
+            <div className="text-3xl mb-3">💬</div>
+            <div className="font-bold text-[#073B4C] mb-1">
+              {language === "fr" ? "Un canal direct" : "A direct channel"}
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {language === "fr"
+                ? "Vos retours nous font progresser. Chaque avis compte."
+                : "Your feedback drives us. Every review counts."
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* Waitlist email capture */}
+        <div className="bg-[#073B4C] text-white rounded-2xl p-6 sm:p-10">
+          <div className="max-w-xl mx-auto text-center">
+            <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight">
+              {language === "fr" ? "Prévenez-moi quand la V1 sort" : "Notify me when V1 launches"}
+            </h3>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              {language === "fr"
+                ? "Vous serez informé(e) en avant-première, avec un tarif de lancement réservé aux beta-testeurs."
+                : "Get early access with a launch price reserved for beta testers."
+              }
+            </p>
+
+            {status === "success" ? (
+              <div className="bg-[#06D6A0]/20 border border-[#06D6A0] rounded-xl p-5">
+                <div className="text-2xl mb-2">✓</div>
+                <p className="font-medium text-white">
+                  {language === "fr" ? "C'est noté ! On vous tiendra au courant." : "You're in! We'll keep you posted."}
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  required
+                  placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === "loading"}
+                  className="flex-1 px-5 py-3 rounded-full text-[#073B4C] bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#06D6A0] disabled:opacity-60"
+                  data-testid="input-waitlist-email"
+                />
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={status === "loading"}
+                  className="bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-[#073B4C] font-bold rounded-full px-8 py-3"
+                  data-testid="button-waitlist-submit"
+                >
+                  {status === "loading"
+                    ? (language === "fr" ? "Envoi..." : "Sending...")
+                    : (language === "fr" ? "Me prévenir" : "Notify me")
+                  }
+                </Button>
+              </form>
+            )}
+
+            {status === "error" && (
+              <p className="text-[#EF476F] text-sm mt-3">{errorMsg}</p>
+            )}
+
+            <p className="text-xs text-gray-400 mt-4">
+              {language === "fr"
+                ? "Email uniquement pour la notification V1. Aucun spam, aucune revente."
+                : "Email used only for V1 notification. No spam, no reselling."
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
 
@@ -273,32 +431,52 @@ export default function Home() {
               <h1 className="text-[3.5rem] sm:text-[5rem] md:text-[6rem] lg:text-[7rem] leading-[0.85] font-bold tracking-tighter text-[#073B4C]">
                 {language === "fr" ? (
                   <>
-                    TROUVEZ
+                    LA BONNE
                     <br />
-                    VOTRE
+                    AIDE POUR
                     <br />
-                    SUBVENTION
+                    VOTRE ART.
                   </>
                 ) : (
                   <>
-                    FIND
+                    THE RIGHT
                     <br />
-                    YOUR
+                    GRANT FOR
                     <br />
-                    GRANT
+                    YOUR ART.
                   </>
                 )}
               </h1>
             </div>
 
             {/* Description */}
-            <div className="space-y-3 text-base sm:text-lg text-gray-600 max-w-2xl leading-relaxed">
-              <p>
-                {language === "fr" 
-                  ? "Ton partenaire pour trouver la meilleure subvention à ton projet."
-                  : "Your partner to find the best grant for your project."
+            <div className="space-y-4 text-base sm:text-lg text-gray-700 max-w-2xl leading-relaxed">
+              <p className="text-xl sm:text-2xl font-medium text-[#073B4C]">
+                {language === "fr"
+                  ? "L'IA spécialisée en subventions culturelles."
+                  : "The AI specialized in cultural grants."
                 }
               </p>
+              <p>
+                {language === "fr"
+                  ? "Chaque aide vérifiée une à une par nos équipes : deadline réelle, montant précis, lien direct vers le bon dossier. Vous décrivez votre projet, vous recevez votre top 5 matché — en 3 minutes."
+                  : "Every grant verified one by one by our team: real deadline, precise amount, direct link to the right application. Describe your project, get your top 5 matches — in 3 minutes."
+                }
+              </p>
+            </div>
+
+            {/* Trust pills — sous le sous-titre, niveau des yeux */}
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <span className="inline-flex items-center gap-1.5 bg-[#06D6A0]/10 text-[#073B4C] border border-[#06D6A0]/30 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium">
+                <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full animate-pulse" />
+                {language === "fr" ? "Base mise à jour cette semaine" : "Database updated this week"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-[#FFD166]/30 text-[#073B4C] border border-[#FFD166] px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold">
+                🎁 {language === "fr" ? "Gratuit pendant la beta" : "Free during beta"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-white text-[#073B4C] border border-gray-200 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium">
+                {language === "fr" ? "Sans carte bancaire · Sans abonnement" : "No credit card · No subscription"}
+              </span>
             </div>
 
             {/* Stats cards */}
@@ -478,6 +656,166 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Pourquoi pas juste ChatGPT ? — Traitement de l'objection #1 */}
+      <section className="py-20 sm:py-28 px-4 sm:px-8 bg-white border-t border-gray-100">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12 sm:mb-16 max-w-3xl">
+            <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold mb-4 tracking-wide uppercase">
+              {language === "fr" ? "La question qu'on nous pose le plus" : "The question we hear most"}
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter leading-[0.95] text-[#073B4C] mb-6">
+              {language === "fr" ? (
+                <>
+                  « ET POURQUOI
+                  <br />
+                  PAS JUSTE
+                  <br />
+                  CHATGPT ? »
+                </>
+              ) : (
+                <>
+                  "WHY NOT
+                  <br />
+                  JUST USE
+                  <br />
+                  CHATGPT?"
+                </>
+              )}
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              {language === "fr"
+                ? "On adore les IA généralistes. Elles sont imbattables pour rédiger votre dossier, reformuler votre note d'intention, ou traduire votre CV. Mais pour trouver la bonne subvention, il y a trois choses qu'elles ne peuvent pas faire — et on les fait."
+                : "We love general-purpose AIs. They're unbeatable for drafting your application, rephrasing your artistic statement, or translating your CV. But for finding the right grant, there are three things they can't do — and we do."
+              }
+            </p>
+          </div>
+
+          {/* Comparaison — 3 lignes, mobile-friendly */}
+          <div className="space-y-4 sm:space-y-5">
+            {/* Ligne 1 : Fraîcheur des données */}
+            <div className="rounded-2xl border-2 border-gray-200 overflow-hidden bg-white">
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-1">
+                  {language === "fr" ? "01 — Une base à jour" : "01 — A current database"}
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                <div className="p-6 sm:p-8 bg-gray-50/50">
+                  <div className="text-xs uppercase tracking-wide text-gray-500 mb-2 font-semibold">
+                    {language === "fr" ? "Une IA généraliste" : "A general-purpose AI"}
+                  </div>
+                  <p className="text-base text-gray-700 leading-relaxed">
+                    {language === "fr"
+                      ? "Sa connaissance s'arrête début 2025. Elle peut citer des aides qui n'existent plus, ou donner des informations qui ne sont plus valables."
+                      : "Its knowledge stopped in early 2025. It may mention programs that no longer exist, or give information that's no longer valid."
+                    }
+                  </p>
+                </div>
+                <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
+                  <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
+                    SubventionMatch
+                  </div>
+                  <p className="text-base text-gray-800 leading-relaxed font-medium">
+                    {language === "fr"
+                      ? `${grantsCount} subventions vérifiées une à une par nos équipes. Base revue chaque semaine, nouvelles aides ajoutées en continu.`
+                      : `${grantsCount} grants verified one by one by our team. Database reviewed every week, new grants added continuously.`
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Ligne 2 : Précision */}
+            <div className="rounded-2xl border-2 border-gray-200 overflow-hidden bg-white">
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-1">
+                  {language === "fr" ? "02 — Des montants et deadlines précis" : "02 — Precise amounts and deadlines"}
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                <div className="p-6 sm:p-8 bg-gray-50/50">
+                  <div className="text-xs uppercase tracking-wide text-gray-500 mb-2 font-semibold">
+                    {language === "fr" ? "Une IA généraliste" : "A general-purpose AI"}
+                  </div>
+                  <p className="text-base text-gray-700 leading-relaxed italic">
+                    {language === "fr"
+                      ? "« Le montant se situe entre 5 000 et 50 000 € environ. La date limite varie selon les sessions, renseignez-vous sur le site officiel. »"
+                      : "\"The amount is roughly between €5,000 and €50,000. The deadline varies by session, check the official website.\""
+                    }
+                  </p>
+                </div>
+                <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
+                  <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
+                    SubventionMatch
+                  </div>
+                  <p className="text-base text-gray-800 leading-relaxed font-medium">
+                    {language === "fr"
+                      ? "« 8 000 € – 45 000 €. Prochaine deadline : 23 juin 2026. Dossier à déposer ici. »"
+                      : "\"€8,000 – €45,000. Next deadline: June 23, 2026. Submit your application here.\""
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Ligne 3 : Pertinence métier */}
+            <div className="rounded-2xl border-2 border-gray-200 overflow-hidden bg-white">
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-1">
+                  {language === "fr" ? "03 — La finesse métier" : "03 — Industry nuance"}
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                <div className="p-6 sm:p-8 bg-gray-50/50">
+                  <div className="text-xs uppercase tracking-wide text-gray-500 mb-2 font-semibold">
+                    {language === "fr" ? "Une IA généraliste" : "A general-purpose AI"}
+                  </div>
+                  <p className="text-base text-gray-700 leading-relaxed">
+                    {language === "fr"
+                      ? "Propose les mêmes aides à un DJ électro, un quatuor à cordes et un compositeur de musique de film. Mélange souvent spectacle vivant et audiovisuel."
+                      : "Suggests the same grants to an electronic DJ, a string quartet and a film composer. Often mixes up performing arts and audiovisual."
+                    }
+                  </p>
+                </div>
+                <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
+                  <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
+                    SubventionMatch
+                  </div>
+                  <p className="text-base text-gray-800 leading-relaxed font-medium">
+                    {language === "fr"
+                      ? "Entraîné uniquement sur la culture. Sait qu'un DJ, un compositeur classique et un musicien de film n'ont pas accès aux mêmes dispositifs."
+                      : "Trained only on cultural grants. Knows a DJ, a classical composer and a film composer don't qualify for the same programs."
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Note finale — positionnement complémentaire */}
+          <div className="mt-10 sm:mt-12 bg-gradient-to-br from-[#FFD166]/10 to-white border border-[#FFD166]/40 rounded-2xl p-6 sm:p-8 text-center">
+            <p className="text-lg sm:text-xl text-[#073B4C] font-medium leading-relaxed max-w-2xl mx-auto">
+              {language === "fr" ? (
+                <>
+                  Utilisez <span className="font-bold">ChatGPT</span> pour rédiger votre dossier.
+                  <br className="hidden sm:block" />
+                  {" "}Utilisez <span className="font-bold">SubventionMatch</span> pour savoir lequel remplir.
+                </>
+              ) : (
+                <>
+                  Use <span className="font-bold">ChatGPT</span> to draft your application.
+                  <br className="hidden sm:block" />
+                  {" "}Use <span className="font-bold">SubventionMatch</span> to know which one to fill.
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* How it works - Nouvelle palette */}
       <section className="py-24 px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
@@ -512,12 +850,12 @@ export default function Home() {
                 </div>
                 <div className="flex-1 pt-2">
                   <h3 className="text-2xl font-bold mb-2 text-[#073B4C]">
-                    {language === "fr" ? "IA analyse et matche" : "AI analyzes and matches"}
+                    {language === "fr" ? "Notre IA croise votre profil avec la base" : "Our AI cross-references your profile with the database"}
                   </h3>
                   <p className="text-gray-600 text-lg leading-relaxed">
                     {language === "fr"
-                      ? `Notre IA analyse ${grantsCount} subventions pour trouver les meilleures pour vous.`
-                      : `Our AI analyzes ${grantsCount} grants to find the best matches for you.`
+                      ? `Elle compare votre profil, votre discipline et votre budget aux ${grantsCount} aides répertoriées. Deadline, éligibilité, montant : chaque critère est vérifié avant de vous proposer un match.`
+                      : `It compares your profile, discipline and budget against our ${grantsCount} listed grants. Deadline, eligibility, amount: every criterion is checked before we show you a match.`
                     }
                   </p>
                 </div>
@@ -529,12 +867,12 @@ export default function Home() {
                 </div>
                 <div className="flex-1 pt-2">
                   <h3 className="text-2xl font-bold mb-2 text-[#073B4C]">
-                    {language === "fr" ? "Accédez aux résultats" : "Access results"}
+                    {language === "fr" ? "Recevez votre top 5 personnalisé" : "Receive your personalized top 5"}
                   </h3>
                   <p className="text-gray-600 text-lg leading-relaxed">
                     {language === "fr"
-                      ? "1 résultat gratuit, puis 2€ par subventions."
-                      : "1 free result, then €2 per grant."
+                      ? "Vos matches s'affichent avec deadline, montant, éligibilité et lien direct vers le bon dossier. 100 % gratuit pendant toute la durée de la beta."
+                      : "Your matches appear with deadline, amount, eligibility and direct link to the right application. 100% free during the entire beta."
                     }
                   </p>
                 </div>
@@ -579,6 +917,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Beta gratuite + waitlist — positionnement honnête */}
+      <BetaWaitlistSection language={language} />
+
 
       {/* Coming Soon - Carnet d'adresses artistique */}
       <section className="py-24 px-8 bg-white">

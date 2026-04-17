@@ -214,6 +214,17 @@ export const betaFeedback = pgTable("beta_feedback", {
 
 export type BetaFeedback = typeof betaFeedback.$inferSelect;
 
+// Beta waitlist — emails captures depuis la homepage pour etre preven\u0301es quand la V1 payante sort
+export const betaWaitlist = pgTable("beta_waitlist", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  source: text("source"), // ex: 'homepage-pricing', 'homepage-hero'
+  notified: text("notified").default("false").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type BetaWaitlistEntry = typeof betaWaitlist.$inferSelect;
+
 // Grant/Subvention result schema (from AI matching)
 export const grantResultSchema = z.object({
   id: z.string(),

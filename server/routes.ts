@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, type InsertGrant, type Grant, type GrantResult } from "@shared/schema";
+import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, type InsertGrant, type Grant, type GrantResult } from "@shared/schema";
 import { storage } from "./storage";
 import { grantStorage } from "./grant-storage";
 import { matchGrantsWithAI } from "./ai-matcher";
@@ -641,6 +641,51 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
       res.json(feedbacks);
     } catch (error: any) {
       console.error("Erreur listing beta-feedback:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // --- Beta waitlist (email capture homepage pour notifier la V1) ---
+  const waitlistLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Trop de tentatives." },
+  });
+
+  app.post("/api/waitlist", waitlistLimiter, async (req, res) => {
+    try {
+      const { email, source } = req.body;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || typeof email !== "string" || !emailRegex.test(email)) {
+        return res.status(400).json({ error: "Email invalide" });
+      }
+      const { db } = await import("./db");
+      await db
+        .insert(betaWaitlist)
+        .values({
+          email: email.toLowerCase().trim().slice(0, 320),
+          source: source ? String(source).slice(0, 80) : "homepage",
+        })
+        .onConflictDoNothing();
+      console.log(`📬 Waitlist: ${email}`);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Erreur waitlist:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin : consulter la waitlist
+  app.get("/api/admin/waitlist", requireAdmin, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { desc } = await import("drizzle-orm");
+      const entries = await db.select().from(betaWaitlist).orderBy(desc(betaWaitlist.createdAt)).limit(500);
+      res.json(entries);
+    } catch (error: any) {
+      console.error("Erreur listing waitlist:", error);
       res.status(500).json({ error: error.message });
     }
   });
