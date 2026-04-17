@@ -16,12 +16,23 @@ import {
 import type { FormSubmission } from "@shared/schema";
 
 /**
+ * La réponse de /api/admin/submissions enrichit chaque ligne avec une URL PDF
+ * signée (token HMAC à 15 min) quand le PDF est dispo. On étend le type côté
+ * client sans polluer le schéma partagé.
+ */
+export type AdminSubmission = FormSubmission & {
+  pdfSignedUrl?: string | null;
+};
+
+/**
  * Centralisation des URLs côté admin — si la route change, un seul endroit à
  * modifier.
  */
 const urls = {
   results: (sessionId: string) => `/results?sessionId=${sessionId}`,
-  pdf: (sessionId: string) => `/api/pdf/${sessionId}`,
+  // Fallback: sessionId brut si pas d'URL signée (ex: backend pas encore déployé).
+  pdf: (submission: AdminSubmission) =>
+    submission.pdfSignedUrl ?? `/api/pdf/${submission.sessionId}`,
 };
 
 /**
@@ -96,7 +107,7 @@ function BadgeList({
 /**
  * Sections
  */
-function ProfileSection({ s }: { s: FormSubmission }) {
+function ProfileSection({ s }: { s: AdminSubmission }) {
   return (
     <Section title="Profil créatif" icon={<Users className="h-4 w-4" />}>
       <Field label="Statut">
@@ -113,7 +124,7 @@ function ProfileSection({ s }: { s: FormSubmission }) {
   );
 }
 
-function ContactSection({ s }: { s: FormSubmission }) {
+function ContactSection({ s }: { s: AdminSubmission }) {
   return (
     <Section title="Contact & Localisation" icon={<MapPin className="h-4 w-4" />}>
       <Field label="Email">
@@ -134,7 +145,7 @@ function ContactSection({ s }: { s: FormSubmission }) {
   );
 }
 
-function ProjectSection({ s }: { s: FormSubmission }) {
+function ProjectSection({ s }: { s: AdminSubmission }) {
   return (
     <Section title="Projet" icon={<Target className="h-4 w-4" />}>
       <Field label="Description">
@@ -156,7 +167,7 @@ function ProjectSection({ s }: { s: FormSubmission }) {
   );
 }
 
-function ImpactSection({ s }: { s: FormSubmission }) {
+function ImpactSection({ s }: { s: AdminSubmission }) {
   return (
     <Section title="Innovation & Impact" icon={<Lightbulb className="h-4 w-4" />}>
       <Field label="Innovation">
@@ -179,7 +190,7 @@ function ImpactSection({ s }: { s: FormSubmission }) {
   );
 }
 
-function NeedsSection({ s }: { s: FormSubmission }) {
+function NeedsSection({ s }: { s: AdminSubmission }) {
   return (
     <Section title="Besoins" icon={<DollarSign className="h-4 w-4" />}>
       <Field label="Urgence">
@@ -210,7 +221,7 @@ function ResultsSection({
   s,
   resultsCount,
 }: {
-  s: FormSubmission;
+  s: AdminSubmission;
   resultsCount: number;
 }) {
   if (resultsCount === 0) return null;
@@ -241,7 +252,7 @@ function ResultsSection({
               asChild
               data-testid={`button-download-pdf-${s.sessionId}`}
             >
-              <a href={urls.pdf(s.sessionId)} target="_blank" rel="noopener noreferrer">
+              <a href={urls.pdf(s)} target="_blank" rel="noopener noreferrer">
                 <Download className="h-4 w-4 mr-2" />
                 Télécharger le PDF
               </a>
@@ -256,7 +267,7 @@ function ResultsSection({
 /**
  * Composant principal — affiche une soumission complète.
  */
-export function SubmissionCard({ submission }: { submission: FormSubmission }) {
+export function SubmissionCard({ submission }: { submission: AdminSubmission }) {
   const resultsCount = Array.isArray(submission.results) ? submission.results.length : 0;
 
   return (

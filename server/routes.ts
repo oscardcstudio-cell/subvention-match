@@ -10,6 +10,7 @@ import { testApiConnection, fetchAides } from "./aides-territoires-api";
 import { getGrantsStatistics, getOverallStats } from "./stats";
 import { enrichMultipleGrants } from "./ai-enricher";
 import { analyzeDataQuality } from "./data-quality-analyzer";
+import { createPdfToken, verifyPdfToken } from "./pdf-token";
 import Stripe from "stripe";
 import express from "express";
 import rateLimit from "express-rate-limit";
@@ -1052,64 +1053,93 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   });
 
   /**
-   * GET /api/pdf/:sessionId - Servir le PDF généré
+   * Helper: résout le pdfPath pour un sessionId, régénère le PDF si le cache
+   * a été purgé (Railway /tmp est wipé à chaque restart), puis envoie le fichier.
+   * Utilisé par les deux routes PDF (capability raw sessionId + token signé admin).
+   */
+  async function servePdfForSession(sessionId: string, res: any) {
+    const submission = await storage.getFormSubmission(sessionId);
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" });
+    }
+
+    const fs = await import("fs");
+    const cacheMissing = !submission.pdfPath || !fs.existsSync(submission.pdfPath);
+    let pdfPath = submission.pdfPath || "";
+
+    if (cacheMissing) {
+      const results = (submission.results as any[]) || [];
+      if (results.length === 0) {
+        return res.status(404).json({ error: "No grants matched — nothing to render." });
+      }
+      const grantsWithDetails = await Promise.all(
+        results.map(async (result: any) => {
+          const grant = await grantStorage.getGrantById(result.grantId);
+          return grant
+            ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason }
+            : null;
+        }),
+      );
+      const validGrants = grantsWithDetails.filter(
+        (g): g is NonNullable<typeof g> => g !== null,
+      );
+      if (validGrants.length === 0) {
+        return res.status(404).json({ error: "No valid grants resolvable from cached results." });
+      }
+      const { path: freshPath } = await generateAndSaveGrantsPDF(
+        {
+          grants: validGrants,
+          userEmail: submission.email,
+          formData: submissionToPdfFormData(submission),
+        },
+        sessionId,
+      );
+      await storage.savePdfPath(sessionId, freshPath);
+      pdfPath = freshPath;
+    }
+
+    res.setHeader("Content-Disposition", `inline; filename="subventions_${sessionId}.pdf"`);
+    const isAbsolute = pdfPath.startsWith("/") || /^[A-Za-z]:[\\/]/.test(pdfPath);
+    if (isAbsolute) {
+      res.sendFile(pdfPath);
+    } else {
+      res.sendFile(pdfPath, { root: process.cwd() });
+    }
+  }
+
+  /**
+   * GET /api/pdf/:sessionId - Capability sessionId (flow utilisateur).
+   * Le sessionId (UUIDv4, 122 bits d'entropie) sert de bearer. Rate-limité et
+   * validé par regex en défense en profondeur.
    */
   app.get("/api/pdf/:sessionId", pdfDownloadLimiter, async (req, res) => {
     try {
       const { sessionId } = req.params;
-
-      // Défense en profondeur: rejeter tout sessionId malformé avant de toucher la DB.
       if (!UUID_RE.test(sessionId)) {
         return res.status(400).json({ error: "Invalid session ID format." });
       }
-
-      const submission = await storage.getFormSubmission(sessionId);
-
-      if (!submission) {
-        return res.status(404).json({ error: "Submission not found" });
-      }
-
-      // Regenerate if cache is missing (Railway /tmp is wiped on container restart).
-      const fs = await import('fs');
-      const cacheMissing = !submission.pdfPath || !fs.existsSync(submission.pdfPath);
-      let pdfPath = submission.pdfPath || "";
-
-      if (cacheMissing) {
-        const results = (submission.results as any[]) || [];
-        if (results.length === 0) {
-          return res.status(404).json({ error: "No grants matched — nothing to render." });
-        }
-        const grantsWithDetails = await Promise.all(
-          results.map(async (result: any) => {
-            const grant = await grantStorage.getGrantById(result.grantId);
-            return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
-          })
-        );
-        const validGrants = grantsWithDetails.filter((g): g is NonNullable<typeof g> => g !== null);
-        if (validGrants.length === 0) {
-          return res.status(404).json({ error: "No valid grants resolvable from cached results." });
-        }
-        const { path: freshPath } = await generateAndSaveGrantsPDF(
-          {
-            grants: validGrants,
-            userEmail: submission.email,
-            formData: submissionToPdfFormData(submission),
-          },
-          sessionId,
-        );
-        await storage.savePdfPath(sessionId, freshPath);
-        pdfPath = freshPath;
-      }
-
-      res.setHeader("Content-Disposition", `inline; filename="subventions_${sessionId}.pdf"`);
-      const isAbsolute = pdfPath.startsWith("/") || /^[A-Za-z]:[\\/]/.test(pdfPath);
-      if (isAbsolute) {
-        res.sendFile(pdfPath);
-      } else {
-        res.sendFile(pdfPath, { root: process.cwd() });
-      }
+      await servePdfForSession(sessionId, res);
     } catch (error: any) {
       console.error("Error serving PDF:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/pdf/signed/:token - Lien admin signé, à courte durée (15 min).
+   * Utilisé quand l'admin partage un lien par ex. dans Slack ou un mail: si le
+   * lien fuit, il expire vite et ne révèle pas le sessionId brut.
+   */
+  app.get("/api/pdf/signed/:token", pdfDownloadLimiter, async (req, res) => {
+    try {
+      const { token } = req.params;
+      const verified = verifyPdfToken(token);
+      if (!verified) {
+        return res.status(401).json({ error: "Lien expiré ou invalide." });
+      }
+      await servePdfForSession(verified.sessionId, res);
+    } catch (error: any) {
+      console.error("Error serving signed PDF:", error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -1198,7 +1228,17 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
   app.get("/api/admin/submissions", requireAdmin, async (req, res) => {
     try {
       const submissions = await storage.getAllSubmissions();
-      res.json(submissions);
+      // Enrichit chaque soumission avec une URL PDF signée courte durée.
+      // Les composants admin l'utilisent pour que les liens partagés soient
+      // périssables (15 min) sans exposer le sessionId brut.
+      const enriched = submissions.map((s) => {
+        const token = s.pdfPath ? createPdfToken(s.sessionId) : null;
+        return {
+          ...s,
+          pdfSignedUrl: token ? `/api/pdf/signed/${token}` : null,
+        };
+      });
+      res.json(enriched);
     } catch (error: any) {
       console.error("Error fetching submissions:", error);
       res.status(500).json({ error: error.message });

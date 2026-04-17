@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, FileText, AlertTriangle } from "lucide-react";
-import type { FormSubmission } from "@shared/schema";
-import { SubmissionCard } from "@/components/admin/SubmissionCard";
+import { SubmissionCard, type AdminSubmission } from "@/components/admin/SubmissionCard";
 
 export default function AdminPage() {
   const {
@@ -13,7 +12,7 @@ export default function AdminPage() {
     isError,
     error,
     refetch,
-  } = useQuery<FormSubmission[]>({
+  } = useQuery<AdminSubmission[]>({
     queryKey: ["/api/admin/submissions"],
   });
 
