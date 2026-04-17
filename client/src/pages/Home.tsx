@@ -510,6 +510,58 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Coming Soon - Carnet d'adresses artistique */}
+      <section className="py-24 px-8 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative overflow-hidden border-2 border-[#118AB2]/20 rounded-2xl p-8 sm:p-12 bg-gradient-to-br from-[#118AB2]/5 via-white to-[#06D6A0]/5">
+            {/* Badge Coming Soon */}
+            <div className="inline-flex items-center gap-2 bg-[#118AB2]/10 text-[#118AB2] px-4 py-1.5 rounded-full text-sm font-semibold mb-6 tracking-wide uppercase">
+              <span className="w-2 h-2 bg-[#118AB2] rounded-full animate-pulse" />
+              {language === "fr" ? "Bientot disponible" : "Coming soon"}
+            </div>
+
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-[#073B4C] mb-4 leading-tight">
+              {language === "fr" ? (
+                <>TROUVEZ AUSSI<br /><span className="text-[#118AB2]">QUI REPRESENTE VOTRE ART</span></>
+              ) : (
+                <>ALSO FIND<br /><span className="text-[#118AB2]">WHO REPRESENTS YOUR ART</span></>
+              )}
+            </h2>
+
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl leading-relaxed">
+              {language === "fr"
+                ? "Une subvention finance votre projet. Mais il vous faut aussi les bonnes personnes pour le representer et le diffuser. Bientot, SubventionMatch vous connectera directement avec les professionnels de votre secteur."
+                : "A grant funds your project. But you also need the right people to represent and distribute it. Soon, SubventionMatch will connect you directly with professionals in your field."
+              }
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4 mb-8">
+              {[
+                { icon: "🎨", label: language === "fr" ? "Galeries d'art" : "Art galleries", desc: language === "fr" ? "Par style, region et ouverture aux emergents" : "By style, region and openness to emerging artists" },
+                { icon: "🎵", label: language === "fr" ? "Labels & producteurs" : "Labels & producers", desc: language === "fr" ? "Par genre musical et type de contrat" : "By music genre and contract type" },
+                { icon: "📚", label: language === "fr" ? "Maisons d'edition" : "Publishers", desc: language === "fr" ? "Par genre litteraire et politique editoriale" : "By literary genre and editorial policy" },
+                { icon: "🎭", label: language === "fr" ? "Agents & tourneurs" : "Agents & bookers", desc: language === "fr" ? "Par discipline et reseau de diffusion" : "By discipline and distribution network" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 p-4 bg-white/60 rounded-xl border border-gray-100">
+                  <span className="text-2xl">{item.icon}</span>
+                  <div>
+                    <div className="font-semibold text-[#073B4C]">{item.label}</div>
+                    <div className="text-sm text-gray-500">{item.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-sm text-gray-400 italic">
+              {language === "fr"
+                ? "Le meme matching IA que pour vos subventions, applique a l'ecosysteme artistique professionnel."
+                : "The same AI matching as for your grants, applied to the professional artistic ecosystem."
+              }
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Test Flow Section - Nouvelle palette */}
       <section className="py-32 px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
