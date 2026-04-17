@@ -40,7 +40,7 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
   const { to, grantsCount, pdfBuffer } = data;
 
   try {
-    await getResend().emails.send({
+    const result = await getResend().emails.send({
       from: 'SubventionMatch <onboarding@resend.dev>', // Change to your verified domain
       to,
       subject: `Vos ${grantsCount} subventions culturelles personnalisées`,
@@ -119,7 +119,15 @@ export async function sendGrantsEmail(data: EmailData): Promise<void> {
       ],
     });
 
-    console.log(`✅ Email sent successfully to ${to}`);
+    // Le SDK Resend retourne { data, error } au lieu de throw — on doit checker explicitement.
+    // Sans ça, des erreurs comme "testing mode — recipient not allowed" passent inaperçues.
+    if (result.error) {
+      const msg = `Resend API error: ${result.error.name} — ${result.error.message}`;
+      console.error(`❌ ${msg}`);
+      throw new Error(msg);
+    }
+
+    console.log(`✅ Email sent successfully to ${to} (id: ${result.data?.id})`);
   } catch (error) {
     console.error('❌ Failed to send email:', error);
     throw error;
@@ -156,7 +164,7 @@ export async function sendGrantsEmailFallback(data: FallbackEmailData): Promise<
   }).join("");
 
   try {
-    await getResend().emails.send({
+    const result = await getResend().emails.send({
       from: 'SubventionMatch <onboarding@resend.dev>',
       to,
       subject: `Vos ${grants.length} subventions culturelles personnalisees`,
@@ -185,7 +193,13 @@ export async function sendGrantsEmailFallback(data: FallbackEmailData): Promise<
       `,
     });
 
-    console.log(`✅ Fallback email (HTML only) sent to ${to}`);
+    if (result.error) {
+      const msg = `Resend API error: ${result.error.name} — ${result.error.message}`;
+      console.error(`❌ ${msg}`);
+      throw new Error(msg);
+    }
+
+    console.log(`✅ Fallback email (HTML only) sent to ${to} (id: ${result.data?.id})`);
   } catch (error) {
     console.error('❌ Failed to send fallback email:', error);
     throw error;
