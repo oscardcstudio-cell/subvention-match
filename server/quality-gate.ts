@@ -22,7 +22,10 @@ import type { Grant } from "../shared/schema";
 import type { GrantResult } from "../shared/schema";
 import { scoreUrl } from "./url-validator";
 
-export const QUALITY_GATE_THRESHOLD = 60;
+// Seuil abaissé à 35 pour la beta — beaucoup de grants ont des descriptions
+// courtes ou absentes. L'enrichissement IA à la volée comble les lacunes.
+// À remonter à 60 une fois la base enrichie.
+export const QUALITY_GATE_THRESHOLD = 35;
 export const ENRICHMENT_THRESHOLD = 80; // En dessous, on tente d'enrichir à la volée
 
 function stripHtml(html: string | null | undefined): string {

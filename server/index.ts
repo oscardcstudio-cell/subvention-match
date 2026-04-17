@@ -16,6 +16,9 @@ if (process.env.SENTRY_DSN) {
 }
 
 const app = express();
+// Railway (et tout reverse proxy) envoie X-Forwarded-For.
+// Sans ça, express-rate-limit voit toutes les requêtes comme venant de la même IP.
+app.set("trust proxy", 1);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
