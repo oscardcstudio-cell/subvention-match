@@ -7,6 +7,25 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+/**
+ * Construit les headers d'une requête vers l'API.
+ * - Pour les routes admin, injecte automatiquement `x-admin-token` à partir de
+ *   la query string `?admin_token=...` (convention déjà acceptée côté serveur).
+ *   Ça évite que les composants doivent gérer l'auth à la main, et ça empêche
+ *   les fuites dans les logs serveur (header au lieu de query).
+ */
+function buildHeaders(url: string, extra?: HeadersInit): HeadersInit {
+  const headers: Record<string, string> = {};
+  if (extra) Object.assign(headers, extra);
+
+  if (url.startsWith("/api/admin/") && typeof window !== "undefined") {
+    const token = new URLSearchParams(window.location.search).get("admin_token");
+    if (token) headers["x-admin-token"] = token;
+  }
+
+  return headers;
+}
+
 export async function apiRequest(
   method: string,
   url: string,
@@ -14,7 +33,7 @@ export async function apiRequest(
 ): Promise<Response> {
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: buildHeaders(url, data ? { "Content-Type": "application/json" } : undefined),
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -29,8 +48,10 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const url = queryKey.join("/") as string;
+    const res = await fetch(url, {
       credentials: "include",
+      headers: buildHeaders(url),
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
