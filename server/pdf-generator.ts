@@ -115,16 +115,12 @@ export async function generateGrantsPDF(data: PDFData): Promise<Buffer> {
     
     await page.setContent(html, { waitUntil: 'networkidle0' });
     
-    // Generate PDF with same styling as website
+    // Marges à 0 pour que le fond dark Mecene aille jusqu'au bord (pas de
+    // cadre blanc). Le padding visuel est géré par .container en CSS.
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: {
-        top: '15mm',
-        right: '15mm',
-        bottom: '15mm',
-        left: '15mm',
-      },
+      margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' },
     });
 
     return Buffer.from(pdfBuffer);
@@ -220,38 +216,40 @@ function formatHTMLContent(content: string, maxLength?: number): string {
     }
   }
   
-  // Simple HTML formatting for PDF without external dependencies
+  // Simple HTML formatting for PDF — couleurs alignées sur le thème Mecene
+  // Swiss Dark. Contraste élevé (#F5F5F6 texte, #FFFFFF en gras) pour rester
+  // lisible sur le fond #0A0A0A.
   let formatted = content;
-  
+
   // Replace headings
-  formatted = formatted.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, 
-    '<h3 style="font-weight: 800; color: #111827; margin: 20px 0 10px 0; font-size: 18px; border-bottom: 2px solid #f3f4f6; padding-bottom: 6px; letter-spacing: -0.01em;">$1</h3>');
-  
+  formatted = formatted.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi,
+    '<h3 style="font-family: Archivo, sans-serif; font-weight: 800; color: #F5F5F6; margin: 18px 0 10px 0; font-size: 16px; letter-spacing: -0.02em; text-transform: uppercase;">$1</h3>');
+
   // Replace paragraphs
-  formatted = formatted.replace(/<p[^>]*>(.*?)<\/p>/gi, 
-    '<p style="margin-bottom: 12px; line-height: 1.6; color: #374151; font-size: 14px;">$1</p>');
-  
+  formatted = formatted.replace(/<p[^>]*>(.*?)<\/p>/gi,
+    '<p style="margin-bottom: 10px; line-height: 1.7; color: #E5E5E7; font-size: 13px;">$1</p>');
+
   // Replace list items
-  formatted = formatted.replace(/<li[^>]*>(.*?)<\/li>/gi, 
-    '<li style="margin-bottom: 8px; padding-left: 20px; position: relative; color: #374151; font-size: 14px;"><span style="position: absolute; left: 0; color: #06D6A0; font-weight: bold;">•</span>$1</li>');
-  
+  formatted = formatted.replace(/<li[^>]*>(.*?)<\/li>/gi,
+    '<li style="margin-bottom: 8px; padding-left: 20px; position: relative; color: #E5E5E7; font-size: 13px; line-height: 1.6;"><span style="position: absolute; left: 0; color: #06D6A0; font-weight: bold;">→</span>$1</li>');
+
   // Replace ul/ol
-  formatted = formatted.replace(/<ul[^>]*>/gi, '<ul style="margin: 8px 0; padding-left: 0; list-style: none;">');
-  formatted = formatted.replace(/<ol[^>]*>/gi, '<ul style="margin: 8px 0; padding-left: 0; list-style: none;">');
+  formatted = formatted.replace(/<ul[^>]*>/gi, '<ul style="margin: 10px 0; padding-left: 0; list-style: none;">');
+  formatted = formatted.replace(/<ol[^>]*>/gi, '<ul style="margin: 10px 0; padding-left: 0; list-style: none;">');
   formatted = formatted.replace(/<\/ol>/gi, '</ul>');
-  
+
   // Replace strong/b
-  formatted = formatted.replace(/<(strong|b)[^>]*>(.*?)<\/(strong|b)>/gi, 
-    '<strong style="font-weight: 700; color: #000;">$2</strong>');
-  
+  formatted = formatted.replace(/<(strong|b)[^>]*>(.*?)<\/(strong|b)>/gi,
+    '<strong style="font-weight: 700; color: #FFFFFF;">$2</strong>');
+
   // Replace br
   formatted = formatted.replace(/<br\s*\/?>/gi, '<br>');
-  
+
   // If still has HTML, it's good. If not, wrap in paragraph
   if (!formatted.includes('<')) {
-    formatted = `<p style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${formatted}</p>`;
+    formatted = `<p style="margin-bottom: 8px; line-height: 1.75; color: #E5E5E7; font-size: 13px;">${formatted}</p>`;
   }
-  
+
   return formatted;
 }
 
@@ -270,28 +268,38 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>
         /* === Mecene Swiss Dark — tokens === */
+        /* Contraste relevé par rapport au site : sur un PDF on lit sans
+           lumière émise par l'écran, les gris paraissent plus ternes.
+           --mc-muted passe de #8B8B92 à #B5B5BC pour rester lisible. */
         :root {
           --mc-bg: #0A0A0A;
           --mc-panel: #141416;
           --mc-panel-2: #1A1A1D;
-          --mc-border: #26262A;
+          --mc-border: #2E2E33;
           --mc-border-soft: #1C1C1F;
           --mc-text: #F5F5F6;
-          --mc-muted: #8B8B92;
-          --mc-muted-2: #5D5D63;
+          --mc-text-2: #E5E5E7;
+          --mc-muted: #B5B5BC;
+          --mc-muted-2: #7D7D84;
           --mc-primary: #06D6A0;
-          --mc-primary-soft: rgba(6, 214, 160, 0.10);
-          --mc-accent: #118AB2;
-          --mc-accent-soft: rgba(17, 138, 178, 0.12);
+          --mc-primary-soft: rgba(6, 214, 160, 0.12);
+          --mc-accent: #3BB3DB;
+          --mc-accent-soft: rgba(59, 179, 219, 0.15);
           --mc-warn: #FFD166;
           --mc-danger: #EF476F;
         }
 
+        @page { margin: 0; size: A4; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+          background: var(--mc-bg);
+          min-height: 100%;
+        }
 
         body {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          background: var(--mc-bg);
           color: var(--mc-text);
           line-height: 1.6;
           font-size: 13px;
@@ -312,7 +320,9 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
         .container {
           max-width: 820px;
           margin: 0 auto;
-          padding: 20px 24px 40px;
+          /* 15mm ≈ 57px top/bottom, 12mm ≈ 45px left/right pour l'espace
+             respiratoire, maintenant que les marges A4 sont à 0. */
+          padding: 57px 45px;
         }
 
         /* Header */
@@ -619,11 +629,11 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
 
         .section-content {
           font-size: 13px;
-          color: var(--mc-text);
+          color: var(--mc-text-2);
           line-height: 1.75;
         }
 
-        .section-content p { margin-bottom: 10px; color: var(--mc-text); }
+        .section-content p { margin-bottom: 10px; color: var(--mc-text-2); }
         .section-content strong { font-weight: 700; color: var(--mc-text); }
 
         .section-content ul {
@@ -636,7 +646,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
           margin-bottom: 8px;
           padding-left: 20px;
           position: relative;
-          color: var(--mc-text);
+          color: var(--mc-text-2);
         }
 
         .section-content li::before {
