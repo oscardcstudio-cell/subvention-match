@@ -317,9 +317,13 @@ export default function FormPage() {
                             {...field}
                             placeholder={language === "fr" ? "Parlez-nous de votre projet en quelques phrases..." : "Tell us about your project in a few sentences..."}
                             className="min-h-32 resize-none"
+                            maxLength={3000}
                             data-testid="textarea-project-description"
                           />
                         </FormControl>
+                        <div className="text-xs text-muted-foreground text-right">
+                          {(field.value ?? "").length} / 3000
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
