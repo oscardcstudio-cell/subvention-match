@@ -32,10 +32,14 @@ test.describe("Results page", () => {
     await expect(page.locator("text=78").first()).toBeVisible();
   });
 
-  test("profile chips reflect submission", async ({ page }) => {
+  test("project recap shows submission fields + edit button", async ({ page }) => {
     await page.goto("/results?sessionId=e2e-session-abc123");
+    // Recap card is the first match of "Auvergne-Rhône-Alpes"
     await expect(page.locator("text=Auvergne-Rhône-Alpes").first()).toBeVisible();
-    await expect(page.getByRole("button", { name: /Modifier mon profil/ })).toBeVisible();
+    // Description quoted
+    await expect(page.locator("text=Compagnie de théâtre contemporain à Lyon")).toBeVisible();
+    // Edit button
+    await expect(page.getByRole("button", { name: /Modifier/ })).toBeVisible();
   });
 
   test("expand details of first match", async ({ page }) => {
@@ -80,10 +84,11 @@ test.describe("Results page", () => {
     expect(href).toMatch(/^https:\/\//);
   });
 
-  test("PDF download link points to /api/pdf?sessionId=...", async ({ page }) => {
+  test("PDF download link points to /api/pdf/:sessionId", async ({ page }) => {
     await page.goto("/results?sessionId=e2e-session-abc123");
     const link = page.getByRole("link", { name: /Télécharger PDF/i }).first();
     const href = await link.getAttribute("href");
-    expect(href).toMatch(/\/api\/pdf\?sessionId=/);
+    // Server route is /api/pdf/:sessionId (path param, not query string)
+    expect(href).toMatch(/\/api\/pdf\/e2e-session-abc123$/);
   });
 });

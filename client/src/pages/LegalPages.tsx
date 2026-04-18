@@ -32,7 +32,7 @@ function LegalLayout({ title, children }: { title: string; children: React.React
           <span>© 2026 Mecene · Paris</span>
           <span className="flex gap-6">
             <Link href="/"><a className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>Accueil</a></Link>
-            <a href="mailto:contact@mecene.app" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>Contact</a>
+            <a href="mailto:oscardcstudio@gmail.com" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>Contact</a>
           </span>
         </div>
       </footer>
@@ -74,7 +74,7 @@ export function MentionsLegales() {
       <h2>Éditeur du site</h2>
       <p>
         <strong>Mecene</strong> est édité par Oscar DC Studio, entrepreneur individuel.<br />
-        Email de contact : <a href="mailto:contact@mecene.app">contact@mecene.app</a>
+        Email de contact : <a href="mailto:oscardcstudio@gmail.com">oscardcstudio@gmail.com</a>
       </p>
 
       <h2>Hébergement</h2>
@@ -171,7 +171,7 @@ export function PolitiqueConfidentialite() {
       <h2>Responsable du traitement</h2>
       <p>
         Le responsable du traitement est Oscar DC Studio, éditeur de Mecene.<br />
-        Contact : <a href="mailto:privacy@mecene.app">privacy@mecene.app</a>
+        Contact : <a href="mailto:oscardcstudio@gmail.com">oscardcstudio@gmail.com</a>
       </p>
 
       <h2>Ce qu'on collecte</h2>
@@ -216,7 +216,7 @@ export function PolitiqueConfidentialite() {
       </ul>
 
       <h2>Vos droits (RGPD)</h2>
-      <p>Accès, rectification, portabilité, suppression. Écrivez à <a href="mailto:privacy@mecene.app">privacy@mecene.app</a>. Réponse sous 30 jours.</p>
+      <p>Accès, rectification, portabilité, suppression. Écrivez à <a href="mailto:oscardcstudio@gmail.com">oscardcstudio@gmail.com</a>. Réponse sous 30 jours.</p>
 
       <h2>Réclamation</h2>
       <p>

@@ -75,7 +75,7 @@ export default function ResultsPage() {
     feedbackMutation.mutate({ grantId, vote });
   };
 
-  const pdfUrl = `/api/pdf?sessionId=${sessionId}`;
+  const pdfUrl = sessionId ? `/api/pdf/${sessionId}` : "";
 
   // Synthèse
   const avgScore = sorted.length
@@ -142,19 +142,6 @@ export default function ResultsPage() {
                 {results.length} MATCH{results.length > 1 ? "ES" : ""}<br />
                 {language === "fr" ? "TROUVÉS" : "FOUND"}<span style={{ color: "var(--mc-primary)" }}>.</span>
               </h1>
-              {data?.submission && (
-                <div className="mt-8 flex flex-wrap gap-2">
-                  {data.submission.status?.map((s, i) => <span key={i} className="mc-chip" style={{ background: "var(--mc-panel)", color: "var(--mc-muted)" }}>{s}</span>)}
-                  {data.submission.region && <span className="mc-chip" style={{ background: "var(--mc-panel)", color: "var(--mc-muted)" }}>{data.submission.region}</span>}
-                  {data.submission.artisticDomain?.slice(0, 3).map((d, i) => <span key={i} className="mc-chip" style={{ background: "var(--mc-panel)", color: "var(--mc-muted)" }}>{d}</span>)}
-                  <button
-                    onClick={() => setLocation("/form")}
-                    className="mc-chip mc-chip-accent hover:bg-[var(--mc-accent)] hover:text-[var(--mc-bg)] transition"
-                  >
-                    {language === "fr" ? "Modifier mon profil →" : "Edit my profile →"}
-                  </button>
-                </div>
-              )}
             </div>
             <div className="col-span-12 md:col-span-4">
               <div className="mc-mono text-xs uppercase tracking-widest mb-6" style={{ color: "var(--mc-muted)" }}>
@@ -171,6 +158,51 @@ export default function ResultsPage() {
               </div>
             </div>
           </div>
+
+          {/* Project recap */}
+          {data?.submission && (
+            <div className="mt-10">
+              <div className="mc-mono text-xs uppercase tracking-widest mb-4 flex items-center justify-between" style={{ color: "var(--mc-muted)" }}>
+                <span>/ {language === "fr" ? "Votre projet" : "Your project"}</span>
+                <button
+                  onClick={() => setLocation("/form")}
+                  className="inline-flex items-center gap-1.5 hover:text-white transition"
+                  style={{ color: "var(--mc-accent)" }}
+                >
+                  ✎ {language === "fr" ? "Modifier" : "Edit"}
+                </button>
+              </div>
+              <div className="mc-card p-6 md:p-8">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-5">
+                  {data.submission.status && data.submission.status.length > 0 && (
+                    <RecapField label={language === "fr" ? "Profil" : "Profile"} value={data.submission.status.join(" · ")} />
+                  )}
+                  {data.submission.artisticDomain && data.submission.artisticDomain.length > 0 && (
+                    <RecapField label={language === "fr" ? "Disciplines" : "Disciplines"} value={data.submission.artisticDomain.join(" · ")} />
+                  )}
+                  {data.submission.projectType && data.submission.projectType.length > 0 && (
+                    <RecapField label={language === "fr" ? "Type de projet" : "Project type"} value={data.submission.projectType.join(" · ")} />
+                  )}
+                  {data.submission.region && (
+                    <RecapField label={language === "fr" ? "Localisation" : "Location"} value={data.submission.region} />
+                  )}
+                  {data.submission.isInternational && (
+                    <RecapField label={language === "fr" ? "International" : "International"} value={labelInternational(data.submission.isInternational, language)} />
+                  )}
+                </div>
+                {data.submission.projectDescription && (
+                  <div className="mt-6 pt-5 border-t" style={{ borderColor: "var(--mc-border)" }}>
+                    <div className="mc-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--mc-muted)" }}>
+                      {language === "fr" ? "Description" : "Description"}
+                    </div>
+                    <p className="text-sm italic leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                      « {data.submission.projectDescription} »
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -254,7 +286,7 @@ export default function ResultsPage() {
       {/* Footer */}
       <footer className="border-t" style={{ borderColor: "var(--mc-border)" }}>
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-8 mc-mono text-xs uppercase tracking-widest flex flex-wrap justify-between gap-4" style={{ color: "var(--mc-muted)" }}>
-          <span>© 2026 Mecene · session {sessionId.slice(0, 8)}</span>
+          <span>© 2026 Mecene</span>
           <span className="flex flex-wrap gap-4 md:gap-6">
             <a href="/" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>Accueil</a>
             <a href="/mentions-legales" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>
@@ -265,6 +297,22 @@ export default function ResultsPage() {
       </footer>
     </div>
   );
+}
+
+function RecapField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="mc-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mc-muted)" }}>{label}</div>
+      <div className="text-sm">{value}</div>
+    </div>
+  );
+}
+
+function labelInternational(v: string, language: string) {
+  if (v === "non") return language === "fr" ? "Uniquement France" : "France only";
+  if (v === "tournee") return language === "fr" ? "Tournée / coproduction" : "Tour / coproduction";
+  if (v === "export") return language === "fr" ? "Export / diffusion étranger" : "Export / foreign";
+  return v;
 }
 
 function SynthRow({ label, value, color, size }: { label: string; value: string; color?: "primary"; size?: "md" }) {
@@ -326,10 +374,9 @@ function MatchCard({ grant, rank, top, feedback, onFeedback, language }: {
           {grant.description && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="mc-mono text-xs uppercase tracking-widest inline-flex items-center gap-2 hover:text-white transition"
-              style={{ color: "var(--mc-muted)" }}
+              className="mc-btn-ghost inline-flex items-center gap-2 px-4 py-2 rounded-full mc-mono text-xs uppercase tracking-widest"
             >
-              {expanded ? (language === "fr" ? "Masquer" : "Hide") : (language === "fr" ? "Voir tous les détails" : "View all details")}
+              {expanded ? (language === "fr" ? "Masquer les détails" : "Hide details") : (language === "fr" ? "Voir tous les détails" : "View all details")}
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
             </button>
           )}

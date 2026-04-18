@@ -68,12 +68,12 @@ const STAGE_OPTIONS = [
 ];
 
 const PROFILE_PRESETS: Record<string, { status?: string[]; artisticDomain?: string[]; projectType?: string[] }> = {
-  "orga-soiree":    { status: ["collectif"], artisticDomain: ["musique"], projectType: ["evenementiel"] },
-  "dj-producteur":  { status: ["artiste-auteur"], artisticDomain: ["musique"], projectType: ["production", "diffusion"] },
-  "danseur":        { status: ["artiste-auteur"], artisticDomain: ["spectacle-vivant"], projectType: ["creation"] },
+  "orga-soiree":    { status: ["collectif"], artisticDomain: ["musique"], projectType: ["evenementiel", "diffusion"] },
+  "dj-producteur":  { status: ["artiste-auteur"], artisticDomain: ["musique"], projectType: ["creation", "production", "diffusion"] },
+  "danseur":        { status: ["artiste-auteur"], artisticDomain: ["spectacle-vivant"], projectType: ["creation", "diffusion"] },
   "compagnie":      { status: ["compagnie"], artisticDomain: ["spectacle-vivant"], projectType: ["creation", "production"] },
-  "lieu-culturel":  { status: ["lieu-culturel"], projectType: ["evenementiel"] },
-  "artisan-art":    { status: ["artiste-auteur"], artisticDomain: ["metiers-art"] },
+  "lieu-culturel":  { status: ["lieu-culturel"], projectType: ["evenementiel", "diffusion"] },
+  "artisan-art":    { status: ["artiste-auteur"], artisticDomain: ["metiers-art"], projectType: ["creation", "production"] },
 };
 
 export default function FormWizard() {

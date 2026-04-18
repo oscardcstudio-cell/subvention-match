@@ -409,6 +409,19 @@ d'exclure les mauvais matches — il faut AUSSI repérer les bons :
   → "Aide à la création", CNM "Aide à la création musicale", Sacem aides
      création, résidences de composition.
 
+- Profil DJ / PRODUCTEUR ÉLECTRONIQUE / BEATMAKER / MUSIQUE URBAINE :
+  → Un DJ/producteur est à la fois créateur (il compose/produit ses tracks),
+     interprète (il joue en live / en club) et entrepreneur (son label, ses sorties).
+  → Pistes typiques : CNM "Aide au développement d'artiste", CNM "Aide à la
+     production phonographique", CNM "Aide aux musiques actuelles", Sacem aides
+     création musicale, Spedidam aides tournée, FCM (Fonds de Création Musicale),
+     aides régionales aux musiques actuelles, aides aux labels indépendants.
+  → Le fait qu'il soit "DJ" ne doit PAS exclure d'office les aides à la création
+     musicale — la composition de tracks électro/hip-hop/house EST de la création.
+     Exclusion uniquement si le projet se limite à DJ SET ÉVÉNEMENTIEL sans
+     production originale.
+  → Pour ce profil, vise 5 à 8 résultats (multiple cordes à leur arc).
+
 - Projet de TOURNÉE / CONCERTS / SPECTACLE VIVANT :
   → Spedidam "Aide au spectacle musical" / "Aide aux projets", aides à la
      tournée, aides aux artistes-interprètes, aides au spectacle vivant.

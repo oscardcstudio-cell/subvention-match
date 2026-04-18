@@ -92,8 +92,8 @@ export async function installApiMocks(page: Page) {
     })
   );
 
-  // PDF — return a minimal PDF stub
-  await page.route("**/api/pdf**", (route) =>
+  // PDF — return a minimal PDF stub for both /api/pdf/:sessionId and legacy /api/pdf?sessionId=
+  await page.route("**/api/pdf/**", (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/pdf",
