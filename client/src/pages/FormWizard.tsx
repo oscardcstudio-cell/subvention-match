@@ -326,7 +326,7 @@ export default function FormWizard() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => setStepIdx(i)}
+                  onClick={() => { setStepIdx(i); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   className={`mc-card p-4 text-left ${state === "future" ? "opacity-60" : ""}`}
                   style={state === "active" ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)" } : undefined}
                 >

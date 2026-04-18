@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, type InsertGrant, type Grant, type GrantResult } from "@shared/schema";
+import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, type InsertGrant, type Grant, type GrantResult, type FormSubmission } from "@shared/schema";
 import { storage } from "./storage";
 import { grantStorage } from "./grant-storage";
 import { matchGrantsWithAI } from "./ai-matcher";
@@ -154,6 +154,83 @@ if (!isStripeEnabled) {
   console.log("⚠️  Stripe non configuré - Mode gratuit uniquement");
 }
 
+/**
+ * Run the heavy post-submission work (AI matching, PDF, email) asynchronously
+ * so the HTTP response can return quickly. The client polls /api/results/:id
+ * which returns {status: "pending"} until this finishes.
+ */
+async function processSubmissionAsync(submission: FormSubmission): Promise<void> {
+  try {
+    console.log(`🤖 [background] matching IA démarré pour ${maskSessionId(submission.sessionId)}`);
+    const allGrants = await grantStorage.getAllActiveGrants();
+    console.log(`📚 [background] ${allGrants.length} subventions disponibles`);
+    const formattedGrants = allGrants.map(formatGrantToResult);
+
+    const matchedGrants = await matchGrantsWithAI(submission, formattedGrants);
+    console.log(`✅ [background] ${matchedGrants.length} subventions matchées`);
+
+    await storage.updateFormResults(submission.sessionId, matchedGrants);
+    await storage.markAsPaid(submission.sessionId);
+    console.log(`💾 [background] résultats sauvegardés + session marquée payée`);
+
+    // PDF + email (best effort — don't fail the submission if email bounces).
+    if (submission.email && matchedGrants.length > 0) {
+      try {
+        const grantsWithDetails = await Promise.all(
+          matchedGrants.map(async (result: any) => {
+            const grant = await grantStorage.getGrantById(result.grantId);
+            return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
+          })
+        );
+        const validGrants = grantsWithDetails.filter((g): g is NonNullable<typeof g> => g !== null);
+        if (validGrants.length === 0) throw new Error("Aucune subvention valide trouvée");
+
+        console.log(`📄 [background] génération PDF...`);
+        const { buffer, path } = await generateAndSaveGrantsPDF(
+          {
+            grants: validGrants,
+            userEmail: submission.email,
+            formData: submissionToPdfFormData(submission),
+          },
+          submission.sessionId
+        );
+        await storage.savePdfPath(submission.sessionId, path);
+        console.log(`✅ [background] PDF généré: ${path}`);
+
+        await sendGrantsEmail({
+          to: submission.email,
+          grantsCount: matchedGrants.length,
+          pdfBuffer: buffer,
+        });
+        console.log(`✅ [background] email envoyé`);
+      } catch (pdfError: any) {
+        console.error(`⚠️  [background] PDF/email erreur:`, pdfError.message);
+        try {
+          const grantsForFallback = await Promise.all(
+            matchedGrants.map(async (result: any) => {
+              const grant = await grantStorage.getGrantById(result.grantId);
+              return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
+            })
+          );
+          const validForFallback = grantsForFallback.filter((g): g is NonNullable<typeof g> => g !== null);
+          if (validForFallback.length > 0) {
+            await sendGrantsEmailFallback({ to: submission.email, grants: validForFallback });
+            console.log(`📧 [background] fallback HTML email envoyé`);
+          }
+        } catch (fallbackError: any) {
+          console.error(`❌ [background] fallback email aussi échoué:`, fallbackError.message);
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error(`❌ [background] matching échoué pour ${maskSessionId(submission.sessionId)}:`, err?.message || err);
+    // Mark session as failed so /api/results can return a proper error
+    try {
+      await storage.updateFormResults(submission.sessionId, []);
+    } catch {}
+  }
+}
+
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
 
@@ -211,92 +288,25 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/submit-form", formSubmitLimiter, async (req, res) => {
     try {
       const validatedData = userFormInputSchema.parse(req.body);
-      
+
       const submission = await storage.createFormSubmission(validatedData);
       console.log(`📝 Nouvelle soumission: ${maskSessionId(submission.sessionId)}`);
-      
-      // Matcher avec l'IA en utilisant PostgreSQL
-      console.log("🤖 Démarrage du matching IA avec PostgreSQL...");
-      const allGrants = await grantStorage.getAllActiveGrants();
-      console.log(`📚 ${allGrants.length} subventions disponibles en base`);
-      
-      // Convert Grant[] to GrantResult[] format
-      const formattedGrants = allGrants.map(formatGrantToResult);
-      
-      const matchedGrants = await matchGrantsWithAI(submission, formattedGrants);
-      console.log(`✅ ${matchedGrants.length} subventions matchées par l'IA`);
-      
-      // Sauvegarder les résultats
-      await storage.updateFormResults(submission.sessionId, matchedGrants);
-      console.log("💾 Résultats sauvegardés");
 
-      // MODE GRATUIT BETA: Marquer comme payé immédiatement
-      await storage.markAsPaid(submission.sessionId);
-      console.log("✅ Session marquée comme gratuite (mode beta)");
-
-      // Générer le PDF et envoyer l'email immédiatement (mode beta gratuit)
-      if (submission.email && matchedGrants.length > 0) {
-        try {
-          // Récupérer les données complètes des subventions depuis la base
-          const grantsWithDetails = await Promise.all(
-            matchedGrants.map(async (result: any) => {
-              const grant = await grantStorage.getGrantById(result.grantId);
-              return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
-            })
-          );
-          const validGrants = grantsWithDetails.filter((g): g is NonNullable<typeof g> => g !== null);
-          
-          if (validGrants.length === 0) {
-            throw new Error("Aucune subvention valide trouvée");
-          }
-          
-          console.log("📄 Génération du PDF...");
-          const { buffer, path } = await generateAndSaveGrantsPDF(
-            {
-              grants: validGrants,
-              userEmail: submission.email,
-              formData: submissionToPdfFormData(submission),
-            },
-            submission.sessionId
-          );
-          
-          // Sauvegarder le chemin du PDF
-          await storage.savePdfPath(submission.sessionId, path);
-          console.log(`✅ PDF généré: ${path}`);
-          
-          // Envoyer l'email avec le PDF
-          console.log("📧 Envoi de l'email...");
-          await sendGrantsEmail({
-            to: submission.email,
-            grantsCount: matchedGrants.length,
-            pdfBuffer: buffer
-          });
-          console.log("✅ Email envoyé avec succès");
-        } catch (pdfError: any) {
-          console.error("⚠️  Erreur PDF/Email:", pdfError.message);
-          // Fallback : envoyer les matches en HTML dans le corps de l'email
-          try {
-            const grantsForFallback = await Promise.all(
-              matchedGrants.map(async (result: any) => {
-                const grant = await grantStorage.getGrantById(result.grantId);
-                return grant ? { ...grant, matchScore: result.matchScore, matchReason: result.matchReason } : null;
-              })
-            );
-            const validForFallback = grantsForFallback.filter((g): g is NonNullable<typeof g> => g !== null);
-            if (validForFallback.length > 0) {
-              await sendGrantsEmailFallback({ to: submission.email, grants: validForFallback });
-              console.log("📧 Fallback HTML email envoyé (sans PDF)");
-            }
-          } catch (fallbackError: any) {
-            console.error("❌ Fallback email aussi échoué:", fallbackError.message);
-          }
-        }
-      }
-
+      // RESPOND IMMEDIATELY so the client can navigate to /loading without
+      // hanging on a 30+ second "Envoi…" spinner. The actual matching,
+      // PDF generation and email send run in the background; the /results
+      // endpoint returns {status: "pending"} until everything is ready.
       res.json({ sessionId: submission.sessionId });
+
+      // ----- BACKGROUND: matching + PDF + email -------------------------------
+      processSubmissionAsync(submission).catch((err) => {
+        console.error("❌ [background] submission processing failed:", err);
+      });
     } catch (error: any) {
       console.error("Erreur lors de la soumission:", error);
-      res.status(400).json({ error: error.message });
+      if (!res.headersSent) {
+        res.status(400).json({ error: error.message });
+      }
     }
   });
 
@@ -546,8 +556,14 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
         return res.status(404).json({ error: "Session not found" });
       }
 
+      // results is null while the background matching is still running;
+      // the client polls this endpoint until status === "ready".
+      const rawResults = submission.results as unknown as GrantResult[] | null;
+      const isReady = Array.isArray(rawResults);
+
       res.json({
-        results: submission.results || [],
+        status: isReady ? "ready" : "pending",
+        results: isReady ? rawResults : [],
         isPaid: submission.isPaid || false,
         submission: {
           projectDescription: submission.projectDescription,

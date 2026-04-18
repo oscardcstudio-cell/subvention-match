@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,6 +27,21 @@ import { MentionsLegales, CGV, PolitiqueConfidentialite } from "@/pages/LegalPag
 import { CookieBanner } from "@/components/CookieBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import NotFound from "@/pages/not-found";
+
+/**
+ * Scroll window to top on every route change.
+ * Wouter doesn't do this automatically. Without this, a user who
+ * scrolled down the homepage and clicks a profile card lands on /form
+ * still scrolled to the bottom — confusing.
+ */
+function ScrollToTopOnRouteChange() {
+  const [location] = useLocation();
+  useEffect(() => {
+    // Use "instant" to avoid perceivable scroll-jank on navigation
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location]);
+  return null;
+}
 
 function Router() {
   return (
@@ -61,6 +77,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <TooltipProvider>
+          <ScrollToTopOnRouteChange />
           <Toaster />
           <Router />
           <FeedbackWidget />
