@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  Loader2, Check, Database, Cpu, Shield, Target, Sparkles, Zap, Globe,
-  FileText, MapPin, Coins, Drama, Edit3,
+  Loader2, Target, Sparkles, Globe, MapPin, Drama, Edit3,
 } from "lucide-react";
 
 const MAX_WAIT_MS = 60_000; // Hard timeout
@@ -39,7 +38,6 @@ export default function LoadingPage() {
   const [submission, setSubmission] = useState<SubmissionSummary | null>(null);
   const [serverStatus, setServerStatus] = useState<"pending" | "ready">("pending");
   const [matchesReady, setMatchesReady] = useState(0);
-  const [stage5Pct, setStage5Pct] = useState(30);
 
   useEffect(() => {
     if (!sessionId) {
@@ -81,7 +79,6 @@ export default function LoadingPage() {
       if (stopped.current) return;
       const e = (Date.now() - start.current) / 1000;
       setElapsed(e);
-      setStage5Pct((prev) => Math.min(95, prev + (95 - prev) * 0.015));
       rafId.current = requestAnimationFrame(tick);
     };
     tick();
@@ -93,16 +90,21 @@ export default function LoadingPage() {
     };
   }, [sessionId, setLocation]);
 
-  const masterPct = serverStatus === "ready" ? 100 : Math.min(95, 20 + elapsed * 4);
+  // Asymptotique : part de 0, monte vite au début, se tasse près de 97, jamais
+  // de plateau sec ni de saut. Quand le serveur répond, on saute à 100.
+  // Constante 9 = "temps caractéristique" en secondes (à t=9s on est à ~63%,
+  // à t=20s à ~89%, à t=30s à ~96%).
+  const masterPct = serverStatus === "ready"
+    ? 100
+    : 97 * (1 - Math.exp(-elapsed / 9));
   const remainingSec = serverStatus === "ready" ? 0 : Math.max(0, 20 - elapsed);
 
-  const stageLabel =
-    serverStatus === "ready"
-      ? language === "fr" ? "Résultats prêts !" : "Ready!"
-      : elapsed > 14 ? (language === "fr" ? "Étape 11 / 12 · Génération du rapport" : "Step 11 / 12 · Report generation")
-      : elapsed > 10 ? (language === "fr" ? "Étape 08 / 12 · Scoring personnalisé" : "Step 08 / 12 · Scoring")
-      : elapsed > 7 ? (language === "fr" ? "Étape 06 / 12 · Enrichissement par IA" : "Step 06 / 12 · AI enrichment")
-      : language === "fr" ? "Étape 05 / 12 · Classement IA" : "Step 05 / 12 · AI ranking";
+  const stageLabel = serverStatus === "ready"
+    ? (language === "fr" ? "Résultats prêts" : "Ready")
+    : elapsed > 14 ? (language === "fr" ? "Génération du rapport" : "Report generation")
+    : elapsed > 10 ? (language === "fr" ? "Scoring personnalisé" : "Personalized scoring")
+    : elapsed > 7 ? (language === "fr" ? "Enrichissement par IA" : "AI enrichment")
+    : (language === "fr" ? "Classement IA" : "AI ranking");
 
   return (
     <div className="min-h-screen" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
@@ -229,34 +231,6 @@ export default function LoadingPage() {
         </div>
       </section>
 
-      {/* PIPELINE */}
-      <section className="mc-section-rule">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-12">
-          <div className="mc-card mc-divide-border">
-            <StageRow n="01" icon={Database} title={language === "fr" ? "Chargement du profil" : "Loading profile"} right="✓ 0.1 s" done />
-            <StageRow n="02" icon={Globe} title={language === "fr" ? "Aides Territoires (API officielle)" : "Aides Territoires (official API)"} right="✓ 312" done />
-            <StageRow n="03" icon={Globe} title={language === "fr" ? "Scrapers (CNM · ADAMI · DRAC ×12)" : "Scrapers (CNM · ADAMI · DRAC ×12)"} right="✓ 320" done />
-            <StageRow n="04" icon={Shield} title={language === "fr" ? "Quality gate (score 0–100)" : "Quality gate (score 0–100)"} right="✓ 241" done />
-            <StageRow
-              n="05"
-              icon={Cpu}
-              title={language === "fr" ? "Classement IA (DeepSeek v3)" : "AI ranking (DeepSeek v3)"}
-              right={serverStatus === "ready" ? "✓" : `${Math.round(stage5Pct)} %`}
-              active={serverStatus !== "ready"}
-              done={serverStatus === "ready"}
-              pct={serverStatus === "ready" ? 100 : stage5Pct}
-            />
-            <StageRow n="06" icon={Sparkles} title={language === "fr" ? "Enrichissement par IA" : "AI enrichment"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-            <StageRow n="07" icon={Target} title={language === "fr" ? "Scoring personnalisé" : "Personalized scoring"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-            <StageRow n="08" icon={Zap} title={language === "fr" ? "Estimation de difficulté" : "Difficulty estimation"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-            <StageRow n="09" icon={Database} title={language === "fr" ? "Cross-match deadlines" : "Cross-match deadlines"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-            <StageRow n="10" icon={Cpu} title={language === "fr" ? "Détection de cumul" : "Cumul detection"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-            <StageRow n="11" icon={FileText} title={language === "fr" ? "Génération du rapport" : "Report generation"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-            <StageRow n="12" icon={FileText} title={language === "fr" ? "Rendu PDF" : "PDF rendering"} right={serverStatus === "ready" ? "✓" : (language === "fr" ? "en attente" : "pending")} done={serverStatus === "ready"} />
-          </div>
-        </div>
-      </section>
-
       {/* TIPS */}
       <section className="mc-section-rule">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-12">
@@ -294,7 +268,11 @@ function labelInternational(v: string): string {
   return v;
 }
 
-function ProgressBar({ value, tall, shimmer }: { value: number; tall?: boolean; shimmer?: boolean }) {
+function ProgressBar({ value, tall, shimmer, animated }: { value: number; tall?: boolean; shimmer?: boolean; animated?: boolean }) {
+  // `animated` = false (défaut) quand on update la value soi-même à 60fps via
+  // requestAnimationFrame → pas de transition CSS, sinon elle se ré-applique
+  // à chaque frame et donne un effet de retard / figement.
+  // `animated` = true pour les barres qui ne changent que de loin en loin.
   return (
     <div
       style={{
@@ -312,7 +290,7 @@ function ProgressBar({ value, tall, shimmer }: { value: number; tall?: boolean; 
           width: `${value}%`,
           background: "var(--mc-primary)",
           borderRadius: 999,
-          transition: "width 0.5s ease",
+          transition: animated ? "width 0.5s ease" : undefined,
           backgroundImage: shimmer
             ? "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.15) 50%, transparent 100%)"
             : undefined,
@@ -342,32 +320,6 @@ function Field({ icon: Icon, label, value }: { icon: React.ElementType; label: s
         <Icon className="w-3.5 h-3.5" /> {label}
       </div>
       <div className="text-sm">{value}</div>
-    </div>
-  );
-}
-
-function StageRow({ n, icon: Icon, title, right, done, active, pct }: {
-  n: string; icon: React.ElementType; title: string; right: string; done?: boolean; active?: boolean; pct?: number;
-}) {
-  const labelColor = done || active ? "var(--mc-primary)" : "var(--mc-muted)";
-  return (
-    <div
-      className={`p-4 grid grid-cols-12 gap-4 items-center ${!done && !active ? "opacity-60" : ""}`}
-      style={active ? { background: "var(--mc-primary-soft)" } : undefined}
-    >
-      <div className="col-span-1 mc-mono text-sm" style={{ color: labelColor }}>{n}</div>
-      <div className="col-span-5 md:col-span-4 flex items-center gap-3">
-        <Icon className="w-4 h-4" style={{ color: labelColor }} strokeWidth={1.75} />
-        <div className="text-sm">{title}</div>
-      </div>
-      <div className="col-span-4 md:col-span-5">
-        <ProgressBar value={done ? 100 : (active ? pct ?? 0 : 0)} shimmer={active} />
-      </div>
-      <div className="col-span-2 text-right mc-mono text-xs flex items-center justify-end gap-2" style={{ color: labelColor }}>
-        {active && <Loader2 className="w-3 h-3 animate-spin" />}
-        {done && !active && <Check className="w-3 h-3" strokeWidth={3} />}
-        {right}
-      </div>
     </div>
   );
 }
