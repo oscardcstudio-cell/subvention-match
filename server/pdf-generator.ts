@@ -264,111 +264,159 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Vos Subventions - SubventionMatch</title>
+      <title>Vos Subventions — Mecene</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+        /* === Mecene Swiss Dark — tokens === */
+        :root {
+          --mc-bg: #0A0A0A;
+          --mc-panel: #141416;
+          --mc-panel-2: #1A1A1D;
+          --mc-border: #26262A;
+          --mc-border-soft: #1C1C1F;
+          --mc-text: #F5F5F6;
+          --mc-muted: #8B8B92;
+          --mc-muted-2: #5D5D63;
+          --mc-primary: #06D6A0;
+          --mc-primary-soft: rgba(6, 214, 160, 0.10);
+          --mc-accent: #118AB2;
+          --mc-accent-soft: rgba(17, 138, 178, 0.12);
+          --mc-warn: #FFD166;
+          --mc-danger: #EF476F;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-          background: white;
-          color: #1f2937;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          background: var(--mc-bg);
+          color: var(--mc-text);
           line-height: 1.6;
-          font-size: 14px;
+          font-size: 13px;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .mc-display {
+          font-family: 'Archivo', sans-serif;
+          font-weight: 900;
+          letter-spacing: -0.035em;
+          line-height: 0.88;
+        }
+        .mc-mono {
+          font-family: 'JetBrains Mono', monospace;
         }
 
         .container {
-          max-width: 800px;
+          max-width: 820px;
           margin: 0 auto;
-          padding: 30px 20px;
+          padding: 20px 24px 40px;
         }
 
         /* Header */
         .header {
           margin-bottom: 40px;
-          padding-bottom: 25px;
-          border-bottom: 1px solid #e5e7eb;
+          padding-bottom: 20px;
+          border-bottom: 1px solid var(--mc-border);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
 
         .logo {
-          font-size: 24px;
-          font-weight: 300;
-          color: #000;
-          letter-spacing: -0.5px;
-          margin-bottom: 6px;
+          font-family: 'Archivo', sans-serif;
+          font-weight: 900;
+          letter-spacing: -0.035em;
+          font-size: 22px;
+          color: var(--mc-text);
         }
 
-        .logo strong {
-          font-weight: 700;
-        }
+        .logo .dot { color: var(--mc-primary); }
 
-        .subtitle {
-          color: #6b7280;
-          font-size: 13px;
+        .header-tag {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: var(--mc-muted);
         }
 
         /* Title */
+        .section-label {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: var(--mc-primary);
+          margin-bottom: 18px;
+        }
+
         .title-section {
-          margin-bottom: 35px;
+          margin-bottom: 45px;
         }
 
         .main-title {
-          font-size: 42px;
-          font-weight: 700;
-          line-height: 1.1;
-          letter-spacing: -1px;
-          margin-bottom: 10px;
-          color: #000;
+          font-family: 'Archivo', sans-serif;
+          font-weight: 900;
+          font-size: 72px;
+          line-height: 0.88;
+          letter-spacing: -0.035em;
+          margin-bottom: 16px;
+          color: var(--mc-text);
+          text-transform: uppercase;
         }
 
-        .main-title .highlight {
-          color: #06D6A0;
-        }
+        .main-title .dot { color: var(--mc-primary); }
 
         .main-subtitle {
-          font-size: 16px;
-          color: #6b7280;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: var(--mc-muted);
         }
 
         /* Form Summary */
         .form-summary {
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
+          background: var(--mc-panel);
+          border: 1px solid var(--mc-border);
+          border-radius: 12px;
           padding: 24px;
-          margin-bottom: 35px;
+          margin-bottom: 40px;
           page-break-inside: avoid;
         }
 
         .form-summary-title {
-          font-size: 16px;
-          font-weight: 700;
-          color: #000;
-          margin-bottom: 18px;
-          padding-bottom: 12px;
-          border-bottom: 2px solid #06D6A0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: var(--mc-primary);
+          margin-bottom: 20px;
+          padding-bottom: 14px;
+          border-bottom: 1px solid var(--mc-border);
         }
 
         .form-field {
-          margin-bottom: 14px;
+          margin-bottom: 16px;
         }
 
         .form-label {
-          font-size: 10px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 9px;
           text-transform: uppercase;
-          color: #9ca3af;
-          letter-spacing: 0.5px;
-          margin-bottom: 4px;
-          font-weight: 600;
+          color: var(--mc-muted);
+          letter-spacing: 0.15em;
+          margin-bottom: 6px;
+          font-weight: 500;
           display: block;
         }
 
         .form-value {
           font-size: 13px;
-          color: #374151;
+          color: var(--mc-text);
           line-height: 1.6;
         }
 
@@ -376,71 +424,73 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
           display: flex;
           flex-wrap: wrap;
           gap: 6px;
-          margin-top: 4px;
+          margin-top: 6px;
         }
 
         .form-tag {
-          background: #06D6A0;
-          color: white;
-          padding: 3px 9px;
-          border-radius: 3px;
-          font-size: 11px;
-          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          background: var(--mc-primary-soft);
+          color: var(--mc-primary);
+          border: 1px solid rgba(6, 214, 160, 0.3);
+          padding: 3px 10px;
+          border-radius: 999px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          letter-spacing: 0.05em;
         }
 
-        /* Mise en avant de la description du projet — c'est la chose qui permet
-           à l'utilisateur de retrouver instantanément quel projet il a soumis
-           quand il rouvre le PDF des semaines plus tard. */
         .project-description-block {
-          background: white;
-          border: 1px solid #06D6A0;
-          border-left: 4px solid #06D6A0;
+          background: var(--mc-panel-2);
+          border: 1px solid var(--mc-border);
+          border-left: 3px solid var(--mc-primary);
           padding: 16px 18px;
           margin-bottom: 18px;
-          border-radius: 0 4px 4px 0;
+          border-radius: 0 8px 8px 0;
         }
 
         .project-description-label {
-          font-size: 10px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 9px;
           text-transform: uppercase;
-          color: #059669;
-          letter-spacing: 0.5px;
-          margin-bottom: 8px;
-          font-weight: 700;
+          color: var(--mc-primary);
+          letter-spacing: 0.2em;
+          margin-bottom: 10px;
+          font-weight: 500;
         }
 
         .project-description-text {
           font-size: 14px;
-          color: #111827;
+          color: var(--mc-text);
           line-height: 1.6;
-          font-weight: 500;
         }
 
-        /* Grille 2 colonnes pour les champs courts (statut, région, etc.) */
         .form-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px 24px;
+          gap: 14px 28px;
         }
 
         .form-field-other {
           font-size: 11px;
-          color: #6b7280;
+          color: var(--mc-muted);
           font-style: italic;
           margin-top: 4px;
         }
 
         /* Grant Card */
         .grant-card {
-          background: white;
-          border: 1px solid #e5e7eb;
-          margin-bottom: 25px;
+          background: var(--mc-panel);
+          border: 1px solid var(--mc-border);
+          border-radius: 12px;
+          margin-bottom: 24px;
           page-break-inside: avoid;
+          overflow: hidden;
         }
 
         .grant-card-header {
-          padding: 20px 24px;
-          border-bottom: 1px solid #f3f4f6;
+          padding: 24px;
+          border-bottom: 1px solid var(--mc-border);
         }
 
         .grant-header-row {
@@ -451,28 +501,32 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
           margin-bottom: 14px;
         }
 
-        .grant-info {
-          flex: 1;
-        }
+        .grant-info { flex: 1; }
 
         .match-badge {
-          display: inline-block;
-          background: #118AB2;
-          color: white;
-          padding: 3px 8px;
-          border-radius: 3px;
+          display: inline-flex;
+          align-items: center;
+          background: var(--mc-accent-soft);
+          color: var(--mc-accent);
+          border: 1px solid rgba(17, 138, 178, 0.3);
+          padding: 3px 10px;
+          border-radius: 999px;
+          font-family: 'JetBrains Mono', monospace;
           font-size: 10px;
-          font-weight: 600;
-          margin-bottom: 8px;
+          font-weight: 500;
+          letter-spacing: 0.05em;
+          margin-bottom: 10px;
         }
 
         .grant-title {
-          font-size: 24px;
-          font-weight: 800;
-          color: #000;
-          margin-bottom: 8px;
-          line-height: 1.2;
-          letter-spacing: -0.02em;
+          font-family: 'Archivo', sans-serif;
+          font-weight: 900;
+          font-size: 26px;
+          line-height: 1.0;
+          letter-spacing: -0.035em;
+          color: var(--mc-text);
+          margin-bottom: 10px;
+          text-transform: uppercase;
           overflow: hidden;
           display: -webkit-box;
           -webkit-box-orient: vertical;
@@ -481,120 +535,113 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
         }
 
         .grant-organization {
-          font-size: 15px;
-          font-weight: 600;
-          color: #4b5563;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          font-weight: 500;
+          color: var(--mc-muted);
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.2em;
         }
 
         .amount-box {
           text-align: right;
           flex-shrink: 0;
-          max-width: 140px;
+          max-width: 150px;
         }
 
         .amount-label {
+          font-family: 'JetBrains Mono', monospace;
           font-size: 9px;
           text-transform: uppercase;
-          color: #9ca3af;
-          letter-spacing: 0.5px;
-          margin-bottom: 3px;
+          color: var(--mc-muted);
+          letter-spacing: 0.2em;
+          margin-bottom: 6px;
         }
 
         .amount-value {
-          font-size: 14px;
-          font-weight: 700;
-          color: #000;
-          line-height: 1.3;
+          font-family: 'Archivo', sans-serif;
+          font-weight: 800;
+          font-size: 16px;
+          color: var(--mc-primary);
+          line-height: 1.2;
+          letter-spacing: -0.02em;
         }
 
         .deadline-row {
           display: flex;
           align-items: center;
-          gap: 6px;
-          font-size: 11px;
-          color: #6b7280;
-          margin-bottom: 12px;
+          gap: 8px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: var(--mc-muted);
+          margin-bottom: 14px;
         }
 
         .match-reason {
-          background: rgba(6, 214, 160, 0.05);
-          border-left: 2px solid #06D6A0;
-          padding: 12px;
+          background: var(--mc-primary-soft);
+          border-left: 2px solid var(--mc-primary);
+          padding: 12px 14px;
           font-size: 13px;
-          color: #374151;
+          color: var(--mc-text);
           line-height: 1.6;
+          border-radius: 0 4px 4px 0;
         }
 
-        /* Grant Details */
         .grant-details {
-          padding: 20px 24px;
+          padding: 24px;
         }
 
         .detail-section {
-          margin-bottom: 24px;
+          margin-bottom: 26px;
         }
 
-        .detail-section:last-child {
-          margin-bottom: 0;
-        }
+        .detail-section:last-child { margin-bottom: 0; }
 
         .section-header {
           display: flex;
           align-items: center;
-          gap: 6px;
-          margin-bottom: 10px;
+          gap: 8px;
+          margin-bottom: 12px;
         }
 
         .section-title {
-          font-size: 12px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
           text-transform: uppercase;
-          color: #111827;
-          letter-spacing: 1.5px;
-          font-weight: 800;
-          border-bottom: 2px solid #06D6A0;
-          padding-bottom: 2px;
+          color: var(--mc-primary);
+          letter-spacing: 0.2em;
+          font-weight: 500;
           margin-bottom: 12px;
           display: inline-block;
         }
 
-        .section-icon {
-          width: 14px;
-          height: 14px;
-          color: #9ca3af;
-        }
-
         .section-content {
           font-size: 13px;
-          color: #374151;
-          line-height: 1.8;
+          color: var(--mc-text);
+          line-height: 1.75;
         }
 
-        .section-content p {
-          margin-bottom: 8px;
-        }
-
-        .section-content strong {
-          font-weight: 700;
-          color: #000;
-        }
+        .section-content p { margin-bottom: 10px; color: var(--mc-text); }
+        .section-content strong { font-weight: 700; color: var(--mc-text); }
 
         .section-content ul {
-          margin: 8px 0;
+          margin: 10px 0;
           padding-left: 0;
           list-style: none;
         }
 
         .section-content li {
-          margin-bottom: 6px;
+          margin-bottom: 8px;
           padding-left: 20px;
           position: relative;
+          color: var(--mc-text);
         }
 
         .section-content li::before {
-          content: "•";
-          color: #06D6A0;
+          content: "→";
+          color: var(--mc-primary);
           position: absolute;
           left: 0;
           font-weight: 700;
@@ -602,9 +649,10 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
 
         /* Stats Box */
         .stats-box {
-          background: #f9fafb;
-          padding: 18px;
-          border-radius: 6px;
+          background: var(--mc-panel-2);
+          border: 1px solid var(--mc-border);
+          padding: 20px;
+          border-radius: 8px;
           margin-bottom: 20px;
         }
 
@@ -614,283 +662,172 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
           gap: 14px;
         }
 
-        .stat-item {
-          text-align: center;
-        }
+        .stat-item { text-align: center; }
 
         .stat-value {
-          font-size: 20px;
-          font-weight: 700;
-          color: #000;
-          margin-bottom: 4px;
+          font-family: 'Archivo', sans-serif;
+          font-weight: 800;
+          font-size: 18px;
+          color: var(--mc-text);
+          margin-bottom: 6px;
+          letter-spacing: -0.02em;
         }
 
         .stat-label {
+          font-family: 'JetBrains Mono', monospace;
           font-size: 9px;
           text-transform: uppercase;
-          color: #9ca3af;
-          letter-spacing: 0.5px;
-        }
-
-        /* Process Table */
-        .process-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        .process-table tr {
-          border-bottom: 1px solid #f3f4f6;
-        }
-
-        .process-table tr:last-child {
-          border-bottom: none;
-        }
-
-        .process-table td {
-          padding: 8px 0;
-          font-size: 13px;
-        }
-
-        .process-table td:first-child {
-          color: #6b7280;
-          width: 50%;
-        }
-
-        .process-table td:last-child {
-          font-weight: 500;
-          color: #000;
-          text-align: right;
-        }
-
-        /* Colored Boxes */
-        .advice-box {
-          background: #eff6ff;
-          border-left: 4px solid #3b82f6;
-          padding: 14px;
-          margin-bottom: 20px;
-        }
-
-        .advice-box-title {
-          font-size: 9px;
-          text-transform: uppercase;
-          color: #3b82f6;
-          letter-spacing: 1px;
-          margin-bottom: 8px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .advice-box-content {
-          font-size: 13px;
-          color: #374151;
-          line-height: 1.6;
-        }
-
-        .resources-box {
-          background: #f5f3ff;
-          border-left: 4px solid #a78bfa;
-          padding: 14px;
-          margin-bottom: 20px;
-        }
-
-        .resources-box-title {
-          font-size: 9px;
-          text-transform: uppercase;
-          color: #7c3aed;
-          letter-spacing: 1px;
-          margin-bottom: 10px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .resource-item {
-          background: white;
-          padding: 10px;
-          border-radius: 5px;
-          margin-bottom: 8px;
-        }
-
-        .resource-item:last-child {
-          margin-bottom: 0;
-        }
-
-        .resource-title {
-          font-size: 12px;
-          font-weight: 600;
-          color: #000;
-          margin-bottom: 3px;
-        }
-
-        .resource-description {
-          font-size: 11px;
-          color: #6b7280;
-          margin-bottom: 3px;
-        }
-
-        .resource-type {
-          font-size: 9px;
-          text-transform: uppercase;
-          color: #9ca3af;
-          margin-top: 3px;
-        }
-
-        .resource-url {
-          font-size: 10px;
-          color: #3b82f6;
-          margin-top: 4px;
-          word-break: break-all;
-        }
-
-        /* Contact */
-        .contact-list {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .contact-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          color: #374151;
+          color: var(--mc-muted);
+          letter-spacing: 0.15em;
         }
 
         /* Apply Button */
         .apply-section {
-          padding-top: 18px;
-          border-top: 1px solid #e5e7eb;
+          padding-top: 20px;
+          border-top: 1px solid var(--mc-border);
           margin-top: 20px;
         }
 
         .apply-button {
-          background: #000;
-          color: white;
+          background: var(--mc-primary);
+          color: #0A0A0A;
           padding: 14px 22px;
           text-align: center;
-          border-radius: 50px;
-          font-size: 13px;
-          font-weight: 600;
+          border-radius: 999px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
           display: block;
           text-decoration: none;
         }
 
         /* Footer */
         .footer {
-          margin-top: 40px;
-          padding-top: 25px;
-          border-top: 1px solid #e5e7eb;
+          margin-top: 48px;
+          padding-top: 24px;
+          border-top: 1px solid var(--mc-border);
           text-align: center;
-          font-size: 11px;
-          color: #9ca3af;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: var(--mc-muted-2);
         }
 
         .footer-email {
-          color: #6b7280;
+          color: var(--mc-muted);
           margin-top: 6px;
         }
 
-        /* Beta feedback box */
+        /* Beta feedback */
         .beta-feedback {
-          margin-top: 50px;
+          margin-top: 40px;
           padding: 24px;
-          background: #FFF4D6;
-          border: 2px solid #FFD166;
+          background: rgba(255, 209, 102, 0.08);
+          border: 1px solid rgba(255, 209, 102, 0.3);
           border-radius: 12px;
           text-align: center;
           page-break-inside: avoid;
         }
         .beta-feedback h3 {
+          font-family: 'Archivo', sans-serif;
+          font-weight: 800;
           font-size: 16px;
-          font-weight: 700;
-          color: #073B4C;
+          color: var(--mc-warn);
           margin: 0 0 10px;
+          text-transform: uppercase;
+          letter-spacing: -0.02em;
         }
         .beta-feedback p {
-          font-size: 13px;
-          color: #4a4a4a;
-          margin: 0 0 14px;
-          line-height: 1.5;
+          font-size: 12px;
+          color: var(--mc-muted);
+          margin: 0 0 16px;
+          line-height: 1.6;
         }
         .beta-feedback a {
           display: inline-block;
-          background: #073B4C;
-          color: white;
+          background: var(--mc-warn);
+          color: #0A0A0A;
           padding: 10px 22px;
-          border-radius: 8px;
+          border-radius: 999px;
           text-decoration: none;
-          font-size: 13px;
-          font-weight: 600;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
         }
 
-        /* Transparence : champs manquants ou approximatifs */
         .info-missing {
           font-style: italic;
-          color: #6b7280;
-          font-size: 13px;
-          padding: 8px 12px;
-          background: #f9fafb;
-          border-radius: 4px;
+          color: var(--mc-muted);
+          font-size: 12px;
+          padding: 10px 14px;
+          background: var(--mc-panel-2);
+          border: 1px solid var(--mc-border);
+          border-radius: 6px;
           line-height: 1.5;
         }
 
         .info-missing-amount {
           font-size: 12px;
-          color: #6b7280;
+          color: var(--mc-muted);
           font-weight: 500;
         }
 
-        /* Encart contact direct (recommandé quand l'URL n'est pas optimale ou
-           qu'on a un email de contact) */
         .contact-recommendation {
-          background: #fef3c7;
-          border-left: 4px solid #f59e0b;
+          background: rgba(255, 209, 102, 0.08);
+          border: 1px solid rgba(255, 209, 102, 0.25);
+          border-left: 3px solid var(--mc-warn);
           padding: 12px 14px;
           margin-bottom: 14px;
           font-size: 12px;
-          color: #78350f;
-          border-radius: 0 4px 4px 0;
+          color: var(--mc-text);
+          border-radius: 0 6px 6px 0;
         }
 
         .contact-recommendation-title {
-          font-weight: 700;
-          margin-bottom: 4px;
-          font-size: 11px;
+          font-family: 'JetBrains Mono', monospace;
+          font-weight: 500;
+          margin-bottom: 6px;
+          font-size: 9px;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.2em;
+          color: var(--mc-warn);
         }
 
         .contact-recommendation a {
-          color: #92400e;
+          color: var(--mc-warn);
           text-decoration: underline;
           word-break: break-all;
         }
 
-        /* Hint sous le bouton de candidature (kind = homepage/mailto/search) */
         .apply-button-hint {
-          font-size: 10px;
-          color: #6b7280;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 9px;
+          color: var(--mc-muted);
           text-align: center;
-          margin-top: 6px;
-          font-style: italic;
+          margin-top: 8px;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
         }
 
-        /* Variants du bouton selon le kind d'URL */
+        /* Variants — kind != direct */
         .apply-button-mailto {
-          background: #92400e !important;
+          background: var(--mc-warn) !important;
+          color: #0A0A0A !important;
         }
-
         .apply-button-search {
-          background: #6b7280 !important;
+          background: var(--mc-panel-2) !important;
+          color: var(--mc-text) !important;
+          border: 1px solid var(--mc-border);
         }
-
         .apply-button-none {
-          background: #e5e7eb !important;
-          color: #6b7280 !important;
+          background: var(--mc-panel-2) !important;
+          color: var(--mc-muted-2) !important;
+          border: 1px solid var(--mc-border);
           cursor: not-allowed;
         }
       </style>
@@ -899,19 +836,16 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
       <div class="container">
         <!-- Header -->
         <div class="header">
-          <div class="logo">
-            Subvention<strong>Match</strong>
-          </div>
-          <div class="subtitle">
-            Vos subventions culturelles personnalisées
-          </div>
+          <div class="logo">Mecene<span class="dot">.</span></div>
+          <div class="header-tag">/ Rapport subventions</div>
         </div>
 
         <!-- Title -->
         <div class="title-section">
+          <div class="section-label">/ 01 — Résultats pour votre projet</div>
           <div class="main-title">
-            ${grants.length}<br>
-            <span class="highlight">SUBVENTION${grants.length > 1 ? 'S' : ''}</span>
+            ${grants.length} match${grants.length > 1 ? 'es' : ''}<br>
+            trouvé${grants.length > 1 ? 's' : ''}<span class="dot">.</span>
           </div>
           <div class="main-subtitle">Pour votre profil artistique</div>
         </div>
@@ -920,13 +854,13 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
              retrouve instantanément le contexte de ce dossier -->
         ${formData ? `
           <div class="form-summary">
-            <div class="form-summary-title">📋 Votre profil & projet</div>
+            <div class="form-summary-title">/ 02 — Votre profil &amp; projet</div>
 
             <!-- DESCRIPTION DU PROJET : mise en avant car c'est l'élément central
                  qui permet à l'utilisateur de reconnaître son dossier -->
             ${formData.projectDescription ? `
               <div class="project-description-block">
-                <div class="project-description-label">📝 Description du projet</div>
+                <div class="project-description-label">Description du projet</div>
                 <div class="project-description-text">${formData.projectDescription}</div>
               </div>
             ` : ''}
@@ -1067,7 +1001,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
                 </div>
 
                 <div class="deadline-row">
-                  📅 ${deadlineLine}
+                  ⤳ ${deadlineLine}
                 </div>
 
                 ${grant.matchReason ? `
@@ -1083,7 +1017,6 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
                 <!-- Description -->
                 <div class="detail-section">
                   <div class="section-header">
-                    <span class="section-icon">📄</span>
                     <span class="section-title">Description</span>
                   </div>
                   <div class="section-content">
@@ -1148,7 +1081,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
                      pour qu'il y ait toujours un chemin humain en backup. -->
                 ${(grant.contactEmail && grant.contactEmail.includes('@')) || (appUrl && appUrl.kind !== 'direct') ? `
                   <div class="contact-recommendation">
-                    <div class="contact-recommendation-title">📞 Contact direct recommandé</div>
+                    <div class="contact-recommendation-title">Contact direct recommandé</div>
                     ${grant.contactEmail && grant.contactEmail.includes('@')
                       ? `Pour confirmer les modalités à jour : <a href="mailto:${grant.contactEmail}">${grant.contactEmail}</a>${grant.contactPhone ? ` — ${grant.contactPhone}` : ''}`
                       : `Les modalités évoluent régulièrement. Contactez ${grant.organization} pour confirmer les détails actuels avant de candidater.`
@@ -1179,18 +1112,18 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
 
         <!-- Beta feedback box -->
         <div class="beta-feedback">
-          <h3>🧪 SubventionMatch est en beta</h3>
+          <h3>Mecene est en beta</h3>
           <p>
             Un résultat pertinent ? Une subvention mal matchée ? Une idée ?<br/>
             Votre retour nous aide à améliorer le matching pour tous les artistes.
           </p>
-          <a href="https://subvention-match-production.up.railway.app/?feedback=1">💬 Donner un retour</a>
+          <a href="https://subvention-match-production.up.railway.app/?feedback=1">Donner un retour →</a>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-          <div>© ${new Date().getFullYear()} SubventionMatch - Tous droits réservés</div>
-          <div class="footer-email">Document généré pour: ${userEmail}</div>
+          <div>© ${new Date().getFullYear()} Mecene — Tous droits réservés</div>
+          <div class="footer-email">Document généré pour : ${userEmail}</div>
         </div>
       </div>
     </body>
