@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Qualité des données — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_theme-dark.css" />
+<style>
+  .bar { position:relative; height:10px; background:var(--panel-2); border-radius:999px; overflow:hidden; }
+  .bar-fill { position:absolute; left:0; top:0; bottom:0; background:var(--primary); border-radius:999px; }
+  table.data { width:100%; border-collapse:collapse; }
+  table.data th, table.data td { text-align:left; padding:.85rem 1rem; border-bottom:1px solid var(--border); font-size:.9rem; }
+  table.data th { font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.08em; font-size:.7rem; color:var(--muted); background:var(--panel-2); }
+  table.data tr:hover { background:var(--panel-2); }
+  .status-ok { color:var(--primary); }
+  .status-warn { color:var(--warn); }
+  .status-ko { color:var(--danger); }
+  .tag { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:999px; border:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2 1 21h22zM12 9v4M12 17h.01"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-database" viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 6.4 2.6L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9 9 0 0 1-6.4-2.6L3 16M3 21v-5h5"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+</defs></svg>
+
+<div class="text-center text-xs py-2 px-4 mono" style="background:#FFD166;color:#0A0A0A;">
+  [ TRANSPARENCE ] &nbsp;&nbsp; Chaque dispositif et sa qualité — publié, pas caché.
+</div>
+
+<header class="section-rule sticky top-0 z-40 backdrop-blur" style="background:rgba(10,10,10,.85)">
+  <div class="max-w-7xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="style-01-swiss-dark.html" class="display text-lg">Mecene<span style="color:var(--primary)">.</span></a>
+    <nav class="hidden md:flex items-center gap-6 mono text-xs uppercase tracking-widest text-[color:var(--muted)]">
+      <a href="style-01-swiss-dark-stats.html" class="hover:text-white">Stats</a>
+      <a href="#" class="text-white">Qualité</a>
+      <a href="#registry" class="hover:text-white">Registre</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section>
+  <div class="max-w-7xl mx-auto px-8 py-16">
+    <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-10">/ Data quality</div>
+    <h1 class="display text-[72px] md:text-[96px]">
+      CHAQUE AIDE<br>
+      PASSE AU<br>
+      CRIBLE<span style="color:var(--primary)">.</span>
+    </h1>
+    <p class="mt-8 text-[color:var(--muted)] max-w-2xl leading-relaxed">
+      Un dispositif mal décrit mène à un mauvais match. Chaque fiche est scorée sur
+      6 critères, révisée à la main quand le score chute, et réévaluée toutes les semaines.
+      On montre les résultats bruts — y compris nos points faibles.
+    </p>
+    <div class="mt-10 flex items-center gap-4">
+      <button class="btn-ghost inline-flex items-center gap-2 px-4 py-2 rounded-full mono text-xs uppercase tracking-widest">
+        <svg class="icon-sm"><use href="#i-refresh"/></svg> Dernière révision il y a 3 jours
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- QUALITY OVERVIEW -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-[color:var(--border)] border-y" style="border-color:var(--border)">
+    <div class="p-8">
+      <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-3">
+        <svg class="icon-sm"><use href="#i-check"/></svg> Score ≥ 75
+      </div>
+      <div class="display text-5xl">144</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">30 % de la base — qualité excellente</div>
+    </div>
+    <div class="p-8">
+      <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-3">
+        <svg class="icon-sm"><use href="#i-check"/></svg> Score 60-74
+      </div>
+      <div class="display text-5xl">97</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">Passe le seuil, sera enrichi</div>
+    </div>
+    <div class="p-8">
+      <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--warn)] mb-3">
+        <svg class="icon-sm"><use href="#i-alert"/></svg> À réviser
+      </div>
+      <div class="display text-5xl">97</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">Score faible — en cours de correction</div>
+    </div>
+    <div class="p-8">
+      <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--danger)] mb-3">
+        <svg class="icon-sm"><use href="#i-x"/></svg> Écartés
+      </div>
+      <div class="display text-5xl">135</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">Hors-ligne ou éligibilité floue</div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 CRITERIA -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-4">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 01 — Les 6 critères</div>
+      <h2 class="display text-5xl mt-4">COMMENT<br>ON SCORE.</h2>
+      <p class="text-[color:var(--muted)] mt-6 max-w-sm leading-relaxed">
+        Chaque critère vaut entre 0 et 20 points. Le total sur 100 détermine si la fiche
+        est servie à l'IA ou renvoyée en correction.
+      </p>
+    </div>
+    <div class="col-span-12 md:col-span-8">
+      <div class="card divide-border">
+        <div class="p-6 grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-12 md:col-span-5"><span class="mono text-xs text-[color:var(--muted)] mr-2">01</span><span class="font-semibold">URL officielle valide</span></div>
+          <div class="col-span-10 md:col-span-5"><div class="bar"><div class="bar-fill" style="width:94%"></div></div></div>
+          <div class="col-span-2 text-right mono text-sm text-[color:var(--primary)]">94 %</div>
+        </div>
+        <div class="p-6 grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-12 md:col-span-5"><span class="mono text-xs text-[color:var(--muted)] mr-2">02</span><span class="font-semibold">Description &gt; 80 caractères</span></div>
+          <div class="col-span-10 md:col-span-5"><div class="bar"><div class="bar-fill" style="width:91%"></div></div></div>
+          <div class="col-span-2 text-right mono text-sm text-[color:var(--primary)]">91 %</div>
+        </div>
+        <div class="p-6 grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-12 md:col-span-5"><span class="mono text-xs text-[color:var(--muted)] mr-2">03</span><span class="font-semibold">Domaine artistique identifié</span></div>
+          <div class="col-span-10 md:col-span-5"><div class="bar"><div class="bar-fill" style="width:88%"></div></div></div>
+          <div class="col-span-2 text-right mono text-sm text-[color:var(--primary)]">88 %</div>
+        </div>
+        <div class="p-6 grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-12 md:col-span-5"><span class="mono text-xs text-[color:var(--muted)] mr-2">04</span><span class="font-semibold">Éligibilité explicite</span></div>
+          <div class="col-span-10 md:col-span-5"><div class="bar"><div class="bar-fill warn" style="background:var(--warn);width:78%"></div></div></div>
+          <div class="col-span-2 text-right mono text-sm" style="color:var(--warn)">78 %</div>
+        </div>
+        <div class="p-6 grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-12 md:col-span-5"><span class="mono text-xs text-[color:var(--muted)] mr-2">05</span><span class="font-semibold">Montant précis</span></div>
+          <div class="col-span-10 md:col-span-5"><div class="bar"><div class="bar-fill" style="background:var(--warn);width:64%"></div></div></div>
+          <div class="col-span-2 text-right mono text-sm" style="color:var(--warn)">64 %</div>
+        </div>
+        <div class="p-6 grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-12 md:col-span-5"><span class="mono text-xs text-[color:var(--muted)] mr-2">06</span><span class="font-semibold">Deadline datée</span></div>
+          <div class="col-span-10 md:col-span-5"><div class="bar"><div class="bar-fill" style="background:var(--muted-2);width:52%"></div></div></div>
+          <div class="col-span-2 text-right mono text-sm text-[color:var(--muted)]">52 %</div>
+        </div>
+      </div>
+      <p class="mt-4 text-xs text-[color:var(--muted-2)] italic">
+        Les deadlines sont le point faible de la base — beaucoup de dispositifs publient
+        sans date fixe. L'IA compense en proposant les aides « permanentes » en priorité.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTRY TABLE -->
+<section id="registry" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20">
+    <div class="grid grid-cols-12 gap-6 mb-10">
+      <div class="col-span-12 md:col-span-4">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 02 — Registre public</div>
+        <h2 class="display text-5xl mt-4">EXTRAIT<br>DE LA BASE.</h2>
+      </div>
+      <div class="col-span-12 md:col-span-8 flex items-end">
+        <p class="text-[color:var(--muted)] max-w-2xl">
+          15 dispositifs échantillonnés parmi les 473. Chaque ligne montre le score brut,
+          la dernière révision, et le statut opérationnel. Registre complet disponible sur
+          demande via le feedback.
+        </p>
+      </div>
+    </div>
+
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Dispositif</th>
+              <th>Source</th>
+              <th>Domaine</th>
+              <th>Score</th>
+              <th>Dernière révision</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody class="mono">
+            <tr><td>0012</td><td class="font-sans">ADSV — Équipes indépendantes</td><td>Min. Culture</td><td><span class="tag">Spectacle vivant</span></td><td class="status-ok">92</td><td>2026-04-15</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0047</td><td class="font-sans">DRAC ARA — Création</td><td>DRAC</td><td><span class="tag">Spectacle vivant</span></td><td class="status-ok">88</td><td>2026-04-11</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0089</td><td class="font-sans">CNC — Aide écriture documentaire</td><td>CNC</td><td><span class="tag">Cinéma</span></td><td class="status-ok">91</td><td>2026-04-14</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0123</td><td class="font-sans">SCAM — Brouillon d'un rêve</td><td>SCAM</td><td><span class="tag">Cinéma</span></td><td class="status-ok">85</td><td>2026-04-09</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0156</td><td class="font-sans">CNM — Aide à la production phonographique</td><td>CNM</td><td><span class="tag">Musique</span></td><td class="status-ok">87</td><td>2026-04-16</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0178</td><td class="font-sans">Fondation de France — Art visuel</td><td>Fondation France</td><td><span class="tag">Arts visuels</span></td><td class="status-ok">81</td><td>2026-04-08</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0201</td><td class="font-sans">Sacem — Bourse d'aide à la création</td><td>Sacem</td><td><span class="tag">Musique</span></td><td class="status-ok">79</td><td>2026-04-10</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0234</td><td class="font-sans">Europe Créative — Coopération</td><td>CE</td><td><span class="tag">Transversal</span></td><td class="status-ok">76</td><td>2026-04-03</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0267</td><td class="font-sans">CNL — Bourse de création (livre)</td><td>CNL</td><td><span class="tag">Livre</span></td><td class="status-ok">74</td><td>2026-04-07</td><td class="status-ok">● Actif</td></tr>
+            <tr><td>0298</td><td class="font-sans">ADAMI — Aide à la diffusion</td><td>ADAMI</td><td><span class="tag">Musique</span></td><td class="status-warn">68</td><td>2026-04-02</td><td class="status-warn">◐ À réviser</td></tr>
+            <tr><td>0312</td><td class="font-sans">Spedidam — Aide à la création</td><td>Spedidam</td><td><span class="tag">Musique</span></td><td class="status-warn">64</td><td>2026-03-29</td><td class="status-warn">◐ À réviser</td></tr>
+            <tr><td>0345</td><td class="font-sans">Aide ville de Lyon — Spectacle vivant</td><td>Ville Lyon</td><td><span class="tag">Spectacle vivant</span></td><td class="status-warn">61</td><td>2026-03-28</td><td class="status-warn">◐ À réviser</td></tr>
+            <tr><td>0378</td><td class="font-sans">Région Bretagne — Fonds culture</td><td>Région</td><td><span class="tag">Transversal</span></td><td class="status-ko">52</td><td>2026-03-20</td><td class="status-ko">○ Écarté (URL morte)</td></tr>
+            <tr><td>0401</td><td class="font-sans">DRAC IDF — Bourse résidence</td><td>DRAC</td><td><span class="tag">Spectacle vivant</span></td><td class="status-ko">48</td><td>2026-03-15</td><td class="status-ko">○ Écarté (éligibilité floue)</td></tr>
+            <tr><td>0432</td><td class="font-sans">CITL — Aide traduction</td><td>CITL</td><td><span class="tag">Livre</span></td><td class="status-warn">67</td><td>2026-04-01</td><td class="status-warn">◐ À réviser</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-6 py-4 border-t flex justify-between items-center mono text-xs text-[color:var(--muted)]" style="border-color:var(--border)">
+        <span>15 lignes / 473 au total</span>
+        <button class="btn-ghost px-3 py-1.5 rounded-full text-xs">Voir le registre complet →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-4">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 03 — Méthodo</div>
+      <h2 class="display text-5xl mt-4">SOURCES<br>&amp; LIMITES.</h2>
+    </div>
+    <div class="col-span-12 md:col-span-8 space-y-4">
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-3">✓ Nos sources</div>
+        <ul class="text-sm text-[color:var(--muted)] space-y-2 leading-relaxed">
+          <li>— <strong class="text-white">Aides Territoires</strong> (API officielle française)</li>
+          <li>— Scrapers maison sur ADAMI, CNM, Sacem, Spedidam, Ministère Culture, Mon Projet Musique</li>
+          <li>— Import Europe Créative (open data)</li>
+          <li>— Remontées manuelles (émetteurs, utilisateurs beta)</li>
+        </ul>
+      </div>
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--warn)] mb-3">⚠ Ce qu'on ne garantit pas</div>
+        <ul class="text-sm text-[color:var(--muted)] space-y-2 leading-relaxed">
+          <li>— L'exhaustivité : certaines subventions régionales ou fondations privées échappent encore à nos radars</li>
+          <li>— Les dates limites exactes : nous suivons les annonces officielles, mais les organismes publient parfois tardivement</li>
+          <li>— L'éligibilité : lire les CGU de chaque dispositif reste essentiel avant dépôt</li>
+        </ul>
+      </div>
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--accent)] mb-3">↻ Fréquence de mise à jour</div>
+        <ul class="text-sm text-[color:var(--muted)] space-y-2 leading-relaxed">
+          <li>— Scrapers : <strong class="text-white">quotidien (03h00)</strong></li>
+          <li>— Révision qualité manuelle : <strong class="text-white">hebdomadaire (lundi)</strong></li>
+          <li>— Audit complet : <strong class="text-white">trimestriel</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-8 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene · Dernière révision : 2026-04-14</span>
+    <span class="flex flex-wrap gap-4 md:gap-6">
+      <a href="style-01-swiss-dark.html" class="hover:text-white">Accueil</a>
+      <a href="style-01-swiss-dark-stats.html" class="hover:text-white">Stats</a>
+      <a href="style-01-swiss-dark-legal.html" class="hover:text-white">Mentions</a>
+    </span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const on = b.dataset.fb === active;
+      b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+      b.style.background = on ? 'var(--primary-soft)' : '';
+      b.style.color = on ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero variants v2 — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Instrument+Serif:ital@0;1&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,700;1,9..144,400;1,9..144,700&family=DM+Serif+Display:ital@0;1&family=Archivo:wght@400;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; }
+  .hero { min-height: 560px; position: relative; overflow: hidden; }
+  .label {
+    position: absolute; top: 16px; left: 16px; z-index: 10;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    background: rgba(0,0,0,.75); color: #fff; padding: 4px 10px; border-radius: 999px;
+  }
+  .sticky-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e5e5e5;
+  }
+</style>
+</head>
+<body class="bg-white text-neutral-900">
+
+<div class="sticky-nav">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3 text-xs">
+    <a href="heroes.html" class="font-medium">← retour</a>
+    <span class="text-neutral-300">|</span>
+    <span class="text-neutral-500">variants de 01 · 02 · 04 · 08 · 09</span>
+    <div class="flex flex-wrap gap-1.5">
+      <a href="#h1a" class="px-2 py-0.5 border rounded">01a</a>
+      <a href="#h1b" class="px-2 py-0.5 border rounded">01b</a>
+      <a href="#h2a" class="px-2 py-0.5 border rounded">02a</a>
+      <a href="#h2b" class="px-2 py-0.5 border rounded">02b</a>
+      <a href="#h4a" class="px-2 py-0.5 border rounded">04a</a>
+      <a href="#h4b" class="px-2 py-0.5 border rounded">04b</a>
+      <a href="#h8a" class="px-2 py-0.5 border rounded">08a</a>
+      <a href="#h8b" class="px-2 py-0.5 border rounded">08b</a>
+      <a href="#h9a" class="px-2 py-0.5 border rounded">09a</a>
+      <a href="#h9b" class="px-2 py-0.5 border rounded">09b</a>
+    </div>
+  </div>
+</div>
+
+<!-- 01a Swiss — warm + accent rouge -->
+<section id="h1a" class="hero bg-[#F4EFE6] text-[#1A1410] border-b">
+  <div class="label">01a · Swiss Warm</div>
+  <div class="max-w-6xl mx-auto px-8 py-24 grid grid-cols-12 gap-6 items-end min-h-[560px]">
+    <div class="col-span-12 md:col-span-2 text-xs tracking-widest uppercase text-neutral-500">
+      <div>001</div>
+      <div class="mt-2">Mécène</div>
+    </div>
+    <div class="col-span-12 md:col-span-8">
+      <div class="text-xs tracking-widest uppercase text-[#B8341E] mb-10">— Avril 2026</div>
+      <h1 style="font-family:'Archivo',sans-serif; font-weight:900; line-height:.88; letter-spacing:-0.035em" class="text-[96px]">
+        SUBVENTIONS<span class="text-[#B8341E]">.</span><br>
+        SIMPLIFIÉES<span class="text-[#B8341E]">.</span>
+      </h1>
+    </div>
+    <div class="col-span-12 md:col-span-2 text-xs">
+      <div class="text-neutral-500 uppercase tracking-widest mb-2">Beta</div>
+      <div>Gratuit</div>
+      <button class="mt-4 text-[#B8341E] underline">Commencer →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 01b Swiss — dense lowercase tech -->
+<section id="h1b" class="hero bg-black text-white border-b">
+  <div class="label">01b · Swiss Dense (lowercase)</div>
+  <div class="max-w-6xl mx-auto px-8 py-20 min-h-[560px]">
+    <div class="grid grid-cols-12 gap-4 text-xs font-mono text-neutral-500 border-b border-neutral-800 pb-4 mb-10">
+      <div class="col-span-2">mecene.app</div>
+      <div class="col-span-2">v0.9.0</div>
+      <div class="col-span-2">470 grants</div>
+      <div class="col-span-2">4 min avg</div>
+      <div class="col-span-4 text-right">• online</div>
+    </div>
+    <h1 style="font-family:'Archivo',sans-serif; font-weight:800; letter-spacing:-0.045em; line-height:.9" class="text-[112px] lowercase">
+      find your<br>
+      <span class="text-neutral-600">next grant.</span>
+    </h1>
+    <div class="mt-12 flex items-end justify-between">
+      <div class="text-sm text-neutral-400 max-w-md">
+        Une interview. Un rapport. Pas de Cerfa, pas de jargon administratif.
+      </div>
+      <button class="bg-white text-black px-6 py-3 text-sm font-medium">Lancer →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 02a Editorial Italic — minimal pur -->
+<section id="h2a" class="hero bg-[#FAF7F2] text-[#1A1410] border-b">
+  <div class="label">02a · Italic Minimal</div>
+  <div class="max-w-5xl mx-auto px-8 py-28 flex flex-col items-start justify-center min-h-[560px]">
+    <h1 style="font-family:'Fraunces',serif; font-weight:400; font-style:italic; letter-spacing:-0.025em" class="text-[132px] leading-[0.92]">
+      Trouvez<br>
+      votre<br>
+      subvention<span class="text-[#B8341E]">.</span>
+    </h1>
+    <div class="mt-14 flex items-center gap-6">
+      <button class="bg-[#1A1410] text-[#FAF7F2] px-6 py-3 rounded-full text-sm">Commencer le diagnostic</button>
+      <span class="text-sm text-neutral-500 italic" style="font-family:'Fraunces',serif">4 minutes, gratuit.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 02b Editorial Upright — serif confiant -->
+<section id="h2b" class="hero bg-[#FAF7F2] text-[#1A1410] border-b">
+  <div class="label">02b · Serif Upright</div>
+  <div class="max-w-5xl mx-auto px-8 py-28 grid md:grid-cols-12 gap-8 items-center min-h-[560px]">
+    <div class="md:col-span-7">
+      <div style="font-family:'Fraunces',serif" class="text-sm italic text-neutral-500 mb-8">pour les créateurs, auteurs, réalisateurs</div>
+      <h1 style="font-family:'Fraunces',serif; font-weight:400; letter-spacing:-0.02em" class="text-[92px] leading-[0.98]">
+        Le moteur de<br>
+        subventions qui<br>
+        lit vraiment votre<br>
+        <em class="text-[#B8341E]">projet</em>.
+      </h1>
+    </div>
+    <div class="md:col-span-5 border-l border-neutral-300 pl-8 space-y-6">
+      <div>
+        <div style="font-family:'Fraunces',serif" class="text-5xl">470</div>
+        <div class="text-xs uppercase tracking-widest text-neutral-500 mt-1">dispositifs analysés</div>
+      </div>
+      <div>
+        <div style="font-family:'Fraunces',serif" class="text-5xl">4<span class="text-[#B8341E]">m</span></div>
+        <div class="text-xs uppercase tracking-widest text-neutral-500 mt-1">par diagnostic</div>
+      </div>
+      <button class="bg-[#1A1410] text-[#FAF7F2] px-5 py-2.5 rounded-full text-sm w-full">Commencer →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 04a Soft Gradient — cool (bleu/vert/lilas) -->
+<section id="h4a" class="hero text-neutral-900 border-b" style="background: linear-gradient(135deg, #E0EAFF 0%, #E8E0FF 50%, #D6F3EA 100%);">
+  <div class="label">04a · Gradient Cool</div>
+  <div class="max-w-5xl mx-auto px-8 py-28 min-h-[560px] flex flex-col justify-center">
+    <div class="text-xs tracking-widest uppercase text-indigo-700 mb-6">✺ Mécène</div>
+    <h1 style="font-family:'DM Serif Display',serif" class="text-[104px] leading-[1.02] max-w-4xl">
+      Le mécénat,<br>augmenté par l'IA.
+    </h1>
+    <p class="mt-8 text-lg max-w-xl text-neutral-700">
+      Un diagnostic, dix subventions, zéro formulaire Cerfa.
+    </p>
+    <div class="mt-10 flex items-center gap-4">
+      <button class="bg-neutral-900 text-white px-6 py-3 rounded-full hover:bg-black text-sm">Commencer →</button>
+      <span class="text-sm text-neutral-600">4 min · gratuit</span>
+    </div>
+  </div>
+</section>
+
+<!-- 04b Soft Gradient — Anthropic exact (cream + subtle) -->
+<section id="h4b" class="hero text-neutral-900 border-b" style="background: linear-gradient(180deg, #FFF9F3 0%, #FFE8D9 100%);">
+  <div class="label">04b · Gradient Cream (Anthropic-like)</div>
+  <div class="max-w-4xl mx-auto px-8 py-28 min-h-[560px] flex flex-col items-center justify-center text-center">
+    <div class="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-orange-800 mb-10 bg-white/40 backdrop-blur border border-orange-200/50 px-3 py-1.5 rounded-full">
+      <span class="w-1.5 h-1.5 rounded-full bg-orange-600"></span> Nouveau · Beta publique
+    </div>
+    <h1 style="font-family:'DM Serif Display',serif" class="text-[104px] leading-[0.98]">
+      Financez votre<br>
+      <em class="text-orange-800">prochain projet</em>.
+    </h1>
+    <p class="mt-8 text-lg max-w-lg text-neutral-700">
+      Un entretien de 4 minutes, un rapport personnalisé par IA, 470 dispositifs passés au crible.
+    </p>
+    <div class="mt-10 flex items-center gap-3">
+      <button class="bg-neutral-900 text-white px-6 py-3 rounded-full hover:bg-black text-sm">Commencer le diagnostic</button>
+      <button class="border border-neutral-300 bg-white/50 backdrop-blur px-6 py-3 rounded-full text-sm">Voir un exemple</button>
+    </div>
+  </div>
+</section>
+
+<!-- 08a Sunset — Nocturne (plus sombre, plus intime) -->
+<section id="h8a" class="hero text-white border-b" style="background: radial-gradient(ellipse at 80% 100%, #8B3A1F 0%, #3D1F1A 40%, #140A0B 100%);">
+  <div class="label">08a · Nocturne</div>
+  <div class="max-w-5xl mx-auto px-8 py-28 min-h-[560px] flex flex-col justify-between">
+    <div style="font-family:'Playfair Display',serif" class="text-sm italic text-orange-200">Mécène</div>
+    <div>
+      <h1 style="font-family:'Playfair Display',serif; font-style:italic; font-weight:400; letter-spacing:-0.02em" class="text-[120px] leading-[0.92]">
+        Un horizon<br>
+        plus large pour<br>
+        vos projets.
+      </h1>
+      <div class="mt-12 flex items-center gap-6">
+        <button class="bg-white text-[#3D1F1A] px-7 py-3.5 rounded-full text-sm font-medium hover:bg-orange-50 transition">Lancer mon diagnostic</button>
+        <span class="text-sm text-orange-200/80">4 min · gratuit</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08b Sunset — Matinal (lighter, mist) -->
+<section id="h8b" class="hero text-[#2B1810] border-b" style="background: linear-gradient(180deg, #FFE4D1 0%, #FFB896 55%, #E07856 100%);">
+  <div class="label">08b · Matinal</div>
+  <div class="max-w-5xl mx-auto px-8 py-28 min-h-[560px] flex flex-col justify-center items-start">
+    <div class="text-xs tracking-widest uppercase text-[#8B3A1F] mb-8">— Avril · 06h47 · Paris</div>
+    <h1 style="font-family:'Playfair Display',serif; font-style:italic; font-weight:400" class="text-[116px] leading-[0.94]">
+      Votre projet<br>
+      mérite d'être<br>
+      <em class="text-white" style="text-shadow: 2px 2px 0 rgba(43,24,16,.15)">financé</em>.
+    </h1>
+    <p class="mt-10 max-w-md text-[#3D1F1A]/80 text-lg">
+      Nous lisons 470 dispositifs publics. Vous récupérez ceux qui vous correspondent vraiment.
+    </p>
+    <button class="mt-10 bg-[#2B1810] text-[#FFE4D1] px-7 py-3.5 rounded-full text-sm hover:bg-black transition">Commencer →</button>
+  </div>
+</section>
+
+<!-- 09a Split — 3 panels (avant / dilemme / après) -->
+<section id="h9a" class="hero border-b">
+  <div class="label">09a · Split 3-panels</div>
+  <div class="grid md:grid-cols-3 min-h-[560px]">
+    <div class="bg-[#0A0A0B] text-neutral-500 px-8 py-20 flex flex-col justify-center">
+      <div style="font-family:'JetBrains Mono',monospace" class="text-xs text-red-400 mb-6">01 / HIER</div>
+      <div class="text-xl leading-relaxed line-through">
+        40 PDFs.<br>Un Cerfa 15059.<br>Trois appels à la DRAC.<br>Une deadline ratée.
+      </div>
+    </div>
+    <div class="bg-[#F5EFE6] text-[#2B1810] px-8 py-20 flex flex-col justify-center items-center text-center">
+      <div style="font-family:'JetBrains Mono',monospace" class="text-xs text-[#B8341E] mb-6">02 / CHOIX</div>
+      <div style="font-family:'Fraunces',serif" class="text-4xl italic leading-tight">
+        Et si trouver<br>une subvention<br>prenait<br>
+        <em class="not-italic text-[#B8341E]">4 minutes</em> ?
+      </div>
+    </div>
+    <div class="bg-[#2B1810] text-[#F5EFE6] px-8 py-20 flex flex-col justify-center">
+      <div style="font-family:'JetBrains Mono',monospace" class="text-xs text-orange-300 mb-6">03 / DEMAIN</div>
+      <h1 style="font-family:'Fraunces',serif" class="text-4xl leading-tight">
+        Un rapport.<br>Dix subventions.<br>Zéro paperasse.
+      </h1>
+      <button class="mt-8 self-start bg-[#F5EFE6] text-[#2B1810] px-5 py-2.5 rounded-full text-sm">Essayer →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 09b Split — Horizontal (haut/bas) avec témoignage -->
+<section id="h9b" class="hero border-b">
+  <div class="label">09b · Split Horizontal + Quote</div>
+  <div class="grid grid-rows-[auto_auto] min-h-[560px]">
+    <div class="bg-[#F5EFE6] text-[#2B1810] px-8 md:px-16 py-20">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-12 gap-8 items-end">
+        <div class="md:col-span-8">
+          <div class="text-xs tracking-widest uppercase text-[#B8341E] mb-6">Pour les créateurs qui n'ont pas le temps</div>
+          <h1 style="font-family:'Fraunces',serif; font-weight:400" class="text-[84px] leading-[0.98]">
+            Le mécénat,<br>
+            <em class="text-[#B8341E]">sans la bureaucratie</em>.
+          </h1>
+        </div>
+        <div class="md:col-span-4 text-sm text-neutral-700">
+          <p>Nous lisons les appels à projets pour vous. Vous recevez un rapport actionnable en 4 minutes.</p>
+          <button class="mt-6 bg-[#2B1810] text-[#F5EFE6] px-5 py-2.5 rounded-full text-sm">Commencer le diagnostic →</button>
+        </div>
+      </div>
+    </div>
+    <div class="bg-[#2B1810] text-[#F5EFE6] px-8 md:px-16 py-10">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-6">
+        <blockquote style="font-family:'Fraunces',serif" class="italic text-xl max-w-2xl">
+          "La première fois qu'un outil comprend la différence entre un projet d'auteur et une demande de guichet."
+        </blockquote>
+        <div class="text-xs text-orange-200/70 tracking-widest uppercase">— Anne L., réalisatrice · Marseille</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="max-w-4xl mx-auto px-8 py-16 text-sm text-neutral-500">
+  10 variants — dis-moi tes préférés (ou les éléments à mixer : typo de X + palette de Y).
+</div>
+
+</body>
+</html>

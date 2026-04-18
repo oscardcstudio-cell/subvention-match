@@ -1,215 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { ArrowRight, ChevronDown, Calendar, Target, FileText, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
-
-function ExampleGrantCard({ language }: { language: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success'>('idle');
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    
-    if (buttonState !== 'idle') return;
-    
-    setButtonState('loading');
-    
-    setTimeout(() => {
-      setButtonState('success');
-      
-      // Ouvrir le lien après validation
-      setTimeout(() => {
-        window.open(
-          'https://www.culture.gouv.fr/fr/catalogue-des-demarches-et-subventions/subvention/aides-aux-equipes-independantes-aides-deconcentrees-au-spectacle-vivant-adsv',
-          '_blank',
-          'noopener,noreferrer'
-        );
-        setButtonState('idle');
-      }, 500);
-    }, 1000);
-  };
-
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <div className="bg-gradient-to-br from-[#06D6A0]/10 to-[#06D6A0]/5 border-2 border-[#06D6A0] rounded-lg">
-        {/* Header - Toujours visible */}
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-[#06D6A0] text-white flex items-center justify-center font-bold">
-              ✓
-            </div>
-            <h3 className="text-xl font-bold text-[#073B4C]">
-              {language === "fr" ? "Subvention matchée" : "Matched grant"}
-            </h3>
-          </div>
-
-          <h4 className="text-3xl font-bold text-[#073B4C] mb-4">
-            {language === "fr" 
-              ? "ADSV - Aides aux équipes indépendantes"
-              : "ADSV - Support for independent teams"
-            }
-          </h4>
-
-          <div className="text-lg text-gray-600 mb-6">
-            {language === "fr" ? "Ministère de la Culture" : "Ministry of Culture"}
-          </div>
-
-          {/* Montant */}
-          <div className="mb-6">
-            <div className="text-sm text-gray-500 uppercase tracking-wide mb-1">
-              {language === "fr" ? "Montant" : "Amount"}
-            </div>
-            <div className="text-2xl font-bold text-[#073B4C]">
-              {language === "fr" ? "Variable selon projet" : "Variable per project"}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {language === "fr" ? "56M€ distribués en 2021 à 1,412 équipes" : "€56M distributed in 2021 to 1,412 teams"}
-            </div>
-          </div>
-
-          {/* Deadline */}
-          <div className="mb-6">
-            <div className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm">
-              <Calendar className="h-4 w-4" />
-              <span className="font-medium">
-                {language === "fr" ? "Permanente" : "Permanent"}
-              </span>
-            </div>
-          </div>
-
-          {/* Match IA */}
-          <div className="bg-[#06D6A0]/20 border-l-4 border-[#06D6A0] p-5 mb-6">
-            <h5 className="text-xs uppercase tracking-widest text-[#06D6A0] font-bold flex items-center gap-2 mb-2">
-              <Target className="h-4 w-4" />
-              {language === "fr" ? "Pourquoi cette subvention ?" : "Why this grant?"}
-            </h5>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {language === "fr"
-                ? "Votre projet de création pluridisciplinaire correspond parfaitement aux critères ADSV. Cette aide permanente soutient les équipes indépendantes en danse, théâtre, musique, cirque et arts de la rue. Budget de 45k€ compatible."
-                : "Your multidisciplinary creation project perfectly matches ADSV criteria. This permanent grant supports independent teams in dance, theater, music, circus and street arts. €45k budget is compatible."
-              }
-            </p>
-          </div>
-
-          {/* Bouton dérouler */}
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="w-full border-2 border-[#06D6A0] hover:border-[#06D6A0] hover:bg-[#06D6A0]/10 rounded-full py-5 mb-4"
-            >
-              <span className="font-medium">
-                {isOpen 
-                  ? (language === "fr" ? "Masquer les détails" : "Hide details")
-                  : (language === "fr" ? "Voir tous les détails" : "View all details")
-                }
-              </span>
-              <ChevronDown className={`ml-2 h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            </Button>
-          </CollapsibleTrigger>
-
-          {/* Bouton accéder à la subvention */}
-          <Button 
-            className={`w-full rounded-lg py-6 font-semibold text-base shadow-sm transition-all ${
-              buttonState === 'success' 
-                ? 'bg-green-600 hover:bg-green-600' 
-                : 'bg-[#06D6A0] hover:bg-[#06D6A0]/90'
-            } text-white`}
-            size="lg"
-            onClick={handleButtonClick}
-            disabled={buttonState !== 'idle'}
-          >
-            {buttonState === 'loading' && (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {language === "fr" ? "Vérification..." : "Checking..."}
-              </>
-            )}
-            {buttonState === 'success' && (
-              <>
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                {language === "fr" ? "Accès autorisé !" : "Access granted!"}
-              </>
-            )}
-            {buttonState === 'idle' && (
-              <>
-                {language === "fr" ? "Accéder à la subvention" : "Access the grant"}
-                <ExternalLink className="ml-2 h-4 w-4 inline-block" />
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* Section dépliable */}
-        <CollapsibleContent>
-          <div className="px-8 pb-8 space-y-6 border-t border-[#06D6A0]/30 pt-8">
-            {/* Description */}
-            <div>
-              <h5 className="text-xs uppercase tracking-widest text-gray-400 mb-3 font-bold flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                {language === "fr" ? "Description" : "Description"}
-              </h5>
-              <p className="text-base text-gray-700 leading-relaxed">
-                {language === "fr"
-                  ? "Le dispositif ADSV constitue le socle de la politique du ministère de la Culture en faveur des équipes artistiques. Il soutient les artistes et équipes indépendants pour qu'ils puissent développer leur travail de création et en faire bénéficier le public le plus large possible."
-                  : "The ADSV program is the cornerstone of the Ministry of Culture's policy for artistic teams. It supports independent artists and teams so they can develop their creative work and share it with the widest possible audience."
-                }
-              </p>
-            </div>
-
-            {/* Éligibilité */}
-            <div>
-              <h5 className="text-xs uppercase tracking-widest text-gray-400 mb-3 font-bold">
-                {language === "fr" ? "Critères d'éligibilité" : "Eligibility criteria"}
-              </h5>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {language === "fr"
-                  ? "Artistes, collectifs, compagnies ou ensembles professionnels en danse, musique, théâtre, cirque et arts de la rue. Associations, entreprises privées ou structures culturelles établies en France."
-                  : "Professional artists, collectives, companies or ensembles in dance, music, theater, circus and street arts. Associations, private companies or cultural structures established in France."
-                }
-              </p>
-            </div>
-
-            {/* Documents requis */}
-            <div>
-              <h5 className="text-xs uppercase tracking-widest text-gray-400 mb-3 font-bold">
-                {language === "fr" ? "Dossier à fournir" : "Required documents"}
-              </h5>
-              <ul className="space-y-2">
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-[#06D6A0] mt-1 flex-shrink-0">•</span>
-                  <span>{language === "fr" ? "Présentation du projet artistique" : "Artistic project presentation"}</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-[#06D6A0] mt-1 flex-shrink-0">•</span>
-                  <span>{language === "fr" ? "Budget prévisionnel" : "Budget forecast"}</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-[#06D6A0] mt-1 flex-shrink-0">•</span>
-                  <span>{language === "fr" ? "Calendrier de diffusion (min. 3-8 représentations)" : "Performance schedule (min. 3-8 shows)"}</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-[#06D6A0] mt-1 flex-shrink-0">•</span>
-                  <span>{language === "fr" ? "Partenariats avec lieux de spectacle" : "Partnerships with venues"}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </CollapsibleContent>
-      </div>
-    </Collapsible>
-  );
-}
+import {
+  Music, Headphones, Pen, Palette, Wrench, Drama, Sparkles, Ticket, Film,
+  Cpu, Landmark, Building, Megaphone, Image as ImageIcon, Disc, BookOpen, Users,
+  ArrowRight, Check, ExternalLink, FileText, Target, MessageSquare, Calendar,
+  Coins, Zap,
+} from "lucide-react";
 
 interface GrantsStats {
   total: number;
@@ -219,7 +19,186 @@ interface GrantsStats {
   withUrl: number;
 }
 
-function BetaWaitlistSection({ language }: { language: string }) {
+/** ------------------------------------------------------------------
+ *  Example Grant Card (preserved logic, new look)
+ *  ------------------------------------------------------------------ */
+function ExampleGrantCard({ language }: { language: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [buttonState, setButtonState] = useState<"idle" | "loading" | "success">("idle");
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (buttonState !== "idle") return;
+    setButtonState("loading");
+    setTimeout(() => {
+      setButtonState("success");
+      setTimeout(() => {
+        window.open(
+          "https://www.culture.gouv.fr/fr/catalogue-des-demarches-et-subventions/subvention/aides-aux-equipes-independantes-aides-deconcentrees-au-spectacle-vivant-adsv",
+          "_blank",
+          "noopener,noreferrer"
+        );
+        setButtonState("idle");
+      }, 500);
+    }, 1000);
+  };
+
+  return (
+    <div className="mc-card overflow-hidden" style={{ borderColor: "var(--mc-primary)" }}>
+      <div className="p-8" style={{ background: "var(--mc-primary-soft)" }}>
+        <div className="flex items-center gap-3 mb-6">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ background: "var(--mc-primary)", color: "var(--mc-bg)" }}
+          >
+            <Check className="w-4 h-4" strokeWidth={3} />
+          </div>
+          <div className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-primary)" }}>
+            {language === "fr" ? "Match · 92 %" : "Match · 92%"}
+          </div>
+        </div>
+
+        <h3 className="mc-display text-4xl mb-3">
+          {language === "fr"
+            ? "ADSV — AIDES AUX ÉQUIPES INDÉPENDANTES"
+            : "ADSV — SUPPORT FOR INDEPENDENT TEAMS"}
+        </h3>
+        <div className="text-sm mb-6" style={{ color: "var(--mc-muted)" }}>
+          {language === "fr" ? "Ministère de la Culture · Spectacle vivant" : "Ministry of Culture · Performing arts"}
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4 mb-6">
+          <div className="mc-card-soft p-4">
+            <div className="flex items-center gap-2 mc-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mc-muted)" }}>
+              <Coins className="w-3.5 h-3.5" /> {language === "fr" ? "Montant" : "Amount"}
+            </div>
+            <div className="font-semibold">
+              {language === "fr" ? "Variable selon projet" : "Variable per project"}
+            </div>
+            <div className="text-xs mt-1" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "56 M€ distribués en 2021" : "€56M distributed in 2021"}
+            </div>
+          </div>
+          <div className="mc-card-soft p-4">
+            <div className="flex items-center gap-2 mc-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mc-muted)" }}>
+              <Calendar className="w-3.5 h-3.5" /> Deadline
+            </div>
+            <div className="font-semibold" style={{ color: "var(--mc-primary)" }}>
+              {language === "fr" ? "Permanente" : "Permanent"}
+            </div>
+            <div className="text-xs mt-1" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Dossier à tout moment" : "Apply anytime"}
+            </div>
+          </div>
+          <div className="mc-card-soft p-4">
+            <div className="flex items-center gap-2 mc-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mc-muted)" }}>
+              <Zap className="w-3.5 h-3.5" /> {language === "fr" ? "Difficulté" : "Difficulty"}
+            </div>
+            <div className="font-semibold">{language === "fr" ? "Modérée" : "Moderate"}</div>
+            <div className="text-xs mt-1" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Budget 45 k€ compatible" : "€45k budget compatible"}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-l-2 pl-5 py-2 mb-6" style={{ borderColor: "var(--mc-primary)" }}>
+          <div className="flex items-center gap-2 mc-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--mc-primary)" }}>
+            <Target className="w-3.5 h-3.5" />
+            {language === "fr" ? "Pourquoi cette subvention ?" : "Why this grant?"}
+          </div>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+            {language === "fr"
+              ? "Votre projet pluridisciplinaire (théâtre + vidéo + musique) correspond parfaitement aux critères ADSV. Cette aide permanente soutient les équipes indépendantes en danse, théâtre, musique, cirque et arts de la rue. Budget de 45 k€ compatible."
+              : "Your multidisciplinary creation project perfectly matches ADSV criteria. This permanent grant supports independent teams in dance, theater, music, circus and street arts. €45k budget is compatible."}
+          </p>
+        </div>
+
+        {isOpen && (
+          <div className="mb-6 space-y-4 text-sm">
+            <div>
+              <div className="mc-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mc-muted-2)" }}>
+                {language === "fr" ? "Description" : "Description"}
+              </div>
+              <p className="leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                {language === "fr"
+                  ? "Le dispositif ADSV constitue le socle de la politique du ministère de la Culture en faveur des équipes artistiques. Il soutient les artistes et équipes indépendants pour qu'ils puissent développer leur travail de création."
+                  : "The ADSV program is the cornerstone of the Ministry of Culture's policy for artistic teams. It supports independent artists and teams in developing their creative work."}
+              </p>
+            </div>
+            <div>
+              <div className="mc-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--mc-muted-2)" }}>
+                {language === "fr" ? "Dossier à fournir" : "Required documents"}
+              </div>
+              <ul className="space-y-1.5" style={{ color: "var(--mc-muted)" }}>
+                <li className="flex items-start gap-2">
+                  <Check className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} />
+                  <span>{language === "fr" ? "Présentation du projet artistique" : "Artistic project presentation"}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} />
+                  <span>{language === "fr" ? "Budget prévisionnel détaillé" : "Detailed budget forecast"}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} />
+                  <span>{language === "fr" ? "Calendrier de diffusion (min. 3-8 représentations)" : "Performance schedule (min. 3-8 shows)"}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} />
+                  <span>{language === "fr" ? "Partenariats avec lieux de spectacle" : "Partnerships with venues"}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="mc-btn-ghost px-5 py-3 rounded-lg text-sm flex-1"
+            data-testid="button-toggle-details"
+          >
+            {isOpen
+              ? (language === "fr" ? "Masquer les détails ↑" : "Hide details ↑")
+              : (language === "fr" ? "Voir tous les détails ↓" : "View all details ↓")}
+          </button>
+          <button
+            className="mc-btn-primary px-5 py-3 rounded-lg text-sm flex-1 inline-flex items-center justify-center gap-2"
+            onClick={handleButtonClick}
+            disabled={buttonState !== "idle"}
+            data-testid="button-access-grant"
+          >
+            {buttonState === "loading" && (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                {language === "fr" ? "Vérification…" : "Checking…"}
+              </>
+            )}
+            {buttonState === "success" && (
+              <>
+                <Check className="w-4 h-4" strokeWidth={3} />
+                {language === "fr" ? "Accès autorisé !" : "Access granted!"}
+              </>
+            )}
+            {buttonState === "idle" && (
+              <>
+                {language === "fr" ? "Accéder au dossier" : "Access the grant"}
+                <ExternalLink className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** ------------------------------------------------------------------
+ *  Beta Waitlist Section (preserved fetch to /api/waitlist)
+ *  ------------------------------------------------------------------ */
+function BetaWaitlistSection({ language, grantsCount }: { language: string; grantsCount: number }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -247,129 +226,134 @@ function BetaWaitlistSection({ language }: { language: string }) {
   };
 
   return (
-    <section className="py-20 sm:py-24 px-4 sm:px-8 bg-gray-50">
-      <div className="max-w-4xl mx-auto">
-        {/* Badge beta */}
-        <div className="flex justify-center mb-6">
-          <span className="inline-flex items-center gap-2 bg-[#FFD166] text-[#073B4C] px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide">
-            🧪 {language === "fr" ? "Version beta" : "Beta version"}
-          </span>
+    <section id="pricing" className="mc-section-rule">
+      <div className="max-w-5xl mx-auto px-6 md:px-8 py-24 text-center">
+        <div className="mc-chip mc-chip-warn inline-flex mc-mono text-xs uppercase tracking-widest mb-8">
+          [ BETA ] — {language === "fr" ? "Version en test" : "Test version"}
         </div>
-
-        {/* Titre principal */}
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter leading-[0.95] text-[#073B4C] mb-6 text-center">
+        <h2 className="mc-display text-6xl md:text-7xl">
           {language === "fr" ? (
-            <>100 % GRATUIT<br /><span className="text-[#06D6A0]">PENDANT LA BETA.</span></>
+            <>
+              100 % GRATUIT<br />
+              <span style={{ color: "var(--mc-primary)" }}>PENDANT LA BETA.</span>
+            </>
           ) : (
-            <>100% FREE<br /><span className="text-[#06D6A0]">DURING THE BETA.</span></>
+            <>
+              100% FREE<br />
+              <span style={{ color: "var(--mc-primary)" }}>DURING THE BETA.</span>
+            </>
           )}
         </h2>
-
-        {/* Explication honnête */}
-        <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed text-center mb-10">
+        <p className="mt-8 text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "var(--mc-muted)" }}>
           {language === "fr"
-            ? "Le matching s'améliore de jour en jour avec chaque projet testé. Tant qu'on n'atteint pas 80 % de résultats vraiment pertinents, tout reste gratuit — aucune carte bancaire, aucun piège."
-            : "Matching improves every day with each project tested. Until we reach 80% truly relevant results, everything stays free — no credit card, no catch."
-          }
+            ? "Le matching s'améliore de jour en jour avec chaque projet testé. Tant qu'on n'atteint pas 80 % de résultats vraiment pertinents, tout reste gratuit."
+            : "Matching improves every day with each project tested. Until we reach 80% truly relevant results, everything stays free."}
         </p>
 
-        {/* Ce que vous obtenez */}
-        <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 mb-12">
-          <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-[#06D6A0]/30">
-            <div className="text-3xl mb-3">🎯</div>
-            <div className="font-bold text-[#073B4C] mb-1">
+        <div className="grid md:grid-cols-3 gap-4 mt-14">
+          <div className="mc-card p-6 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <Target className="w-6 h-6" style={{ color: "var(--mc-primary)" }} strokeWidth={1.5} />
+              <div className="mc-mono text-[10px] uppercase tracking-widest" style={{ color: "var(--mc-primary)" }}>01</div>
+            </div>
+            <div className="text-xl font-bold mb-2">
               {language === "fr" ? "Tous vos matches" : "All your matches"}
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {language === "fr"
-                ? "Aucun résultat flouté. Tout est débloqué."
-                : "No blurred results. Everything unlocked."
-              }
+            <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Aucun résultat flouté. Tout est débloqué." : "No blurred results. Everything unlocked."}
             </p>
           </div>
-          <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-[#06D6A0]/30">
-            <div className="text-3xl mb-3">📄</div>
-            <div className="font-bold text-[#073B4C] mb-1">
+          <div className="mc-card p-6 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <FileText className="w-6 h-6" style={{ color: "var(--mc-primary)" }} strokeWidth={1.5} />
+              <div className="mc-mono text-[10px] uppercase tracking-widest" style={{ color: "var(--mc-primary)" }}>02</div>
+            </div>
+            <div className="text-xl font-bold mb-2">
               {language === "fr" ? "Votre rapport PDF" : "Your PDF report"}
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {language === "fr"
-                ? "Téléchargeable, partageable avec votre équipe."
-                : "Downloadable, shareable with your team."
-              }
+            <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Téléchargeable, partageable avec votre équipe." : "Downloadable, shareable with your team."}
             </p>
           </div>
-          <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-[#06D6A0]/30">
-            <div className="text-3xl mb-3">💬</div>
-            <div className="font-bold text-[#073B4C] mb-1">
+          <div className="mc-card p-6 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <MessageSquare className="w-6 h-6" style={{ color: "var(--mc-primary)" }} strokeWidth={1.5} />
+              <div className="mc-mono text-[10px] uppercase tracking-widest" style={{ color: "var(--mc-primary)" }}>03</div>
+            </div>
+            <div className="text-xl font-bold mb-2">
               {language === "fr" ? "Un canal direct" : "A direct channel"}
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {language === "fr"
-                ? "Vos retours nous font progresser. Chaque avis compte."
-                : "Your feedback drives us. Every review counts."
-              }
+            <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Vos retours nous font progresser." : "Your feedback drives us forward."}
             </p>
           </div>
         </div>
 
-        {/* Waitlist email capture */}
-        <div className="bg-[#073B4C] text-white rounded-2xl p-6 sm:p-10">
-          <div className="max-w-xl mx-auto text-center">
-            <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight">
-              {language === "fr" ? "Prévenez-moi quand la V1 sort" : "Notify me when V1 launches"}
-            </h3>
-            <p className="text-gray-300 mb-6 leading-relaxed">
-              {language === "fr"
-                ? "Vous serez informé(e) en avant-première, avec un tarif de lancement réservé aux beta-testeurs."
-                : "Get early access with a launch price reserved for beta testers."
-              }
-            </p>
-
-            {status === "success" ? (
-              <div className="bg-[#06D6A0]/20 border border-[#06D6A0] rounded-xl p-5">
-                <div className="text-2xl mb-2">✓</div>
-                <p className="font-medium text-white">
-                  {language === "fr" ? "C'est noté ! On vous tiendra au courant." : "You're in! We'll keep you posted."}
-                </p>
+        <div className="mc-card mt-12 p-8 md:p-10 text-left">
+          <div className="grid md:grid-cols-12 gap-6 items-center">
+            <div className="md:col-span-6">
+              <div className="mc-mono text-xs uppercase tracking-widest mb-3" style={{ color: "var(--mc-muted)" }}>
+                / V1 — {language === "fr" ? "à venir" : "coming soon"}
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  required
-                  placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={status === "loading"}
-                  className="flex-1 px-5 py-3 rounded-full text-[#073B4C] bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#06D6A0] disabled:opacity-60"
-                  data-testid="input-waitlist-email"
-                />
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={status === "loading"}
-                  className="bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-[#073B4C] font-bold rounded-full px-8 py-3"
-                  data-testid="button-waitlist-submit"
-                >
-                  {status === "loading"
-                    ? (language === "fr" ? "Envoi..." : "Sending...")
-                    : (language === "fr" ? "Me prévenir" : "Notify me")
-                  }
-                </Button>
-              </form>
-            )}
-
-            {status === "error" && (
-              <p className="text-[#EF476F] text-sm mt-3">{errorMsg}</p>
-            )}
-
-            <p className="text-xs text-gray-400 mt-4">
-              {language === "fr"
-                ? "Email uniquement pour la notification V1. Aucun spam, aucune revente."
-                : "Email used only for V1 notification. No spam, no reselling."
-              }
-            </p>
+              <h3 className="mc-display text-3xl">
+                {language === "fr" ? (
+                  <>PRÉVENEZ-MOI<br />QUAND LA V1 SORT.</>
+                ) : (
+                  <>NOTIFY ME<br />WHEN V1 LAUNCHES.</>
+                )}
+              </h3>
+            </div>
+            <div className="md:col-span-6">
+              <p className="text-sm mb-4 leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                {language === "fr"
+                  ? "Vous serez informé(e) en avant-première, avec un tarif de lancement réservé aux beta-testeurs."
+                  : "You'll get early access with a launch price reserved for beta testers."}
+              </p>
+              {status === "success" ? (
+                <div className="mc-card-soft p-4 flex items-center gap-3" style={{ borderColor: "var(--mc-primary)" }}>
+                  <Check className="w-5 h-5" style={{ color: "var(--mc-primary)" }} strokeWidth={3} />
+                  <p className="text-sm">
+                    {language === "fr" ? "C'est noté ! On vous tiendra au courant." : "You're in! We'll keep you posted."}
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="email"
+                    required
+                    placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={status === "loading"}
+                    className="mc-input flex-1 rounded-full px-5 py-3 text-sm disabled:opacity-60"
+                    style={{
+                      background: "var(--mc-bg)",
+                      border: "1px solid var(--mc-border)",
+                      color: "var(--mc-text)",
+                    }}
+                    data-testid="input-waitlist-email"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="mc-btn-primary px-6 py-3 rounded-full text-sm mc-mono uppercase tracking-widest disabled:opacity-60"
+                    data-testid="button-waitlist-submit"
+                  >
+                    {status === "loading"
+                      ? (language === "fr" ? "Envoi…" : "Sending…")
+                      : (language === "fr" ? "Me prévenir" : "Notify me")}
+                  </button>
+                </form>
+              )}
+              {status === "error" && (
+                <p className="text-sm mt-3" style={{ color: "var(--mc-danger)" }}>{errorMsg}</p>
+              )}
+              <p className="text-xs mt-3" style={{ color: "var(--mc-muted-2)" }}>
+                {language === "fr"
+                  ? "Email uniquement pour la notification V1. Aucun spam, aucune revente."
+                  : "Email only for V1 notification. No spam, no reselling."}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -377,755 +361,474 @@ function BetaWaitlistSection({ language }: { language: string }) {
   );
 }
 
+/** ------------------------------------------------------------------
+ *  Home
+ *  ------------------------------------------------------------------ */
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
 
-  // Récupérer les statistiques détaillées depuis l'API
   const { data: statsData } = useQuery<GrantsStats>({
     queryKey: ["/api/grants/stats"],
   });
-
-  // Utiliser les valeurs de la DB si disponibles, sinon valeurs par défaut
   const grantsCount = statsData?.total ?? 473;
-  const euGrantsCount = statsData?.euGrants ?? 0;
-  const frenchGrantsCount = statsData?.frenchGrants ?? 473;
+
+  const profiles = [
+    { href: "/form?domain=musique",            icon: Music,       label: language === "fr" ? "un musicien" : "a musician", test: "badge-musician" },
+    { href: "/form?profile=dj-producteur",     icon: Headphones,  label: language === "fr" ? "un DJ / producteur" : "a DJ / producer", test: "badge-dj-producer" },
+    { href: "/form?domain=ecriture",           icon: Pen,         label: language === "fr" ? "un écrivain" : "a writer", test: "badge-writer" },
+    { href: "/form?domain=arts-plastiques",    icon: Palette,     label: language === "fr" ? "un artiste" : "an artist", test: "badge-visual-artist" },
+    { href: "/form?profile=artisan-art",       icon: Wrench,      label: language === "fr" ? "un artisan d'art" : "a craft artisan", test: "badge-craftsperson" },
+    { href: "/form?domain=spectacle-vivant",   icon: Drama,       label: language === "fr" ? "un comédien" : "an actor", test: "badge-performer" },
+    { href: "/form?profile=danseur",           icon: Sparkles,    label: language === "fr" ? "un danseur" : "a dancer", test: "badge-dancer" },
+    { href: "/form?profile=compagnie",         icon: Ticket,      label: language === "fr" ? "une compagnie" : "a company", test: "badge-company" },
+    { href: "/form?domain=audiovisuel",        icon: Film,        label: language === "fr" ? "un cinéaste" : "a filmmaker", test: "badge-filmmaker" },
+    { href: "/form?domain=arts-numeriques",    icon: Cpu,         label: language === "fr" ? "un artiste numérique" : "a digital artist", test: "badge-digital-artist" },
+    { href: "/form?domain=patrimoine",         icon: Landmark,    label: language === "fr" ? "dans le patrimoine" : "in heritage", test: "badge-heritage" },
+    { href: "/form?profile=lieu-culturel",     icon: Building,    label: language === "fr" ? "un lieu culturel" : "a cultural venue", test: "badge-venue" },
+    { href: "/form?profile=orga-soiree",       icon: Megaphone,   label: language === "fr" ? "un organisateur d'événements" : "an event organizer", test: "badge-event-organizer" },
+  ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header Minimal */}
+    <div className="min-h-screen" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
       {/* Beta banner */}
-      <div className="fixed top-0 left-0 right-0 z-[60] bg-[#FFD166] text-[#073B4C] px-4 py-2 text-center text-xs sm:text-sm font-medium">
+      <div className="mc-mono text-xs text-center py-2 px-4" style={{ background: "var(--mc-warn)", color: "var(--mc-bg)" }}>
+        [ BETA ] &nbsp;&nbsp;
         {language === "fr"
-          ? "🧪 Version beta — vos retours sont précieux, utilisez le bouton \"Retour\" en bas à droite"
-          : "🧪 Beta version — your feedback matters, use the \"Feedback\" button at the bottom right"}
+          ? "Version beta — vos retours sont précieux, utilisez le bouton « Feedback » en bas à droite"
+          : "Beta version — your feedback matters, use the \"Feedback\" button at the bottom right"}
       </div>
 
-      <header className="fixed top-9 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <a href="/" data-testid="link-home" className="group flex items-center gap-2">
-            <span className="text-lg sm:text-xl font-light tracking-tight text-[#073B4C]">
-              Subvention<span className="font-bold">Match</span>
+      {/* Header */}
+      <header
+        className="mc-section-rule sticky top-0 z-40 backdrop-blur"
+        style={{ background: "rgba(10,10,10,0.85)" }}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-8 h-14 flex items-center justify-between">
+          <a href="/" data-testid="link-home" className="flex items-center gap-3">
+            <div className="mc-display text-lg">
+              Mecene<span style={{ color: "var(--mc-primary)" }}>.</span>
+            </div>
+            <span className="mc-chip mc-chip-warn mc-mono text-[10px] uppercase tracking-widest px-2 py-0.5">
+              v0.9 / beta
             </span>
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-[#FFD166] text-[#073B4C] bg-[#FFD166]/20">
-              BETA
-            </Badge>
           </a>
-          <div className="flex items-center gap-3">
-            <Link href="/notes">
-              <Button variant="outline" size="sm" data-testid="button-notes" className="gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">Notes</span>
+          <nav className="hidden md:flex items-center gap-6 mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+            <a href="#comparaison" className="hover:text-white transition">Méthode</a>
+            <a href="#how" className="hover:text-white transition">3 étapes</a>
+            <a href="#example" className="hover:text-white transition">Exemple</a>
+            <a href="#pricing" className="hover:text-white transition">Tarifs</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <LanguageToggle language={language} onLanguageChange={setLanguage} />
+            <Link href="/form">
+              <Button className="mc-btn-primary mc-mono text-xs uppercase tracking-widest px-4 py-1.5 rounded-full h-auto">
+                {language === "fr" ? "Commencer" : "Start"} →
               </Button>
             </Link>
-            <LanguageToggle language={language} onLanguageChange={setLanguage} />
           </div>
         </div>
       </header>
 
-      {/* Hero - Nouvelle palette */}
-      <section className="pt-32 sm:pt-40 md:pt-48 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 md:px-8 bg-gradient-to-br from-white via-[#FFD166]/5 to-[#06D6A0]/5">
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-12 sm:space-y-16">
-            {/* Titre */}
-            <div className="space-y-6">
-              <h1 className="text-[3.5rem] sm:text-[5rem] md:text-[6rem] lg:text-[7rem] leading-[0.85] font-bold tracking-tighter text-[#073B4C]">
-                {language === "fr" ? (
-                  <>
-                    LA BONNE
-                    <br />
-                    AIDE POUR
-                    <br />
-                    VOTRE ART.
-                  </>
-                ) : (
-                  <>
-                    THE RIGHT
-                    <br />
-                    GRANT FOR
-                    <br />
-                    YOUR ART.
-                  </>
-                )}
-              </h1>
+      {/* HERO */}
+      <section>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-20 md:py-32 grid grid-cols-12 gap-6">
+          <div className="col-span-12 md:col-span-9">
+            <div className="mc-mono text-xs uppercase tracking-widest mb-8 md:mb-10" style={{ color: "var(--mc-primary)" }}>
+              — {language === "fr" ? "l'IA qui a lu les 473 PDFs pour vous" : "the AI that read 473 PDFs so you don't have to"}
             </div>
+            <h1 className="mc-display text-[64px] md:text-[108px]">
+              {language === "fr" ? (
+                <>
+                  VOUS AVEZ<br />L'ŒUVRE<span style={{ color: "var(--mc-primary)" }}>.</span>
+                  <br />
+                  ON TROUVE<br />L'ARGENT<span style={{ color: "var(--mc-primary)" }}>.</span>
+                </>
+              ) : (
+                <>
+                  YOU'VE GOT<br />THE WORK<span style={{ color: "var(--mc-primary)" }}>.</span>
+                  <br />
+                  WE FIND<br />THE MONEY<span style={{ color: "var(--mc-primary)" }}>.</span>
+                </>
+              )}
+            </h1>
+            <p className="mt-8 md:mt-10 max-w-xl text-lg leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr"
+                ? "Chaque aide vérifiée une à une par nos équipes : deadline réelle, montant précis, lien direct vers le bon dossier. Vous décrivez votre projet, vous recevez votre top 5 matché — en 3 minutes."
+                : "Every grant verified one by one by our team: real deadline, precise amount, direct link. Describe your project, get your top 5 matches — in 3 minutes."}
+            </p>
 
-            {/* Description */}
-            <div className="space-y-4 text-base sm:text-lg text-gray-700 max-w-2xl leading-relaxed">
-              <p className="text-xl sm:text-2xl font-medium text-[#073B4C]">
-                {language === "fr"
-                  ? "L'IA spécialisée en subventions culturelles."
-                  : "The AI specialized in cultural grants."
-                }
-              </p>
-              <p>
-                {language === "fr"
-                  ? "Chaque aide vérifiée une à une par nos équipes : deadline réelle, montant précis, lien direct vers le bon dossier. Vous décrivez votre projet, vous recevez votre top 5 matché — en 3 minutes."
-                  : "Every grant verified one by one by our team: real deadline, precise amount, direct link to the right application. Describe your project, get your top 5 matches — in 3 minutes."
-                }
-              </p>
-            </div>
-
-            {/* Trust pills — sous le sous-titre, niveau des yeux */}
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              <span className="inline-flex items-center gap-1.5 bg-[#06D6A0]/10 text-[#073B4C] border border-[#06D6A0]/30 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium">
-                <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full animate-pulse" />
+            <div className="mt-10 flex flex-wrap gap-2">
+              <span className="mc-chip mc-chip-accent">
+                <span className="mc-pulse-dot" style={{ background: "var(--mc-accent)" }} />
                 {language === "fr" ? "Base mise à jour cette semaine" : "Database updated this week"}
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-[#FFD166]/30 text-[#073B4C] border border-[#FFD166] px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold">
-                🎁 {language === "fr" ? "Gratuit pendant la beta" : "Free during beta"}
+              <span className="mc-chip mc-chip-warn font-semibold">
+                {language === "fr" ? "Gratuit pendant la beta" : "Free during beta"}
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-white text-[#073B4C] border border-gray-200 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium">
+              <span className="mc-chip" style={{ background: "var(--mc-panel)", color: "var(--mc-muted)" }}>
                 {language === "fr" ? "Sans carte bancaire · Sans abonnement" : "No credit card · No subscription"}
               </span>
             </div>
+          </div>
 
-            {/* Stats cards */}
-            <div className="grid grid-cols-2 gap-4 max-w-3xl mx-auto">
-              {/* Total subventions */}
-              <div className="col-span-2 p-6 sm:p-8 bg-gradient-to-br from-[#06D6A0]/10 to-[#06D6A0]/5 rounded-lg border-2 border-[#06D6A0]/30">
-                <div className="text-5xl sm:text-6xl font-bold tracking-tighter text-[#06D6A0]">{grantsCount}</div>
-                <div className="text-xs sm:text-sm text-gray-600 uppercase tracking-wide mt-2 font-medium">
-                  {language === "fr" ? "Subventions disponibles" : "Available grants"}
-                </div>
-              </div>
-
-              {/* Organismes partenaires */}
-              <div className="p-5 sm:p-6 bg-white rounded-lg border-2 border-gray-200">
-                <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-[#073B4C]">30+</div>
-                <div className="text-xs text-gray-600 uppercase tracking-wide mt-2 font-medium leading-tight">
-                  {language === "fr" ? "Organismes" : "Partner organizations"}
-                </div>
-              </div>
-
-              {/* Budget total */}
-              <div className="p-5 sm:p-6 bg-white rounded-lg border-2 border-gray-200">
-                <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-[#073B4C]">€30M+</div>
-                <div className="text-xs text-gray-600 uppercase tracking-wide mt-2 font-medium">
-                  {language === "fr" ? "Budget total accessible" : "Total accessible budget"}
-                </div>
-              </div>
-
-              {/* Montant moyen */}
-              <div className="p-5 sm:p-6 bg-white rounded-lg border-2 border-gray-200">
-                <div className="text-2xl sm:text-3xl font-bold tracking-tighter text-[#073B4C]">€60K</div>
-                <div className="text-xs text-gray-600 uppercase tracking-wide mt-2 font-medium">
-                  {language === "fr" ? "Montant médian" : "Median amount"}
-                </div>
-              </div>
+          <div className="col-span-12 md:col-span-3">
+            <div className="mc-mono text-xs uppercase tracking-widest mb-6" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Index · temps réel" : "Index · real time"}
             </div>
-
-            {/* Section "Je suis..." */}
-            <div className="space-y-6 pt-8 flex flex-col items-center">
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#073B4C]">
-                {language === "fr" ? "Je suis..." : "I am..."}
-              </h2>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
-                <Link href="/form?domain=musique">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-musician"
-                  >
-                    🎵 {language === "fr" ? "un musicien" : "a musician"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?profile=dj-producteur">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-dj-producer"
-                  >
-                    🎧 {language === "fr" ? "un DJ / producteur" : "a DJ / producer"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?domain=ecriture">
-                  <Badge 
-                    variant="outline" 
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-writer"
-                  >
-                    ✍️ {language === "fr" ? "un écrivain" : "a writer"}
-                  </Badge>
-                </Link>
-                
-                <Link href="/form?domain=arts-plastiques">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-visual-artist"
-                  >
-                    🎨 {language === "fr" ? "un artiste" : "an artist"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?profile=artisan-art">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-craftsperson"
-                  >
-                    🛠️ {language === "fr" ? "un artisan d'art" : "a craft artisan"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?domain=spectacle-vivant">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-performer"
-                  >
-                    🎭 {language === "fr" ? "un comédien" : "an actor"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?profile=danseur">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-dancer"
-                  >
-                    💃 {language === "fr" ? "un danseur / une danseuse" : "a dancer"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?profile=compagnie">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-company"
-                  >
-                    🎟️ {language === "fr" ? "une compagnie" : "a company"}
-                  </Badge>
-                </Link>
-                
-                <Link href="/form?domain=audiovisuel">
-                  <Badge 
-                    variant="outline" 
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-filmmaker"
-                  >
-                    🎬 {language === "fr" ? "un cinéaste" : "a filmmaker"}
-                  </Badge>
-                </Link>
-                
-                <Link href="/form?domain=arts-numeriques">
-                  <Badge 
-                    variant="outline" 
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-digital-artist"
-                  >
-                    💻 {language === "fr" ? "un artiste numérique" : "a digital artist"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?domain=patrimoine">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-heritage"
-                  >
-                    🏛️ {language === "fr" ? "dans le patrimoine" : "in heritage"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?profile=lieu-culturel">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-venue"
-                  >
-                    🏢 {language === "fr" ? "un lieu culturel" : "a cultural venue"}
-                  </Badge>
-                </Link>
-
-                <Link href="/form?profile=orga-soiree">
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-start px-5 py-3 text-base cursor-pointer hover:bg-[#06D6A0]/10 hover:border-[#06D6A0] transition-all hover:scale-105"
-                    data-testid="badge-event-organizer"
-                  >
-                    🎪 {language === "fr" ? "un organisateur d'événements" : "an event organizer"}
-                  </Badge>
-                </Link>
+            <div className="mc-divide-border">
+              <div className="py-4 flex items-baseline justify-between">
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+                  {language === "fr" ? "Subventions" : "Grants"}
+                </span>
+                <span className="mc-display text-4xl" style={{ color: "var(--mc-primary)" }}>{grantsCount}</span>
+              </div>
+              <div className="py-4 flex items-baseline justify-between">
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+                  {language === "fr" ? "Organismes" : "Organizations"}
+                </span>
+                <span className="mc-display text-4xl">30<span style={{ color: "var(--mc-muted)" }}>+</span></span>
+              </div>
+              <div className="py-4 flex items-baseline justify-between">
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+                  {language === "fr" ? "Budget accessible" : "Accessible budget"}
+                </span>
+                <span className="mc-display text-4xl">30M<span style={{ color: "var(--mc-muted)" }}>€</span></span>
+              </div>
+              <div className="py-4 flex items-baseline justify-between">
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+                  {language === "fr" ? "Montant médian" : "Median"}
+                </span>
+                <span className="mc-display text-4xl">60K<span style={{ color: "var(--mc-muted)" }}>€</span></span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pourquoi pas juste ChatGPT ? — Traitement de l'objection #1 */}
-      <section className="py-20 sm:py-28 px-4 sm:px-8 bg-white border-t border-gray-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12 sm:mb-16 max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold mb-4 tracking-wide uppercase">
-              {language === "fr" ? "La question qu'on nous pose le plus" : "The question we hear most"}
+      {/* JE SUIS... */}
+      <section className="mc-section-rule">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-20">
+          <div className="grid grid-cols-12 gap-6 mb-10">
+            <div className="col-span-12 md:col-span-3">
+              <div className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>/ 01</div>
+              <h2 className="mc-display text-5xl mt-3">{language === "fr" ? "JE SUIS..." : "I AM..."}</h2>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter leading-[0.95] text-[#073B4C] mb-6">
-              {language === "fr" ? (
-                <>
-                  « ET POURQUOI
-                  <br />
-                  PAS JUSTE
-                  <br />
-                  CHATGPT ? »
-                </>
-              ) : (
-                <>
-                  "WHY NOT
-                  <br />
-                  JUST USE
-                  <br />
-                  CHATGPT?"
-                </>
-              )}
-            </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              {language === "fr"
-                ? "On adore les IA généralistes. Elles sont imbattables pour rédiger votre dossier, reformuler votre note d'intention, ou traduire votre CV. Mais pour trouver la bonne subvention, il y a trois choses qu'elles ne peuvent pas faire — et on les fait."
-                : "We love general-purpose AIs. They're unbeatable for drafting your application, rephrasing your artistic statement, or translating your CV. But for finding the right grant, there are three things they can't do — and we do."
-              }
-            </p>
-          </div>
-
-          {/* Comparaison — 3 lignes, mobile-friendly */}
-          <div className="space-y-4 sm:space-y-5">
-            {/* Ligne 1 : Fraîcheur des données */}
-            <div className="rounded-2xl border-2 border-gray-200 overflow-hidden bg-white">
-              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-1">
-                  {language === "fr" ? "01 — Une base à jour" : "01 — A current database"}
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-                <div className="p-6 sm:p-8 bg-gray-50/50">
-                  <div className="text-xs uppercase tracking-wide text-gray-500 mb-2 font-semibold">
-                    {language === "fr" ? "Une IA généraliste" : "A general-purpose AI"}
-                  </div>
-                  <p className="text-base text-gray-700 leading-relaxed">
-                    {language === "fr"
-                      ? "Sa connaissance s'arrête début 2025. Elle peut citer des aides qui n'existent plus, ou donner des informations qui ne sont plus valables."
-                      : "Its knowledge stopped in early 2025. It may mention programs that no longer exist, or give information that's no longer valid."
-                    }
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
-                  <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
-                    SubventionMatch
-                  </div>
-                  <p className="text-base text-gray-800 leading-relaxed font-medium">
-                    {language === "fr"
-                      ? `${grantsCount} subventions vérifiées une à une par nos équipes. Base revue chaque semaine, nouvelles aides ajoutées en continu.`
-                      : `${grantsCount} grants verified one by one by our team. Database reviewed every week, new grants added continuously.`
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Ligne 2 : Précision */}
-            <div className="rounded-2xl border-2 border-gray-200 overflow-hidden bg-white">
-              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-1">
-                  {language === "fr" ? "02 — Des montants et deadlines précis" : "02 — Precise amounts and deadlines"}
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-                <div className="p-6 sm:p-8 bg-gray-50/50">
-                  <div className="text-xs uppercase tracking-wide text-gray-500 mb-2 font-semibold">
-                    {language === "fr" ? "Une IA généraliste" : "A general-purpose AI"}
-                  </div>
-                  <p className="text-base text-gray-700 leading-relaxed italic">
-                    {language === "fr"
-                      ? "« Le montant se situe entre 5 000 et 50 000 € environ. La date limite varie selon les sessions, renseignez-vous sur le site officiel. »"
-                      : "\"The amount is roughly between €5,000 and €50,000. The deadline varies by session, check the official website.\""
-                    }
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
-                  <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
-                    SubventionMatch
-                  </div>
-                  <p className="text-base text-gray-800 leading-relaxed font-medium">
-                    {language === "fr"
-                      ? "« 8 000 € – 45 000 €. Prochaine deadline : 23 juin 2026. Dossier à déposer ici. »"
-                      : "\"€8,000 – €45,000. Next deadline: June 23, 2026. Submit your application here.\""
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Ligne 3 : Pertinence métier */}
-            <div className="rounded-2xl border-2 border-gray-200 overflow-hidden bg-white">
-              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-1">
-                  {language === "fr" ? "03 — La finesse métier" : "03 — Industry nuance"}
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-                <div className="p-6 sm:p-8 bg-gray-50/50">
-                  <div className="text-xs uppercase tracking-wide text-gray-500 mb-2 font-semibold">
-                    {language === "fr" ? "Une IA généraliste" : "A general-purpose AI"}
-                  </div>
-                  <p className="text-base text-gray-700 leading-relaxed">
-                    {language === "fr"
-                      ? "Propose les mêmes aides à un DJ électro, un quatuor à cordes et un compositeur de musique de film. Mélange souvent spectacle vivant et audiovisuel."
-                      : "Suggests the same grants to an electronic DJ, a string quartet and a film composer. Often mixes up performing arts and audiovisual."
-                    }
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 bg-[#06D6A0]/5">
-                  <div className="text-xs uppercase tracking-wide text-[#06D6A0] mb-2 font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-[#06D6A0] rounded-full" />
-                    SubventionMatch
-                  </div>
-                  <p className="text-base text-gray-800 leading-relaxed font-medium">
-                    {language === "fr"
-                      ? "Entraîné uniquement sur la culture. Sait qu'un DJ, un compositeur classique et un musicien de film n'ont pas accès aux mêmes dispositifs."
-                      : "Trained only on cultural grants. Knows a DJ, a classical composer and a film composer don't qualify for the same programs."
-                    }
-                  </p>
-                </div>
-              </div>
+            <div className="col-span-12 md:col-span-9 flex items-end">
+              <p className="max-w-xl" style={{ color: "var(--mc-muted)" }}>
+                {language === "fr"
+                  ? "Cliquez sur votre profil pour pré-remplir le formulaire. 13 questions adaptées à votre domaine, pas une de plus."
+                  : "Click your profile to pre-fill the form. 13 questions tailored to your field, not one more."}
+              </p>
             </div>
           </div>
 
-          {/* Note finale — positionnement complémentaire */}
-          <div className="mt-10 sm:mt-12 bg-gradient-to-br from-[#FFD166]/10 to-white border border-[#FFD166]/40 rounded-2xl p-6 sm:p-8 text-center">
-            <p className="text-lg sm:text-xl text-[#073B4C] font-medium leading-relaxed max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {profiles.map((p) => {
+              const Icon = p.icon;
+              return (
+                <Link key={p.test} href={p.href}>
+                  <a
+                    data-testid={p.test}
+                    className="mc-card hover:border-[var(--mc-primary)] transition px-5 py-4 flex items-center gap-3 cursor-pointer"
+                    style={{ textDecoration: "none", color: "var(--mc-text)" }}
+                  >
+                    <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "var(--mc-muted)" }} strokeWidth={1.75} />
+                    <span>{p.label}</span>
+                  </a>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* POURQUOI PAS CHATGPT */}
+      <section id="comparaison" className="mc-section-rule">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-24">
+          <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-12 md:col-span-4">
+              <div className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+                / 02 — {language === "fr" ? "La question qu'on nous pose le plus" : "The question we hear most"}
+              </div>
+              <h2 className="mc-display text-4xl md:text-5xl mt-4">
+                {language === "fr" ? (
+                  <>« ET POURQUOI<br />PAS JUSTE<br />CHATGPT ? »</>
+                ) : (
+                  <>"WHY NOT<br />JUST USE<br />CHATGPT?"</>
+                )}
+              </h2>
+              <p className="mt-8 max-w-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                {language === "fr"
+                  ? "On adore les IA généralistes. Imbattables pour rédiger votre dossier. Mais pour "
+                  : "We love general-purpose AIs. Unbeatable for drafting your application. But for "}
+                <span style={{ color: "var(--mc-text)" }}>
+                  {language === "fr" ? "trouver la bonne subvention" : "finding the right grant"}
+                </span>
+                {language === "fr"
+                  ? ", il y a trois choses qu'elles ne peuvent pas faire — et on les fait."
+                  : ", there are three things they can't do — and we do."}
+              </p>
+            </div>
+
+            <div className="col-span-12 md:col-span-8 space-y-4">
+              <ComparisonRow
+                num="01"
+                title={language === "fr" ? "Une base à jour" : "A current database"}
+                left={language === "fr"
+                  ? "Sa connaissance s'arrête début 2025. Elle peut citer des aides qui n'existent plus, ou donner des informations qui ne sont plus valables."
+                  : "Its knowledge stopped in early 2025. It may mention programs that no longer exist, or give info that's no longer valid."}
+                right={language === "fr"
+                  ? <><span style={{ color: "var(--mc-primary)" }} className="font-semibold">{grantsCount} subventions</span> vérifiées une à une par nos équipes. Base revue chaque semaine, nouvelles aides ajoutées en continu.</>
+                  : <><span style={{ color: "var(--mc-primary)" }} className="font-semibold">{grantsCount} grants</span> verified one by one by our team. Database reviewed every week, new grants added continuously.</>}
+              />
+              <ComparisonRow
+                num="02"
+                title={language === "fr" ? "Des montants et deadlines précis" : "Precise amounts and deadlines"}
+                leftItalic
+                left={language === "fr"
+                  ? "« Le montant se situe entre 5 000 et 50 000 € environ. La date limite varie selon les sessions, renseignez-vous sur le site officiel. »"
+                  : "\"The amount is roughly between €5,000 and €50,000. The deadline varies by session, check the official website.\""}
+                right={language === "fr"
+                  ? <>« <span style={{ color: "var(--mc-primary)" }}>8 000 € – 45 000 €</span>. Prochaine deadline : <span style={{ color: "var(--mc-text)" }}>23 juin 2026</span>. Dossier à déposer ici. »</>
+                  : <>"<span style={{ color: "var(--mc-primary)" }}>€8,000 – €45,000</span>. Next deadline: <span style={{ color: "var(--mc-text)" }}>June 23, 2026</span>. Submit here."</>}
+              />
+              <ComparisonRow
+                num="03"
+                title={language === "fr" ? "La finesse métier" : "Industry nuance"}
+                left={language === "fr"
+                  ? "Propose les mêmes aides à un DJ électro, un quatuor à cordes et un compositeur de musique de film. Mélange souvent spectacle vivant et audiovisuel."
+                  : "Suggests the same grants to an electronic DJ, a string quartet and a film composer. Often mixes up performing arts and audiovisual."}
+                right={language === "fr"
+                  ? "Entraîné uniquement sur la culture. Sait qu'un DJ, un compositeur classique et un musicien de film n'ont pas accès aux mêmes dispositifs."
+                  : "Trained only on cultural grants. Knows a DJ, a classical composer and a film composer don't qualify for the same programs."}
+              />
+            </div>
+          </div>
+
+          <div className="mt-10 mc-card-soft p-6 md:p-8 text-center">
+            <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
               {language === "fr" ? (
-                <>
-                  Utilisez <span className="font-bold">ChatGPT</span> pour rédiger votre dossier.
-                  <br className="hidden sm:block" />
-                  {" "}Utilisez <span className="font-bold">SubventionMatch</span> pour savoir lequel remplir.
-                </>
+                <>Utilisez <span className="font-bold" style={{ color: "var(--mc-text)" }}>ChatGPT</span> pour rédiger votre dossier.<br />
+                Utilisez <span className="font-bold" style={{ color: "var(--mc-primary)" }}>Mecene</span> pour savoir lequel remplir.</>
               ) : (
-                <>
-                  Use <span className="font-bold">ChatGPT</span> to draft your application.
-                  <br className="hidden sm:block" />
-                  {" "}Use <span className="font-bold">SubventionMatch</span> to know which one to fill.
-                </>
+                <>Use <span className="font-bold" style={{ color: "var(--mc-text)" }}>ChatGPT</span> to draft your application.<br />
+                Use <span className="font-bold" style={{ color: "var(--mc-primary)" }}>Mecene</span> to know which one to fill.</>
               )}
             </p>
           </div>
         </div>
       </section>
 
-      {/* How it works - Nouvelle palette */}
-      <section className="py-24 px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-4">
-              <h2 className="text-5xl font-bold tracking-tighter leading-tight text-[#073B4C]">
-                {language === "fr" ? "COMMENT ÇA MARCHE" : "HOW IT WORKS"}
+      {/* HOW IT WORKS */}
+      <section id="how" className="mc-section-rule">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-24 grid grid-cols-12 gap-6">
+          <div className="col-span-12 md:col-span-4">
+            <div className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>/ 03</div>
+            <h2 className="mc-display text-4xl md:text-5xl mt-4">
+              {language === "fr" ? <>COMMENT<br />ÇA MARCHE.</> : <>HOW IT<br />WORKS.</>}
+            </h2>
+          </div>
+
+          <div className="col-span-12 md:col-span-8 mc-divide-border">
+            <HowStep num="01" color="muted-2"
+              title={language === "fr" ? "Remplissez le formulaire" : "Fill the form"}
+              desc={language === "fr" ? "13 questions sur votre profil, projet, budget et besoins." : "13 questions about your profile, project, budget and needs."} />
+            <HowStep num="02" color="muted-2"
+              title={language === "fr" ? "Notre IA croise votre profil avec la base" : "Our AI cross-references your profile with the database"}
+              desc={language === "fr"
+                ? `Elle compare votre profil, votre discipline et votre budget aux ${grantsCount} aides répertoriées. Deadline, éligibilité, montant : chaque critère est vérifié.`
+                : `It compares your profile, discipline and budget against our ${grantsCount} listed grants. Every criterion is checked.`} />
+            <HowStep num="03" color="primary"
+              title={language === "fr" ? "Recevez votre top 5 personnalisé" : "Receive your personalized top 5"}
+              desc={language === "fr"
+                ? "Vos matches s'affichent avec deadline, montant, éligibilité et lien direct vers le bon dossier. 100 % gratuit pendant la beta."
+                : "Your matches appear with deadline, amount, eligibility and direct link. 100% free during beta."} />
+          </div>
+        </div>
+      </section>
+
+      {/* EXAMPLE */}
+      <section id="example" className="mc-section-rule">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-24">
+          <div className="grid grid-cols-12 gap-6 mb-10">
+            <div className="col-span-12 md:col-span-4">
+              <div className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>/ 04</div>
+              <h2 className="mc-display text-4xl md:text-5xl mt-4">
+                {language === "fr" ? <>VOIR LE<br />MATCHING<br />EN ACTION.</> : <>SEE THE<br />MATCHING<br />IN ACTION.</>}
               </h2>
             </div>
-            
-            <div className="lg:col-span-8 space-y-8">
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 text-5xl font-bold text-black">
-                  1
-                </div>
-                <div className="flex-1 pt-2">
-                  <h3 className="text-2xl font-bold mb-2 text-[#073B4C]">
-                    {language === "fr" ? "Remplissez le formulaire" : "Fill the form"}
-                  </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {language === "fr"
-                      ? "13 questions sur votre profil, projet, budget et besoins."
-                      : "13 questions about your profile, project, budget and needs."
-                    }
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 text-5xl font-bold text-black">
-                  2
-                </div>
-                <div className="flex-1 pt-2">
-                  <h3 className="text-2xl font-bold mb-2 text-[#073B4C]">
-                    {language === "fr" ? "Notre IA croise votre profil avec la base" : "Our AI cross-references your profile with the database"}
-                  </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {language === "fr"
-                      ? `Elle compare votre profil, votre discipline et votre budget aux ${grantsCount} aides répertoriées. Deadline, éligibilité, montant : chaque critère est vérifié avant de vous proposer un match.`
-                      : `It compares your profile, discipline and budget against our ${grantsCount} listed grants. Deadline, eligibility, amount: every criterion is checked before we show you a match.`
-                    }
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 text-5xl font-bold text-black">
-                  3
-                </div>
-                <div className="flex-1 pt-2">
-                  <h3 className="text-2xl font-bold mb-2 text-[#073B4C]">
-                    {language === "fr" ? "Recevez votre top 5 personnalisé" : "Receive your personalized top 5"}
-                  </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {language === "fr"
-                      ? "Vos matches s'affichent avec deadline, montant, éligibilité et lien direct vers le bon dossier. 100 % gratuit pendant toute la durée de la beta."
-                      : "Your matches appear with deadline, amount, eligibility and direct link to the right application. 100% free during the entire beta."
-                    }
-                  </p>
-                </div>
-              </div>
+            <div className="col-span-12 md:col-span-8 flex items-end">
+              <p className="max-w-xl" style={{ color: "var(--mc-muted)" }}>
+                {language === "fr"
+                  ? "Un exemple réel : compagnie de théâtre contemporain, Lyon, création pluridisciplinaire, budget 45 k€."
+                  : "A real example: contemporary theater company, Lyon, multidisciplinary creation, €45k budget."}
+              </p>
             </div>
           </div>
+
+          <div className="mc-card p-6 md:p-8 mb-6">
+            <div className="mc-mono text-xs uppercase tracking-widest mb-3" style={{ color: "var(--mc-muted)" }}>
+              INPUT · {language === "fr" ? "Décrivez votre projet" : "Describe your project"}
+            </div>
+            <p className="text-base md:text-lg italic leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr"
+                ? "« Je suis une compagnie de théâtre contemporain basée à Lyon. Nous préparons une création sur la mémoire collective qui mêle théâtre, vidéo et musique live. Budget estimé : 45 000 €. »"
+                : "\"I'm a contemporary theater company based in Lyon. We're preparing a creation about collective memory that mixes theater, video and live music. Estimated budget: €45,000.\""}
+            </p>
+          </div>
+
+          <div className="flex justify-center py-4">
+            <div className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+              ── {language === "fr" ? "matching" : "matching"} ──
+            </div>
+          </div>
+
+          <ExampleGrantCard language={language} />
         </div>
       </section>
 
-      {/* Example Section */}
-      <section className="py-24 px-8 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-5xl font-bold tracking-tighter leading-tight text-[#073B4C] mb-8">
-                {language === "fr" ? "VOIR LE MATCHING EN ACTION" : "SEE MATCHING IN ACTION"}
+      {/* BETA WAITLIST */}
+      <BetaWaitlistSection language={language} grantsCount={grantsCount} />
+
+      {/* COMING SOON */}
+      <section className="mc-section-rule">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-24">
+          <div className="grid grid-cols-12 gap-6 mb-10">
+            <div className="col-span-12 md:col-span-4">
+              <div className="mc-mono text-xs uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: "var(--mc-accent)" }}>
+                <span className="mc-pulse-dot" style={{ background: "var(--mc-accent)" }} />
+                / 05 — {language === "fr" ? "Bientôt disponible" : "Coming soon"}
+              </div>
+              <h2 className="mc-display text-4xl md:text-5xl">
+                {language === "fr" ? (
+                  <>TROUVEZ AUSSI<br /><span style={{ color: "var(--mc-accent)" }}>QUI REPRÉSENTE<br />VOTRE ART.</span></>
+                ) : (
+                  <>ALSO FIND<br /><span style={{ color: "var(--mc-accent)" }}>WHO REPRESENTS<br />YOUR ART.</span></>
+                )}
               </h2>
             </div>
-            
-            <div className="space-y-8">
-              {/* Input Example */}
-              <div className="bg-white border-2 border-gray-200 rounded-lg p-8">
-                <h3 className="text-xl font-bold text-[#073B4C] mb-4">
-                  {language === "fr" ? "Décrivez votre projet" : "Describe your project"}
-                </h3>
-                <p className="text-gray-700 text-lg leading-relaxed italic">
-                  {language === "fr" 
-                    ? "\"Je suis une compagnie de théâtre contemporain basée à Lyon. Nous préparons une création sur la mémoire collective qui mêle théâtre, vidéo et musique live. Budget estimé : 45 000€.\""
-                    : "\"I'm a contemporary theater company based in Lyon. We're preparing a creation about collective memory that mixes theater, video and live music. Estimated budget: €45,000.\""
-                  }
-                </p>
-              </div>
-
-              {/* Arrow */}
-              <div className="flex justify-center">
-                <div className="text-[#06D6A0] text-4xl font-bold">↓</div>
-              </div>
-
-              {/* Output Example */}
-              <ExampleGrantCard language={language} />
+            <div className="col-span-12 md:col-span-8 flex items-end">
+              <p className="max-w-2xl leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                {language === "fr"
+                  ? "Une subvention finance votre projet. Mais il vous faut aussi les bonnes personnes pour le représenter et le diffuser. Bientôt, Mecene vous connectera directement avec les professionnels de votre secteur."
+                  : "A grant funds your project. But you also need the right people to represent and distribute it. Soon, Mecene will connect you directly with professionals in your field."}
+              </p>
             </div>
           </div>
+
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              { icon: ImageIcon, label: language === "fr" ? "Galeries d'art" : "Art galleries", desc: language === "fr" ? "Par style, région et ouverture aux émergents" : "By style, region and openness to emerging artists" },
+              { icon: Disc, label: language === "fr" ? "Labels & producteurs" : "Labels & producers", desc: language === "fr" ? "Par genre musical et type de contrat" : "By music genre and contract type" },
+              { icon: BookOpen, label: language === "fr" ? "Maisons d'édition" : "Publishers", desc: language === "fr" ? "Par genre littéraire et politique éditoriale" : "By literary genre and editorial policy" },
+              { icon: Users, label: language === "fr" ? "Agents & tourneurs" : "Agents & bookers", desc: language === "fr" ? "Par discipline et réseau de diffusion" : "By discipline and distribution network" },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="mc-card p-6">
+                  <Icon className="w-7 h-7 mb-4" style={{ color: "var(--mc-accent)" }} strokeWidth={1.5} />
+                  <div className="font-bold mb-1">{item.label}</div>
+                  <div className="text-sm" style={{ color: "var(--mc-muted)" }}>{item.desc}</div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-8 text-sm italic" style={{ color: "var(--mc-muted-2)" }}>
+            {language === "fr"
+              ? "Le même matching IA que pour vos subventions, appliqué à l'écosystème artistique professionnel."
+              : "The same AI matching as for your grants, applied to the professional artistic ecosystem."}
+          </p>
         </div>
       </section>
 
-      {/* Beta gratuite + waitlist — positionnement honnête */}
-      <BetaWaitlistSection language={language} />
-
-
-      {/* Coming Soon - Carnet d'adresses artistique */}
-      <section className="py-24 px-8 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden border-2 border-[#118AB2]/20 rounded-2xl p-8 sm:p-12 bg-gradient-to-br from-[#118AB2]/5 via-white to-[#06D6A0]/5">
-            {/* Badge Coming Soon */}
-            <div className="inline-flex items-center gap-2 bg-[#118AB2]/10 text-[#118AB2] px-4 py-1.5 rounded-full text-sm font-semibold mb-6 tracking-wide uppercase">
-              <span className="w-2 h-2 bg-[#118AB2] rounded-full animate-pulse" />
-              {language === "fr" ? "Bientot disponible" : "Coming soon"}
+      {/* FINAL CTA */}
+      <section className="mc-section-rule" style={{ background: "var(--mc-text)", color: "var(--mc-bg)" }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-24 md:py-28 grid grid-cols-12 gap-6 items-end">
+          <div className="col-span-12 md:col-span-9">
+            <div className="mc-mono text-xs uppercase tracking-widest mb-6 md:mb-8" style={{ color: "rgba(0,0,0,0.5)" }}>
+              / 06 — {language === "fr" ? "Commencer" : "Get started"}
             </div>
-
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-[#073B4C] mb-4 leading-tight">
-              {language === "fr" ? (
-                <>TROUVEZ AUSSI<br /><span className="text-[#118AB2]">QUI REPRESENTE VOTRE ART</span></>
-              ) : (
-                <>ALSO FIND<br /><span className="text-[#118AB2]">WHO REPRESENTS YOUR ART</span></>
-              )}
+            <h2 className="mc-display text-[72px] md:text-[128px]">
+              {language === "fr" ? <>PRÊT ?<br />C'EST PARTI.</> : <>READY?<br />LET'S GO.</>}
             </h2>
-
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl leading-relaxed">
-              {language === "fr"
-                ? "Une subvention finance votre projet. Mais il vous faut aussi les bonnes personnes pour le representer et le diffuser. Bientot, SubventionMatch vous connectera directement avec les professionnels de votre secteur."
-                : "A grant funds your project. But you also need the right people to represent and distribute it. Soon, SubventionMatch will connect you directly with professionals in your field."
-              }
-            </p>
-
-            <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              {[
-                { icon: "🎨", label: language === "fr" ? "Galeries d'art" : "Art galleries", desc: language === "fr" ? "Par style, region et ouverture aux emergents" : "By style, region and openness to emerging artists" },
-                { icon: "🎵", label: language === "fr" ? "Labels & producteurs" : "Labels & producers", desc: language === "fr" ? "Par genre musical et type de contrat" : "By music genre and contract type" },
-                { icon: "📚", label: language === "fr" ? "Maisons d'edition" : "Publishers", desc: language === "fr" ? "Par genre litteraire et politique editoriale" : "By literary genre and editorial policy" },
-                { icon: "🎭", label: language === "fr" ? "Agents & tourneurs" : "Agents & bookers", desc: language === "fr" ? "Par discipline et reseau de diffusion" : "By discipline and distribution network" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 bg-white/60 rounded-xl border border-gray-100">
-                  <span className="text-2xl">{item.icon}</span>
-                  <div>
-                    <div className="font-semibold text-[#073B4C]">{item.label}</div>
-                    <div className="text-sm text-gray-500">{item.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-sm text-gray-400 italic">
-              {language === "fr"
-                ? "Le meme matching IA que pour vos subventions, applique a l'ecosysteme artistique professionnel."
-                : "The same AI matching as for your grants, applied to the professional artistic ecosystem."
-              }
+          </div>
+          <div className="col-span-12 md:col-span-3">
+            <Link href="/form">
+              <a
+                className="block w-full text-center py-5 mc-mono text-sm uppercase tracking-widest rounded-full transition hover:bg-[var(--mc-primary)] hover:text-[var(--mc-bg)]"
+                style={{ background: "var(--mc-bg)", color: "var(--mc-text)", textDecoration: "none" }}
+              >
+                {language === "fr" ? "Lancer le matching" : "Start matching"} →
+              </a>
+            </Link>
+            <p className="mc-mono text-xs mt-4" style={{ color: "rgba(0,0,0,0.6)" }}>
+              3 min · {language === "fr" ? "gratuit · sans CB" : "free · no credit card"}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Test Flow Section - Dev only (cachée en prod pour éviter que les users testent par hasard) */}
-      {import.meta.env.DEV && (
-      <section className="py-32 px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 text-[#073B4C]">
-              {language === "fr" ? "TESTER LE" : "TEST THE"}
-              <br />
-              <span className="text-[#118AB2]">
-                {language === "fr" ? "FLOW" : "FLOW"}
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600">
-              {language === "fr" 
-                ? "Prévisualisez les pages de résultats avant et après paiement" 
-                : "Preview result pages before and after payment"
-              }
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <Link href="/results?sessionId=test-unpaid">
-              <div className="group border-2 border-gray-200 hover:border-[#EF476F] transition-all p-10 cursor-pointer h-full flex flex-col rounded-lg" data-testid="link-test-unpaid">
-                <div className="flex-1">
-                  <div className="text-4xl font-bold mb-4 group-hover:text-[#EF476F] transition-colors text-[#073B4C]">
-                    01
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-[#073B4C]">
-                    {language === "fr" ? "Résultats floutés" : "Blurred results"}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {language === "fr"
-                      ? "Vue avec 1 résultat gratuit + paywall pour débloquer le reste"
-                      : "View with 1 free result + paywall to unlock the rest"
-                    }
-                  </p>
-                  <div className="mt-4">
-                    <Badge className="bg-[#FFD166]/20 text-[#FFD166] border-[#FFD166]/30 rounded-md">
-                      {language === "fr" ? "Non payé" : "Unpaid"}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="mt-8 flex items-center text-sm font-medium group-hover:translate-x-2 transition-transform text-[#073B4C]">
-                  {language === "fr" ? "Voir la démo" : "View demo"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/results?sessionId=test-paid">
-              <div className="group border-2 border-[#06D6A0] hover:border-[#06D6A0]/80 transition-all p-10 cursor-pointer h-full flex flex-col bg-[#06D6A0]/5 rounded-lg" data-testid="link-test-paid">
-                <div className="flex-1">
-                  <div className="text-4xl font-bold mb-4 group-hover:text-[#06D6A0]/80 transition-colors text-[#06D6A0]">
-                    02
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-[#073B4C]">
-                    {language === "fr" ? "Résultats complets" : "Full results"}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {language === "fr"
-                      ? "Vue après paiement avec tous les détails débloqués"
-                      : "View after payment with all details unlocked"
-                    }
-                  </p>
-                  <div className="mt-4">
-                    <Badge className="bg-[#06D6A0]/20 text-[#06D6A0] border-[#06D6A0]/30 rounded-md">
-                      {language === "fr" ? "Payé ✓" : "Paid ✓"}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="mt-8 flex items-center text-sm font-medium group-hover:translate-x-2 transition-transform text-[#073B4C]">
-                  {language === "fr" ? "Voir la démo" : "View demo"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/stats">
-              <div className="group border-2 border-[#118AB2] hover:border-[#118AB2]/80 transition-all p-10 cursor-pointer h-full flex flex-col bg-[#118AB2]/5 rounded-lg" data-testid="link-stats">
-                <div className="flex-1">
-                  <div className="text-4xl font-bold mb-4 group-hover:text-[#118AB2]/80 transition-colors text-[#118AB2]">
-                    03
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-[#073B4C]">
-                    {language === "fr" ? "Statistiques DB" : "DB Statistics"}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {language === "fr"
-                      ? "Visualisez les stats de la base de données avec graphiques et taux de remplissage"
-                      : "View database stats with charts and fill rates"
-                    }
-                  </p>
-                  <div className="mt-4">
-                    <Badge className="bg-[#118AB2]/20 text-[#118AB2] border-[#118AB2]/30 rounded-md">
-                      {language === "fr" ? "Analytics 📊" : "Analytics 📊"}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="mt-8 flex items-center text-sm font-medium group-hover:translate-x-2 transition-transform text-[#073B4C]">
-                  {language === "fr" ? "Voir les stats" : "View stats"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-      )}
-
-      {/* Footer Minimal - Nouvelle palette */}
-      <footer className="py-16 px-8 border-t border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-sm text-gray-600">
-            © 2026 SubventionMatch
-          </div>
-          <div className="flex flex-wrap gap-6 sm:gap-8 text-sm text-gray-600 items-center">
-            <button
-              onClick={() => {
-                // Ouvre le widget feedback existant (bouton flottant)
-                const btn = document.querySelector('[aria-label="Donner un retour"]') as HTMLElement | null;
-                btn?.click();
-              }}
-              className="hover:text-[#EF476F] transition-colors font-medium"
-              data-testid="link-feedback"
-            >
-              {language === "fr" ? "💬 Donner un retour" : "💬 Give feedback"}
-            </button>
-            <Link href="/api-status" className="hover:text-[#118AB2] transition-colors" data-testid="link-api-status">
-              {language === "fr" ? "Monitoring APIs" : "API Monitoring"}
-            </Link>
-            <a 
-              href="/api/example-pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:text-[#118AB2] transition-colors"
-              data-testid="link-example-pdf"
-            >
-              {language === "fr" ? "📄 Exemple PDF" : "📄 PDF Example"}
+      {/* FOOTER */}
+      <footer>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-10 mc-mono text-xs uppercase tracking-widest flex flex-wrap justify-between gap-4" style={{ color: "var(--mc-muted)" }}>
+          <span>© 2026 Mecene</span>
+          <span className="flex flex-wrap gap-4 md:gap-6">
+            <Link href="/api-status"><a className="hover:text-white transition" data-testid="link-api-status">API status</a></Link>
+            <a href="/api/example-pdf" target="_blank" rel="noopener noreferrer" className="hover:text-white transition" data-testid="link-example-pdf">
+              {language === "fr" ? "Exemple PDF" : "PDF example"}
             </a>
-            <Link 
-              href="/data-quality"
-              className="hover:text-[#118AB2] transition-colors"
-              data-testid="link-data-quality"
-            >
-              {language === "fr" ? "📊 Qualité des données" : "📊 Data Quality"}
-            </Link>
-            <Link href="/mentions-legales" className="hover:text-[#118AB2] transition-colors">Mentions legales</Link>
-            <Link href="/cgv" className="hover:text-[#118AB2] transition-colors">CGV</Link>
-            <Link href="/confidentialite" className="hover:text-[#118AB2] transition-colors">{t.footerPrivacy}</Link>
-          </div>
+            <Link href="/data-quality"><a className="hover:text-white transition" data-testid="link-data-quality">
+              {language === "fr" ? "Qualité des données" : "Data quality"}
+            </a></Link>
+            <Link href="/mentions-legales"><a className="hover:text-white transition">
+              {language === "fr" ? "Mentions légales" : "Legal"}
+            </a></Link>
+            <Link href="/cgv"><a className="hover:text-white transition">CGV</a></Link>
+            <Link href="/confidentialite"><a className="hover:text-white transition">{t.footerPrivacy}</a></Link>
+          </span>
         </div>
       </footer>
+    </div>
+  );
+}
+
+/** Small helpers (local components) */
+function ComparisonRow({ num, title, left, right, leftItalic }: {
+  num: string; title: string;
+  left: React.ReactNode; right: React.ReactNode;
+  leftItalic?: boolean;
+}) {
+  return (
+    <div className="mc-card overflow-hidden">
+      <div className="mc-mono text-xs uppercase tracking-widest px-6 py-3 border-b" style={{ color: "var(--mc-muted)", borderColor: "var(--mc-border)" }}>
+        {num} — {title}
+      </div>
+      <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x" style={{ borderColor: "var(--mc-border)" }}>
+        <div className="p-6">
+          <div className="mc-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--mc-muted-2)" }}>Une IA généraliste</div>
+          <p className={`text-sm leading-relaxed ${leftItalic ? "italic" : ""}`} style={{ color: "var(--mc-muted)" }}>{left}</p>
+        </div>
+        <div className="p-6" style={{ background: "var(--mc-primary-soft)" }}>
+          <div className="flex items-center gap-2 mc-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--mc-primary)" }}>
+            <span className="mc-pulse-dot" />
+            Mecene
+          </div>
+          <p className="text-sm leading-relaxed">{right}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HowStep({ num, color, title, desc }: { num: string; color: "muted-2" | "primary"; title: string; desc: string }) {
+  const c = color === "primary" ? "var(--mc-primary)" : "var(--mc-muted-2)";
+  return (
+    <div className="py-8 grid grid-cols-[auto_1fr] gap-6">
+      <div className="mc-display text-6xl" style={{ color: c }}>{num}</div>
+      <div>
+        <h3 className="text-2xl font-bold mb-2">{title}</h3>
+        <p className="text-lg leading-relaxed" style={{ color: "var(--mc-muted)" }}>{desc}</p>
+      </div>
     </div>
   );
 }

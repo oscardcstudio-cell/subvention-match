@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stats — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_theme-dark.css" />
+<style>
+  .bar { position:relative; height:32px; background:var(--panel-2); border-radius:6px; overflow:hidden; }
+  .bar-fill { position:absolute; left:0; top:0; bottom:0; background:var(--primary); border-radius:6px; }
+  .bar-fill.accent { background:var(--accent); }
+  .bar-fill.warn { background:var(--warn); }
+  .spark { display:flex; align-items:flex-end; gap:3px; height:60px; }
+  .spark span { flex:1; background:var(--primary); border-radius:2px 2px 0 0; min-height:4px; opacity:.85; }
+  .ring { width:120px; height:120px; border-radius:999px; position:relative; }
+  .ring::before { content:''; position:absolute; inset:10px; border-radius:999px; background:var(--panel); }
+  .ring-content { position:absolute; inset:0; display:grid; place-items:center; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-trending-up" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m23 6-9.5 9.5-5-5L1 18M17 6h6v6"/></symbol>
+<symbol id="i-database" viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+</defs></svg>
+
+<div class="text-center text-xs py-2 px-4 mono" style="background:#FFD166;color:#0A0A0A;">
+  [ TRANSPARENCE ] &nbsp;&nbsp; Toutes les stats de la base sont publiques. Mis à jour en direct.
+</div>
+
+<header class="section-rule sticky top-0 z-40 backdrop-blur" style="background:rgba(10,10,10,.85)">
+  <div class="max-w-7xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="style-01-swiss-dark.html" class="display text-lg">Mecene<span style="color:var(--primary)">.</span></a>
+    <nav class="hidden md:flex items-center gap-6 mono text-xs uppercase tracking-widest text-[color:var(--muted)]">
+      <a href="#global" class="hover:text-white">Global</a>
+      <a href="#domains" class="hover:text-white">Domaines</a>
+      <a href="#quality" class="hover:text-white">Qualité</a>
+      <a href="#activity" class="hover:text-white">Activité</a>
+    </nav>
+    <a href="style-01-swiss-dark-form.html" class="btn-primary text-xs uppercase tracking-widest mono px-4 py-1.5 rounded-full">Lancer un diagnostic →</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section>
+  <div class="max-w-7xl mx-auto px-8 py-16 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-8">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-10">/ Statistiques · temps réel</div>
+      <h1 class="display text-[72px] md:text-[96px]">
+        LA BASE<br>EN TRANSPARENCE<span style="color:var(--primary)">.</span>
+      </h1>
+      <p class="mt-8 text-[color:var(--muted)] max-w-2xl leading-relaxed">
+        Combien de subventions ? De quelle qualité ? Combien de personnes testent ?
+        Avec quel taux de satisfaction ? Tout est là. Pas de cuisine.
+      </p>
+    </div>
+    <div class="col-span-12 md:col-span-4 flex items-center justify-end">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex items-center gap-2">
+        <span class="dot-pulse"></span>
+        Mis à jour il y a 42 s
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GLOBAL STATS -->
+<section id="global" class="section-rule">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-[color:var(--border)] border-y" style="border-color:var(--border)">
+    <div class="p-8">
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-3">Dispositifs</div>
+      <div class="display text-5xl text-[color:var(--primary)]">473</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2 inline-flex items-center gap-1">
+        <svg class="icon-sm"><use href="#i-trending-up"/></svg> +12 ce mois
+      </div>
+    </div>
+    <div class="p-8">
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-3">Actifs ce mois</div>
+      <div class="display text-5xl">241</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">51 % de la base</div>
+    </div>
+    <div class="p-8">
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-3">Score qualité moyen</div>
+      <div class="display text-5xl">78<span class="text-[color:var(--muted)]">%</span></div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">Seuil : 60 %</div>
+    </div>
+    <div class="p-8">
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-3">Diagnostics lancés</div>
+      <div class="display text-5xl">2 847</div>
+      <div class="text-xs text-[color:var(--muted)] mt-2">+ 187 cette semaine</div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMAINS -->
+<section id="domains" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-4">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 01</div>
+      <h2 class="display text-5xl mt-4">RÉPARTITION<br>PAR DOMAINE.</h2>
+      <p class="text-[color:var(--muted)] mt-6 max-w-sm leading-relaxed">
+        Les 473 dispositifs répartis par discipline. Cinéma et musique dominent — reflet
+        du budget public français.
+      </p>
+    </div>
+    <div class="col-span-12 md:col-span-8 space-y-4">
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Cinéma &amp; audiovisuel</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">97</span> · 20.5 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:20.5%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Musique</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">84</span> · 17.8 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:17.8%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Spectacle vivant</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">78</span> · 16.5 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:16.5%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Arts visuels</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">62</span> · 13.1 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill accent" style="width:13.1%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Livre &amp; édition</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">53</span> · 11.2 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill accent" style="width:11.2%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Arts numériques</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">31</span> · 6.6 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill accent" style="width:6.6%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Patrimoine</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">22</span> · 4.6 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="background:var(--muted-2);width:4.6%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline mb-2">
+          <span class="font-medium">Transversal &amp; pluridisciplinaire</span>
+          <span class="mono text-sm text-[color:var(--muted)]"><span class="text-white">46</span> · 9.7 %</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="background:var(--muted-2);width:9.7%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUALITY GATE -->
+<section id="quality" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-4">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 02</div>
+      <h2 class="display text-5xl mt-4">QUALITY<br>GATE.</h2>
+      <p class="text-[color:var(--muted)] mt-6 max-w-sm leading-relaxed">
+        Chaque dispositif passe un score 0–100 (éligibilité claire, description complète,
+        URL valide, deadline précise). Seuls les scores ≥ 60 atteignent l'utilisateur.
+      </p>
+    </div>
+    <div class="col-span-12 md:col-span-8 grid md:grid-cols-2 gap-4">
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-4">Distribution des scores</div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3"><span class="w-16 mono text-xs">90-100</span><div class="bar flex-1"><div class="bar-fill" style="width:22%"></div></div><span class="mono text-xs text-[color:var(--muted)] w-10 text-right">53</span></div>
+          <div class="flex items-center gap-3"><span class="w-16 mono text-xs">75-89</span><div class="bar flex-1"><div class="bar-fill" style="width:38%"></div></div><span class="mono text-xs text-[color:var(--muted)] w-10 text-right">91</span></div>
+          <div class="flex items-center gap-3"><span class="w-16 mono text-xs">60-74</span><div class="bar flex-1"><div class="bar-fill warn" style="width:42%"></div></div><span class="mono text-xs text-[color:var(--muted)] w-10 text-right">97</span></div>
+          <div class="flex items-center gap-3"><span class="w-16 mono text-xs">&lt; 60</span><div class="bar flex-1"><div class="bar-fill" style="background:var(--danger);opacity:.6;width:98%"></div></div><span class="mono text-xs text-[color:var(--muted-2)] w-10 text-right">229</span></div>
+        </div>
+        <div class="mt-5 pt-4 border-t text-xs text-[color:var(--muted)]" style="border-color:var(--border)">
+          <span class="text-[color:var(--primary)] font-semibold">241 / 473</span> passent le seuil et sont servis à l'IA.
+        </div>
+      </div>
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-4">Champs renseignés (moyenne)</div>
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between mono text-xs mb-1"><span>Nom du dispositif</span><span class="text-[color:var(--primary)]">100 %</span></div>
+            <div class="bar"><div class="bar-fill" style="width:100%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between mono text-xs mb-1"><span>Description</span><span class="text-[color:var(--primary)]">94 %</span></div>
+            <div class="bar"><div class="bar-fill" style="width:94%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between mono text-xs mb-1"><span>URL officielle</span><span class="text-[color:var(--primary)]">91 %</span></div>
+            <div class="bar"><div class="bar-fill" style="width:91%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between mono text-xs mb-1"><span>Éligibilité détaillée</span><span class="text-[color:var(--warn)]">78 %</span></div>
+            <div class="bar"><div class="bar-fill warn" style="width:78%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between mono text-xs mb-1"><span>Montant précis</span><span class="text-[color:var(--warn)]">64 %</span></div>
+            <div class="bar"><div class="bar-fill warn" style="width:64%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between mono text-xs mb-1"><span>Deadline datée</span><span class="text-[color:var(--muted)]">52 %</span></div>
+            <div class="bar"><div class="bar-fill" style="background:var(--muted-2);width:52%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTIVITY / USAGE -->
+<section id="activity" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20">
+    <div class="grid grid-cols-12 gap-6 mb-12">
+      <div class="col-span-12 md:col-span-4">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 03</div>
+        <h2 class="display text-5xl mt-4">ACTIVITÉ<br>7 DERNIERS<br>JOURS.</h2>
+      </div>
+      <div class="col-span-12 md:col-span-8 card p-8">
+        <div class="flex items-baseline justify-between mb-6">
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)]">Diagnostics lancés</div>
+            <div class="display text-5xl mt-1">187</div>
+          </div>
+          <div class="text-xs text-[color:var(--primary)] mono inline-flex items-center gap-2">
+            <svg class="icon-sm"><use href="#i-trending-up"/></svg> +34 % vs. sem. dernière
+          </div>
+        </div>
+        <div class="spark">
+          <span style="height:45%"></span>
+          <span style="height:62%"></span>
+          <span style="height:48%"></span>
+          <span style="height:78%"></span>
+          <span style="height:71%"></span>
+          <span style="height:88%"></span>
+          <span style="height:95%"></span>
+        </div>
+        <div class="mt-3 flex justify-between mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">
+          <span>Lun 11</span><span>Mar 12</span><span>Mer 13</span><span>Jeu 14</span><span>Ven 15</span><span>Sam 16</span><span>Dim 17</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-2">Taux de complétion formulaire</div>
+        <div class="display text-4xl text-[color:var(--primary)]">82 %</div>
+        <div class="text-xs text-[color:var(--muted)] mt-2">154 / 187 ont reçu un rapport</div>
+      </div>
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-2">Note moyenne des matches</div>
+        <div class="display text-4xl text-[color:var(--primary)]">4.1<span class="text-[color:var(--muted)] text-2xl">/5</span></div>
+        <div class="text-xs text-[color:var(--muted)] mt-2">Basé sur 263 votes 👍/👎</div>
+      </div>
+      <div class="card p-6">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-2">Email waitlist V1</div>
+        <div class="display text-4xl">1 247</div>
+        <div class="text-xs text-[color:var(--muted)] mt-2">+89 cette semaine</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-rule" style="background:var(--text);color:var(--bg)">
+  <div class="max-w-7xl mx-auto px-8 py-20 grid grid-cols-12 gap-6 items-end">
+    <div class="col-span-12 md:col-span-8">
+      <div class="mono text-xs uppercase tracking-widest text-black/50 mb-6">/ 04</div>
+      <h2 class="display text-5xl md:text-6xl">
+        CES CHIFFRES BOUGENT.<br>VENEZ LES FAIRE GRANDIR<span style="color:var(--primary)">.</span>
+      </h2>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+      <a href="style-01-swiss-dark-form.html" class="block w-full text-center bg-[color:var(--bg)] text-white py-5 mono text-sm uppercase tracking-widest rounded-full hover:bg-[color:var(--primary)] hover:text-[color:var(--bg)] transition inline-flex items-center justify-center gap-2">
+        Lancer mon diagnostic <svg class="icon-sm"><use href="#i-arrow-right"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-8 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene</span>
+    <span class="flex flex-wrap gap-4 md:gap-6">
+      <a href="style-01-swiss-dark.html" class="hover:text-white">Accueil</a>
+      <a href="style-01-swiss-dark-data.html" class="hover:text-white">Qualité des données</a>
+      <a href="style-01-swiss-dark-legal.html" class="hover:text-white">Mentions</a>
+    </span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const on = b.dataset.fb === active;
+      b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+      b.style.background = on ? 'var(--primary-soft)' : '';
+      b.style.color = on ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

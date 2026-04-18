@@ -71,27 +71,26 @@ function CheckoutForm({ sessionId }: { sessionId: string }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <PaymentElement />
-      <Button
+      <button
         type="submit"
         disabled={!stripe || isProcessing}
-        className="w-full"
-        size="lg"
+        className="mc-btn-primary w-full py-3 rounded-lg mc-mono text-sm uppercase tracking-widest inline-flex items-center justify-center gap-2 disabled:opacity-60"
         data-testid="button-pay"
       >
         {isProcessing ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
             {t.loading}
           </>
         ) : (
           <>
-            <Lock className="mr-2 h-4 w-4" />
+            <Lock className="w-3.5 h-3.5" />
             {t.paymentButton}
           </>
         )}
-      </Button>
-      <p className="text-sm text-center text-muted-foreground flex items-center justify-center gap-2">
-        <Lock className="h-3 w-3" />
+      </button>
+      <p className="mc-mono text-xs text-center uppercase tracking-widest flex items-center justify-center gap-2" style={{ color: "var(--mc-muted-2)" }}>
+        <Lock className="w-3 h-3" />
         {t.unlockSecure}
       </p>
     </form>
@@ -127,68 +126,64 @@ export default function CheckoutPage() {
 
   if (!clientSecret) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-emerald-500 to-teal-700 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-white/90 mx-auto" />
-          <p className="text-white/70">{t.loading}</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
+        <div className="flex items-center gap-3 mc-mono text-sm uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+          <Loader2 className="w-4 h-4 animate-spin" /> {t.loading}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-emerald-500 to-teal-700 flex flex-col">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6">
-        <div className="flex items-center justify-between max-w-3xl mx-auto">
-          <a href="/" data-testid="link-home">
-            <span className="font-bold text-2xl text-white/95" style={{ fontFamily: 'serif' }}>
-              SubventionMatch
-            </span>
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
+      <div className="mc-mono text-xs text-center py-2 px-4" style={{ background: "var(--mc-warn)", color: "var(--mc-bg)" }}>
+        [ BETA ] &nbsp;&nbsp; {language === "fr" ? "Aperçu V1 — pendant la beta, tout reste gratuit." : "V1 preview — during beta, everything stays free."}
+      </div>
+
+      <header className="mc-section-rule">
+        <div className="max-w-6xl mx-auto px-6 md:px-8 h-14 flex items-center justify-between">
+          <a href="/" data-testid="link-home" className="mc-display text-lg" style={{ textDecoration: "none", color: "var(--mc-text)" }}>
+            Mecene<span style={{ color: "var(--mc-primary)" }}>.</span>
           </a>
-          <LanguageToggle language={language} onLanguageChange={setLanguage} />
+          <div className="flex items-center gap-3">
+            <div className="mc-mono text-xs uppercase tracking-widest hidden md:flex items-center gap-2" style={{ color: "var(--mc-muted)" }}>
+              <Lock className="w-3 h-3" /> {language === "fr" ? "Paiement sécurisé · Stripe" : "Secure · Stripe"}
+            </div>
+            <LanguageToggle language={language} onLanguageChange={setLanguage} />
+          </div>
         </div>
       </header>
 
-      {/* Payment */}
-      <main className="flex-1 flex pt-32 pb-16 px-6">
+      <main className="flex-1 flex items-center py-16 px-6">
         <div className="max-w-2xl mx-auto w-full">
-          <div className="white-card shadow-xl">
+          <div className="mc-card overflow-hidden">
             <div className="text-center space-y-3 p-8 pb-4">
-              <div className="mx-auto w-12 h-12 rounded-full bg-[#06D6A0]/10 flex items-center justify-center">
-                <Lock className="h-6 w-6 text-[#06D6A0]" />
+              <div className="mx-auto w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "var(--mc-primary-soft)" }}>
+                <Lock className="w-5 h-5" style={{ color: "var(--mc-primary)" }} />
               </div>
               <div>
-                <h2 className="font-serif text-2xl font-bold mb-1 text-gray-900">{t.paymentTitle}</h2>
-                <p className="text-sm text-gray-600">{t.paymentDescription}</p>
+                <h2 className="mc-display text-3xl mb-1">{t.paymentTitle}</h2>
+                <p className="text-sm" style={{ color: "var(--mc-muted)" }}>{t.paymentDescription}</p>
               </div>
-              <div className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-[#06D6A0]/10 rounded-lg">
-                <span className="text-2xl font-bold text-[#06D6A0]">{t.paymentAmount}</span>
+              <div className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg" style={{ background: "var(--mc-primary-soft)" }}>
+                <span className="mc-display text-2xl" style={{ color: "var(--mc-primary)" }}>{t.paymentAmount}</span>
               </div>
             </div>
             <div className="space-y-5 p-8 pt-4">
-              <div className="grid grid-cols-3 gap-3 p-3 bg-gray-100 rounded-lg">
-                <div className="text-center space-y-1">
-                  <CheckCircle className="h-4 w-4 text-[#06D6A0] mx-auto" />
-                  <p className="text-xs text-gray-600">
-                    {language === "fr" ? "Accès immédiat" : "Instant access"}
-                  </p>
-                </div>
-                <div className="text-center space-y-1">
-                  <CheckCircle className="h-4 w-4 text-[#06D6A0] mx-auto" />
-                  <p className="text-xs text-gray-600">
-                    {language === "fr" ? "Toutes les subventions" : "All grants"}
-                  </p>
-                </div>
-                <div className="text-center space-y-1">
-                  <CheckCircle className="h-4 w-4 text-[#06D6A0] mx-auto" />
-                  <p className="text-xs text-gray-600">
-                    {language === "fr" ? "Paiement sécurisé" : "Secure payment"}
-                  </p>
-                </div>
+              <div className="grid grid-cols-3 gap-3 p-3 mc-card-soft">
+                {[
+                  language === "fr" ? "Accès immédiat" : "Instant access",
+                  language === "fr" ? "Toutes les subventions" : "All grants",
+                  language === "fr" ? "Paiement sécurisé" : "Secure payment",
+                ].map((t, i) => (
+                  <div key={i} className="text-center space-y-1">
+                    <CheckCircle className="w-3.5 h-3.5 mx-auto" style={{ color: "var(--mc-primary)" }} />
+                    <p className="text-xs" style={{ color: "var(--mc-muted)" }}>{t}</p>
+                  </div>
+                ))}
               </div>
 
-              <Elements stripe={getStripePromise()} options={{ clientSecret }}>
+              <Elements stripe={getStripePromise()} options={{ clientSecret, appearance: { theme: "night", variables: { colorPrimary: "#06D6A0", colorBackground: "#0A0A0A", colorText: "#F5F5F6", colorDanger: "#EF476F", borderRadius: "10px", fontFamily: "Inter, system-ui, sans-serif" } } }}>
                 <CheckoutForm sessionId={sessionId} />
               </Elements>
             </div>

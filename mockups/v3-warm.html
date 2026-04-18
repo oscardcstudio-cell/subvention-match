@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V3 — Warm Editorial</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F5EFE6;
+    --paper:#FAF5EC;
+    --ink:#2B1810;
+    --ink-soft:#6B4E3D;
+    --rule:#D9CEBE;
+    --accent:#B8341E;
+    --moss:#5C6B3F;
+  }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--ink); }
+  .serif { font-family:'Instrument Serif', serif; font-weight: 400; letter-spacing:-0.01em; }
+  .rule { border-color: var(--rule); }
+  .chip { border:1px solid var(--rule); border-radius:99px; }
+  .fade-in { opacity:0; transform: translateY(12px); transition: opacity .8s ease, transform .8s ease; }
+  .fade-in.in { opacity:1; transform:none; }
+  .underline-ink { background: linear-gradient(var(--ink),var(--ink)) bottom/ 100% 1px no-repeat; }
+  .grain {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 25% 10%, rgba(184,52,30,0.05), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(92,107,63,0.05), transparent 40%);
+  }
+  .marquee {
+    display:flex; gap:3rem; animation: scroll 40s linear infinite;
+  }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+</style>
+</head>
+<body class="grain">
+
+<!-- NAV -->
+<header class="border-b rule">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <span class="serif text-2xl italic">Mécène</span>
+      <span class="text-xs text-[color:var(--ink-soft)] tracking-widest uppercase border-l rule pl-3">Paris · Est. 2026</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#" class="hover:underline-ink">Méthode</a>
+      <a href="#" class="hover:underline-ink">Répertoire</a>
+      <a href="#" class="hover:underline-ink">Journal</a>
+      <a href="#" class="hover:underline-ink">Tarifs</a>
+    </nav>
+    <a href="#cta" class="text-sm border rule px-4 py-2 rounded-full hover:bg-[color:var(--ink)] hover:text-[color:var(--bg)] transition">Commencer →</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="max-w-6xl mx-auto px-6 pt-20 pb-24">
+  <div class="flex items-start justify-between text-xs uppercase tracking-[0.25em] text-[color:var(--ink-soft)] mb-10">
+    <span>№ 001 — Printemps 2026</span>
+    <span>Le matching, mais humaniste</span>
+  </div>
+  <h1 class="serif text-[88px] md:text-[128px] leading-[0.92] fade-in">
+    Le mécénat<br><em>moderne</em><span class="text-[color:var(--accent)]">.</span>
+  </h1>
+  <div class="mt-12 grid md:grid-cols-12 gap-10 fade-in">
+    <div class="md:col-span-5 md:col-start-8">
+      <p class="text-lg leading-relaxed text-[color:var(--ink-soft)]">
+        Un entretien de quatre minutes. Quatre cent soixante-dix dispositifs
+        scrutés. Un rapport qui lit votre projet comme un lecteur le ferait,
+        pas comme un administratif.
+      </p>
+      <div class="mt-8 flex items-center gap-4">
+        <a href="#cta" class="bg-[color:var(--ink)] text-[color:var(--bg)] px-6 py-3 rounded-full text-sm hover:bg-[color:var(--accent)] transition">
+          Commencer le diagnostic
+        </a>
+        <a href="#" class="text-sm underline-ink">un extrait →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<section class="border-y rule bg-[color:var(--paper)] overflow-hidden py-5">
+  <div class="marquee serif text-xl italic text-[color:var(--ink-soft)] whitespace-nowrap">
+    <span>CNC</span><span>·</span><span>CNM</span><span>·</span><span>DRAC</span><span>·</span><span>ADAMI</span><span>·</span><span>SACEM</span><span>·</span><span>SPEDIDAM</span><span>·</span><span>CNL</span><span>·</span><span>Institut Français</span><span>·</span><span>Europe Créative</span><span>·</span><span>Fondation de France</span><span>·</span>
+    <span>CNC</span><span>·</span><span>CNM</span><span>·</span><span>DRAC</span><span>·</span><span>ADAMI</span><span>·</span><span>SACEM</span><span>·</span><span>SPEDIDAM</span><span>·</span><span>CNL</span><span>·</span><span>Institut Français</span><span>·</span><span>Europe Créative</span><span>·</span><span>Fondation de France</span><span>·</span>
+  </div>
+</section>
+
+<!-- EDITORIAL INTRO -->
+<section class="max-w-4xl mx-auto px-6 py-28">
+  <div class="text-xs uppercase tracking-[0.25em] text-[color:var(--accent)] mb-6">Note de la rédaction</div>
+  <p class="serif text-3xl md:text-4xl leading-[1.3] fade-in">
+    Pendant des années, chercher une subvention revenait à lire
+    des PDFs de vingt pages rédigés pour des fonctionnaires. Nous avons
+    pensé qu'une autre grammaire était possible. <em class="text-[color:var(--accent)]">Plus proche
+    de l'œuvre, plus loin de la bureaucratie.</em>
+  </p>
+  <div class="mt-10 flex items-center gap-4">
+    <div class="w-10 h-10 rounded-full bg-[color:var(--ink-soft)]/30"></div>
+    <div>
+      <div class="text-sm font-medium">Oscar D.C.</div>
+      <div class="text-xs text-[color:var(--ink-soft)]">Fondateur</div>
+    </div>
+  </div>
+</section>
+
+<!-- COLUMNS: How it works -->
+<section class="max-w-6xl mx-auto px-6 pb-24">
+  <div class="border-t rule pt-12 mb-12 flex justify-between items-end">
+    <h2 class="serif text-5xl">La méthode.</h2>
+    <div class="text-xs uppercase tracking-widest text-[color:var(--ink-soft)]">Trois mouvements</div>
+  </div>
+  <div class="grid md:grid-cols-3 gap-12">
+    <div class="fade-in border-t-2 border-[color:var(--ink)] pt-6">
+      <div class="serif text-5xl italic leading-none mb-4">i.</div>
+      <div class="serif text-2xl mb-3">L'entretien</div>
+      <p class="text-sm text-[color:var(--ink-soft)] leading-relaxed">
+        Un formulaire conversationnel, rédigé par une éditrice, pas un
+        ingénieur. Nous ne demandons jamais deux fois la même chose.
+      </p>
+    </div>
+    <div class="fade-in border-t-2 border-[color:var(--accent)] pt-6">
+      <div class="serif text-5xl italic leading-none mb-4">ii.</div>
+      <div class="serif text-2xl mb-3">La lecture</div>
+      <p class="text-sm text-[color:var(--ink-soft)] leading-relaxed">
+        Quatre cent soixante-dix dispositifs sont croisés avec votre
+        projet. Les hors-sujets sont écartés — un poète ne reçoit pas
+        d'aide au mobilier.
+      </p>
+    </div>
+    <div class="fade-in border-t-2 border-[color:var(--moss)] pt-6">
+      <div class="serif text-5xl italic leading-none mb-4">iii.</div>
+      <div class="serif text-2xl mb-3">Le rapport</div>
+      <p class="text-sm text-[color:var(--ink-soft)] leading-relaxed">
+        Un PDF de six pages. Dix subventions classées, deadlines,
+        conseils de dépôt, estimation sincère de vos chances.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- PULL QUOTE -->
+<section class="border-y rule bg-[color:var(--paper)]">
+  <div class="max-w-4xl mx-auto px-6 py-28 relative">
+    <div class="serif italic text-[160px] leading-none text-[color:var(--accent)] absolute -top-6 left-0 opacity-20 select-none">"</div>
+    <blockquote class="serif italic text-3xl md:text-4xl leading-snug relative">
+      La première fois qu'un outil comprend la différence entre
+      un projet d'auteur et une demande de guichet.
+    </blockquote>
+    <div class="mt-8 flex items-center gap-3 text-sm text-[color:var(--ink-soft)]">
+      <div class="w-px h-8 bg-[color:var(--ink)]"></div>
+      <div>
+        <div class="font-medium text-[color:var(--ink)]">Anne L.</div>
+        <div>Réalisatrice — Marseille</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TWO COLS: REPERTOIRE + TARIFS -->
+<section class="max-w-6xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-16">
+  <div>
+    <div class="text-xs uppercase tracking-widest text-[color:var(--ink-soft)] mb-3">Le répertoire</div>
+    <h3 class="serif text-4xl leading-tight mb-5">470 dispositifs,<br>tenus à jour.</h3>
+    <ul class="space-y-3 text-sm">
+      <li class="flex justify-between border-b rule py-2"><span>Arts visuels</span><span class="text-[color:var(--ink-soft)]">62</span></li>
+      <li class="flex justify-between border-b rule py-2"><span>Musique</span><span class="text-[color:var(--ink-soft)]">84</span></li>
+      <li class="flex justify-between border-b rule py-2"><span>Cinéma & audiovisuel</span><span class="text-[color:var(--ink-soft)]">97</span></li>
+      <li class="flex justify-between border-b rule py-2"><span>Livre & édition</span><span class="text-[color:var(--ink-soft)]">53</span></li>
+      <li class="flex justify-between border-b rule py-2"><span>Spectacle vivant</span><span class="text-[color:var(--ink-soft)]">78</span></li>
+      <li class="flex justify-between py-2"><span>Transversal · pluridisciplinaire</span><span class="text-[color:var(--ink-soft)]">96</span></li>
+    </ul>
+  </div>
+
+  <div>
+    <div class="text-xs uppercase tracking-widest text-[color:var(--ink-soft)] mb-3">Tarifs</div>
+    <h3 class="serif text-4xl leading-tight mb-5">Gratuit<br>pendant la beta.</h3>
+    <div class="border rule rounded-2xl p-8 bg-[color:var(--paper)]">
+      <div class="flex items-baseline gap-2">
+        <span class="serif text-6xl">0€</span>
+        <span class="text-sm text-[color:var(--ink-soft)]">/ diagnostic</span>
+      </div>
+      <ul class="mt-6 space-y-3 text-sm text-[color:var(--ink-soft)]">
+        <li class="flex gap-3"><span class="text-[color:var(--accent)]">✓</span> Diagnostic complet par IA</li>
+        <li class="flex gap-3"><span class="text-[color:var(--accent)]">✓</span> Rapport PDF téléchargeable</li>
+        <li class="flex gap-3"><span class="text-[color:var(--accent)]">✓</span> Conseils personnalisés par domaine</li>
+        <li class="flex gap-3"><span class="text-[color:var(--accent)]">✓</span> Pas de compte ni CB requise</li>
+      </ul>
+      <a href="#cta" class="inline-block mt-8 bg-[color:var(--ink)] text-[color:var(--bg)] px-5 py-3 rounded-full text-sm hover:bg-[color:var(--accent)] transition">Rejoindre la beta</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="border-t rule">
+  <div class="max-w-4xl mx-auto px-6 py-32 text-center">
+    <div class="text-xs uppercase tracking-[0.25em] text-[color:var(--accent)] mb-6">Fin de la colonne</div>
+    <h2 class="serif text-6xl md:text-8xl leading-[0.95]">Votre prochain<br><em>chapitre</em> commence ici.</h2>
+    <a href="#" class="inline-block mt-12 bg-[color:var(--ink)] text-[color:var(--bg)] px-8 py-4 rounded-full hover:bg-[color:var(--accent)] transition">
+      Lancer le diagnostic →
+    </a>
+  </div>
+</section>
+
+<footer class="border-t rule text-xs text-[color:var(--ink-soft)]">
+  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mécène · Imprimé à Paris · ISSN 0000-0000</span>
+    <span class="flex gap-6"><a href="#" class="underline-ink">Mentions</a><a href="#" class="underline-ink">Contact</a><a href="#" class="underline-ink">RSS</a></span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), { threshold: .15 });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

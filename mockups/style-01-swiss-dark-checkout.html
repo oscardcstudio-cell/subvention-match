@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Débloquer — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_theme-dark.css" />
+<style>
+  .plan { transition:all .2s ease; cursor:pointer; }
+  .plan:hover { border-color:var(--primary); }
+  .plan.selected { border-color:var(--primary); background:var(--primary-soft); }
+  .plan.selected .radio::after { content:''; position:absolute; inset:4px; background:var(--primary); border-radius:999px; }
+  .radio { width:16px; height:16px; border-radius:999px; border:2px solid var(--muted); flex-shrink:0; position:relative; }
+  .plan.selected .radio { border-color:var(--primary); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2s8 4 8 10c0 6-8 10-8 10s-8-4-8-10c0-6 8-10 8-10z"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+</defs></svg>
+
+<div class="text-center text-xs py-2 px-4 mono" style="background:#FFD166;color:#0A0A0A;">
+  [ APRÈS-BETA ] &nbsp;&nbsp; Aperçu V1 — pendant la beta, tout reste gratuit.
+</div>
+
+<header class="section-rule">
+  <div class="max-w-6xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="style-01-swiss-dark.html" class="display text-lg">Mecene<span style="color:var(--primary)">.</span></a>
+    <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex items-center gap-2">
+      <svg class="icon-sm"><use href="#i-shield"/></svg>
+      Paiement sécurisé · Stripe
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="max-w-6xl mx-auto px-8 py-16 grid grid-cols-12 gap-8">
+
+    <!-- Left: Plans -->
+    <div class="col-span-12 md:col-span-7">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-10">/ Débloquer votre rapport</div>
+      <h1 class="display text-5xl md:text-6xl">
+        5 MATCHES<br>
+        VOUS ATTENDENT<span style="color:var(--primary)">.</span>
+      </h1>
+      <p class="mt-6 text-[color:var(--muted)] max-w-md leading-relaxed">
+        Le premier résultat est visible gratuitement. Pour tout voir — critères détaillés,
+        deadlines précises, conseils de dépôt, PDF téléchargeable — choisissez une formule.
+      </p>
+
+      <!-- Plans -->
+      <div class="mt-12 space-y-3">
+        <div class="card plan p-6" onclick="selectPlan(this,'one')">
+          <div class="flex items-start gap-4">
+            <div class="radio"></div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1">Un diagnostic</div>
+                  <h3 class="display text-2xl">À L'UNITÉ</h3>
+                </div>
+                <div class="text-right">
+                  <div class="display text-3xl">9 €</div>
+                  <div class="text-xs text-[color:var(--muted)] mono">Paiement unique</div>
+                </div>
+              </div>
+              <ul class="mt-4 grid sm:grid-cols-2 gap-2 text-sm text-[color:var(--muted)]">
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Tous vos matches débloqués</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Rapport PDF complet</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Conseils personnalisés</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Partage équipe illimité</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card plan p-6 selected" onclick="selectPlan(this,'annual')" style="border-color:var(--primary);background:var(--primary-soft)">
+          <div class="absolute" style="position:relative">
+            <span class="absolute -top-3 left-6 chip chip-primary mono text-[10px]">Recommandé · économisez 68 %</span>
+          </div>
+          <div class="flex items-start gap-4 mt-2">
+            <div class="radio"></div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Diagnostics illimités pendant 12 mois</div>
+                  <h3 class="display text-2xl">ABONNEMENT ANNUEL</h3>
+                </div>
+                <div class="text-right">
+                  <div class="display text-3xl">34 €<span class="text-lg text-[color:var(--muted)]">/an</span></div>
+                  <div class="text-xs text-[color:var(--muted)] mono">~ 2,83 € / mois</div>
+                </div>
+              </div>
+              <ul class="mt-4 grid sm:grid-cols-2 gap-2 text-sm text-[color:var(--muted)]">
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Diagnostics illimités</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Alertes deadlines par email</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Historique &amp; comparatifs</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Prio sur nouvelles features</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Accès carnet d'adresses V1</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Résiliable à tout moment</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card plan p-6" onclick="selectPlan(this,'compagnie')">
+          <div class="flex items-start gap-4">
+            <div class="radio"></div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1">Compagnie / collectif / label</div>
+                  <h3 class="display text-2xl">ÉQUIPE</h3>
+                </div>
+                <div class="text-right">
+                  <div class="display text-3xl">149 €<span class="text-lg text-[color:var(--muted)]">/an</span></div>
+                  <div class="text-xs text-[color:var(--muted)] mono">Jusqu'à 5 profils</div>
+                </div>
+              </div>
+              <ul class="mt-4 grid sm:grid-cols-2 gap-2 text-sm text-[color:var(--muted)]">
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Tout l'annuel ×5</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Support email prio</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>Facture avec n° TVA</li>
+                <li class="flex items-center gap-2"><svg class="icon-sm text-[color:var(--primary)]"><use href="#i-check"/></svg>API clé (bêta)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Beta banner -->
+      <div class="mt-8 card-soft p-4 flex items-start gap-3">
+        <svg class="icon text-[color:var(--warn)] mt-0.5"><use href="#i-lock"/></svg>
+        <div>
+          <div class="font-medium mb-1">Vous êtes en beta.</div>
+          <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+            Tant que la beta est active, tout est gratuit. Cette page est un aperçu de la V1.
+            Les beta-testeurs inscrits sur la waitlist auront <strong class="text-[color:var(--warn)]">-40 %</strong>
+            à vie sur l'annuel.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Order summary -->
+    <div class="col-span-12 md:col-span-5">
+      <div class="card p-6 sticky top-6">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-4">Récapitulatif</div>
+
+        <div class="flex justify-between items-baseline mb-4">
+          <div>
+            <div class="font-medium">Abonnement annuel</div>
+            <div class="text-xs text-[color:var(--muted)]">Diagnostics illimités · 12 mois</div>
+          </div>
+          <div class="display text-2xl">34,00 €</div>
+        </div>
+
+        <div class="border-t pt-4 mt-4 space-y-2" style="border-color:var(--border)">
+          <div class="flex justify-between text-sm text-[color:var(--muted)]">
+            <span>Sous-total</span><span>34,00 €</span>
+          </div>
+          <div class="flex justify-between text-sm text-[color:var(--muted)]">
+            <span>TVA 20 %</span><span>6,80 €</span>
+          </div>
+          <div class="flex justify-between text-sm items-baseline">
+            <span class="text-[color:var(--primary)] mono text-[10px] uppercase tracking-widest">Code BETA40</span>
+            <span class="text-[color:var(--primary)]">−13,60 €</span>
+          </div>
+        </div>
+
+        <div class="border-t pt-4 mt-4 flex justify-between items-baseline" style="border-color:var(--border)">
+          <div class="mono text-xs uppercase tracking-widest">Total TTC</div>
+          <div class="display text-3xl">27,20 €</div>
+        </div>
+
+        <!-- Form -->
+        <div class="mt-6 space-y-3">
+          <div>
+            <label class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-2 block">Email</label>
+            <input type="email" placeholder="votre@email.com" value="oscar@exemple.com"/>
+          </div>
+          <div>
+            <label class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-2 block inline-flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-card"/></svg> Carte bancaire
+            </label>
+            <input type="text" placeholder="1234 1234 1234 1234" value="4242 4242 4242 4242"/>
+            <div class="grid grid-cols-2 gap-3 mt-3">
+              <input type="text" placeholder="MM/AA" value="12/27"/>
+              <input type="text" placeholder="CVC" value="123"/>
+            </div>
+          </div>
+          <button class="btn-primary w-full py-4 rounded-full mono text-sm uppercase tracking-widest inline-flex items-center justify-center gap-2 mt-2">
+            Payer 27,20 € <svg class="icon-sm"><use href="#i-arrow-right"/></svg>
+          </button>
+          <div class="text-center">
+            <div class="text-xs text-[color:var(--muted-2)] mono inline-flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-shield"/></svg>
+              Paiement chiffré · Stripe · Sans abonnement caché
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-rule">
+  <div class="max-w-4xl mx-auto px-8 py-20">
+    <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-6">/ FAQ</div>
+    <h2 class="display text-4xl mb-10">QUESTIONS FRÉQUENTES.</h2>
+    <div class="divide-border">
+      <details class="py-5 group">
+        <summary class="flex justify-between items-center cursor-pointer font-semibold">
+          Pourquoi payer si les subventions sont publiques ?
+          <span class="mono text-xl text-[color:var(--muted)] group-open:rotate-45 transition">+</span>
+        </summary>
+        <p class="mt-3 text-sm text-[color:var(--muted)] leading-relaxed">
+          Parce qu'il y en a 473, que la plupart ne vous concernent pas, et qu'il faudrait
+          lire des centaines de pages pour démêler laquelle vous correspond. On fait ce travail
+          à votre place — c'est ça qu'on vous vend, pas l'accès aux subventions elles-mêmes.
+        </p>
+      </details>
+      <details class="py-5 group">
+        <summary class="flex justify-between items-center cursor-pointer font-semibold">
+          Puis-je résilier à tout moment ?
+          <span class="mono text-xl text-[color:var(--muted)] group-open:rotate-45 transition">+</span>
+        </summary>
+        <p class="mt-3 text-sm text-[color:var(--muted)] leading-relaxed">
+          Oui. L'abonnement annuel est résiliable à tout moment depuis votre espace — aucun
+          frais, aucun préavis. Vous gardez l'accès jusqu'à la fin de la période payée.
+        </p>
+      </details>
+      <details class="py-5 group">
+        <summary class="flex justify-between items-center cursor-pointer font-semibold">
+          Êtes-vous compatible avec un compte structure / association ?
+          <span class="mono text-xl text-[color:var(--muted)] group-open:rotate-45 transition">+</span>
+        </summary>
+        <p class="mt-3 text-sm text-[color:var(--muted)] leading-relaxed">
+          Oui. Factures téléchargeables avec numéro TVA intracommunautaire, paiement par
+          virement possible (plans Équipe et +). Écrivez à contact@mecene.app pour un devis.
+        </p>
+      </details>
+      <details class="py-5 group">
+        <summary class="flex justify-between items-center cursor-pointer font-semibold">
+          La V1 sort quand ?
+          <span class="mono text-xl text-[color:var(--muted)] group-open:rotate-45 transition">+</span>
+        </summary>
+        <p class="mt-3 text-sm text-[color:var(--muted)] leading-relaxed">
+          Quand le matching atteint 80 % de résultats vraiment pertinents sur notre panel
+          beta. On vise courant été 2026 — mais pas de date gravée dans le marbre. Qualité
+          avant calendrier.
+        </p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-8 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene</span>
+    <span class="flex flex-wrap gap-4 md:gap-6">
+      <a href="style-01-swiss-dark-legal.html" class="hover:text-white">CGV</a>
+      <a href="style-01-swiss-dark-legal.html" class="hover:text-white">Confidentialité</a>
+      <a href="#" class="hover:text-white">Contact</a>
+    </span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const on = b.dataset.fb === active;
+      b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+      b.style.background = on ? 'var(--primary-soft)' : '';
+      b.style.color = on ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

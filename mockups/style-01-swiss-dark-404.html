@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>404 — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_theme-dark.css" />
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+</defs></svg>
+
+<header class="section-rule">
+  <div class="max-w-6xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="style-01-swiss-dark.html" class="display text-lg">Mecene<span style="color:var(--primary)">.</span></a>
+    <nav class="hidden md:flex items-center gap-6 mono text-xs uppercase tracking-widest text-[color:var(--muted)]">
+      <a href="style-01-swiss-dark.html" class="hover:text-white">Accueil</a>
+      <a href="style-01-swiss-dark-form.html" class="hover:text-white">Démarrer</a>
+    </nav>
+  </div>
+</header>
+
+<section class="min-h-[calc(100vh-200px)] flex items-center">
+  <div class="max-w-6xl mx-auto px-8 w-full grid grid-cols-12 gap-8 items-center py-20">
+
+    <div class="col-span-12 md:col-span-7">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-10">/ Erreur 404</div>
+      <h1 class="display text-[128px] md:text-[200px]" style="line-height:.82">
+        404<span style="color:var(--primary)">.</span>
+      </h1>
+      <h2 class="display text-3xl md:text-4xl mt-6">
+        CETTE PAGE<br>A DISPARU DU RADAR.
+      </h2>
+      <p class="mt-6 text-[color:var(--muted)] max-w-md leading-relaxed">
+        Pas de panique. Soit le lien est cassé, soit la page a été déplacée, soit on a
+        supprimé quelque chose qui ne servait pas. Les subventions, elles, sont toujours là.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="style-01-swiss-dark.html" class="btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-full mono text-xs uppercase tracking-widest">
+          Retour à l'accueil <svg class="icon-sm"><use href="#i-arrow-right"/></svg>
+        </a>
+        <a href="style-01-swiss-dark-form.html" class="btn-ghost inline-flex items-center gap-2 px-5 py-3 rounded-full mono text-xs uppercase tracking-widest">
+          Lancer un diagnostic
+        </a>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-5">
+      <div class="card p-6">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-4">Peut-être cherchiez-vous</div>
+        <ul class="divide-border">
+          <li class="py-3">
+            <a href="style-01-swiss-dark.html" class="flex items-center justify-between group hover:text-[color:var(--primary)]">
+              <span>La page d'accueil</span>
+              <svg class="icon-sm text-[color:var(--muted)] group-hover:text-[color:var(--primary)]"><use href="#i-arrow-right"/></svg>
+            </a>
+          </li>
+          <li class="py-3">
+            <a href="style-01-swiss-dark-form.html" class="flex items-center justify-between group hover:text-[color:var(--primary)]">
+              <span>Le formulaire de matching</span>
+              <svg class="icon-sm text-[color:var(--muted)] group-hover:text-[color:var(--primary)]"><use href="#i-arrow-right"/></svg>
+            </a>
+          </li>
+          <li class="py-3">
+            <a href="style-01-swiss-dark-results.html" class="flex items-center justify-between group hover:text-[color:var(--primary)]">
+              <span>Un exemple de résultats</span>
+              <svg class="icon-sm text-[color:var(--muted)] group-hover:text-[color:var(--primary)]"><use href="#i-arrow-right"/></svg>
+            </a>
+          </li>
+          <li class="py-3">
+            <a href="style-01-swiss-dark-stats.html" class="flex items-center justify-between group hover:text-[color:var(--primary)]">
+              <span>Les statistiques de la base</span>
+              <svg class="icon-sm text-[color:var(--muted)] group-hover:text-[color:var(--primary)]"><use href="#i-arrow-right"/></svg>
+            </a>
+          </li>
+          <li class="py-3">
+            <a href="style-01-swiss-dark-legal.html" class="flex items-center justify-between group hover:text-[color:var(--primary)]">
+              <span>Les mentions légales</span>
+              <svg class="icon-sm text-[color:var(--muted)] group-hover:text-[color:var(--primary)]"><use href="#i-arrow-right"/></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-8 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene</span>
+    <span>Si le lien vient d'un email à nous, signalez-nous l'erreur via le feedback.</span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const on = b.dataset.fb === active;
+      b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+      b.style.background = on ? 'var(--primary-soft)' : '';
+      b.style.color = on ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V2 — Minimal Tool</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0A0A0B;
+    --surface:#101013;
+    --border:#1F1F23;
+    --text:#F4F4F5;
+    --muted:#8E8E93;
+    --accent:#C4B5FD;
+    --green:#34D399;
+  }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing: antialiased; }
+  .mono { font-family:'JetBrains Mono', monospace; }
+  .grid-bg {
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .btn-primary { background: var(--text); color: var(--bg); transition: transform .15s ease, background .15s ease; }
+  .btn-primary:hover { transform: translateY(-1px); background: #fff; }
+  .card { background: var(--surface); border:1px solid var(--border); transition: border-color .2s ease, transform .2s ease; }
+  .card:hover { border-color:#2E2E36; transform: translateY(-2px); }
+  .dot { width:8px; height:8px; border-radius:99px; background: var(--green); box-shadow: 0 0 0 4px rgba(52,211,153,.15); animation: pulse 2s ease infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(52,211,153,0); } }
+  .divider-soft { background: linear-gradient(90deg, transparent, var(--border), transparent); height:1px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="sticky top-0 z-40 bg-[color:var(--bg)]/80 backdrop-blur border-b border-[color:var(--border)]">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2 font-semibold tracking-tight">
+      <div class="w-5 h-5 rounded-md bg-gradient-to-br from-violet-300 to-violet-500"></div>
+      Mécène<span class="text-[color:var(--muted)] font-normal">.app</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-sm text-[color:var(--muted)]">
+      <a href="#" class="hover:text-white transition">Product</a>
+      <a href="#" class="hover:text-white transition">Data</a>
+      <a href="#" class="hover:text-white transition">Pricing</a>
+      <a href="#" class="hover:text-white transition">Changelog</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a href="#" class="text-sm text-[color:var(--muted)] hover:text-white">Sign in</a>
+      <a href="#cta" class="btn-primary text-sm px-4 py-2 rounded-md">Get started</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="relative">
+  <div class="absolute inset-0 grid-bg opacity-60"></div>
+  <div class="max-w-4xl mx-auto px-6 py-32 md:py-40 text-center relative">
+    <div class="inline-flex items-center gap-2 text-xs border border-[color:var(--border)] rounded-full px-3 py-1 mb-8 mono text-[color:var(--muted)]">
+      <span class="dot"></span> v0.9 — beta publique
+    </div>
+    <h1 class="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
+      Le moteur de subventions<br>
+      <span class="text-[color:var(--muted)]">pensé comme un outil.</span>
+    </h1>
+    <p class="mt-6 max-w-xl mx-auto text-[color:var(--muted)] text-lg">
+      Une interview. 470 dispositifs croisés. Un rapport signé IA
+      qui vous dit où postuler, comment et avec quelles chances.
+    </p>
+    <div class="mt-10 flex items-center justify-center gap-3">
+      <a href="#cta" class="btn-primary px-5 py-3 rounded-md font-medium">Lancer le diagnostic</a>
+      <a href="#" class="px-5 py-3 rounded-md border border-[color:var(--border)] hover:border-[color:var(--muted)] text-sm">Voir une demo →</a>
+    </div>
+    <div class="mt-14 text-xs mono text-[color:var(--muted)]">⌘ + K pour lancer · ⎋ pour fermer · ↑↓ pour naviguer</div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="border-y border-[color:var(--border)]">
+  <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-[color:var(--border)] text-center">
+    <div class="p-8"><div class="text-3xl font-semibold">470</div><div class="text-xs mono text-[color:var(--muted)] mt-1">dispositifs</div></div>
+    <div class="p-8"><div class="text-3xl font-semibold">241</div><div class="text-xs mono text-[color:var(--muted)] mt-1">actifs ce mois</div></div>
+    <div class="p-8"><div class="text-3xl font-semibold">4<span class="text-[color:var(--muted)]">m</span></div><div class="text-xs mono text-[color:var(--muted)] mt-1">temps moyen</div></div>
+    <div class="p-8"><div class="text-3xl font-semibold">0<span class="text-[color:var(--muted)]">€</span></div><div class="text-xs mono text-[color:var(--muted)] mt-1">en beta</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="max-w-6xl mx-auto px-6 py-28">
+  <div class="max-w-xl mb-14">
+    <div class="text-xs mono text-[color:var(--accent)] mb-3">01 · Pipeline</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">Un matching précis, pas générique.</h2>
+    <p class="text-[color:var(--muted)] mt-4">Quatre passes : filtre deadline, quality gate, sélection LLM, enrichissement à la volée. Chaque résultat est tracé.</p>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="card p-6 rounded-xl">
+      <div class="mono text-[11px] text-[color:var(--accent)] mb-4">QUALITY GATE</div>
+      <div class="font-medium mb-2">Score 0–100, seuil 60</div>
+      <p class="text-sm text-[color:var(--muted)]">Les dispositifs incomplets, flous ou hors-sujet sont écartés avant même l'appel au modèle.</p>
+      <div class="divider-soft my-5"></div>
+      <div class="flex items-center gap-2 text-xs mono text-[color:var(--muted)]"><span class="dot"></span> 241 grants passent le gate</div>
+    </div>
+    <div class="card p-6 rounded-xl">
+      <div class="mono text-[11px] text-[color:var(--accent)] mb-4">LLM MATCHING</div>
+      <div class="font-medium mb-2">DeepSeek via OpenRouter</div>
+      <p class="text-sm text-[color:var(--muted)]">Top 10 par pertinence sectorielle stricte. Jamais de reco hors-domaine.</p>
+      <div class="divider-soft my-5"></div>
+      <div class="flex gap-1.5">
+        <div class="h-1 flex-1 bg-violet-300/80 rounded-full"></div>
+        <div class="h-1 flex-1 bg-violet-300/60 rounded-full"></div>
+        <div class="h-1 flex-1 bg-violet-300/40 rounded-full"></div>
+        <div class="h-1 flex-1 bg-violet-300/20 rounded-full"></div>
+        <div class="h-1 flex-1 bg-[color:var(--border)] rounded-full"></div>
+      </div>
+    </div>
+    <div class="card p-6 rounded-xl">
+      <div class="mono text-[11px] text-[color:var(--accent)] mb-4">ENRICHMENT</div>
+      <div class="font-medium mb-2">Personnalisé par profil</div>
+      <p class="text-sm text-[color:var(--muted)]">Conseils d'approche, estimation de difficulté, deadlines pertinentes pour <em>vous</em>.</p>
+      <div class="divider-soft my-5"></div>
+      <div class="mono text-[11px] text-[color:var(--muted)]">avg. difficulty · 6.2/10</div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE PREVIEW -->
+<section class="max-w-6xl mx-auto px-6 pb-28">
+  <div class="card rounded-xl overflow-hidden">
+    <div class="flex items-center gap-2 px-4 py-2.5 border-b border-[color:var(--border)] bg-[#09090B]">
+      <div class="flex gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#3A3A40]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#3A3A40]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#3A3A40]"></span></div>
+      <div class="ml-3 text-xs mono text-[color:var(--muted)]">report · 2026-04-17.json</div>
+    </div>
+    <pre class="mono text-xs leading-relaxed p-6 overflow-x-auto text-[color:var(--text)]">
+<span class="text-[color:var(--muted)]">{</span>
+  "profile": <span class="text-violet-300">"auteur · documentaire · Île-de-France"</span>,
+  "matches": [
+    {
+      "grant":        <span class="text-violet-300">"CNC — Aide à l'écriture de documentaire"</span>,
+      "score":        <span class="text-emerald-300">92</span>,
+      "difficulty":   <span class="text-emerald-300">"modérée"</span>,
+      "deadline":     <span class="text-violet-300">"2026-06-15"</span>,
+      "fit_reason":   <span class="text-violet-300">"sujet éligible, budget cohérent"</span>
+    },
+    { "grant": <span class="text-violet-300">"SCAM — Brouillon d'un rêve"</span>, "score": <span class="text-emerald-300">87</span>, ... },
+    { "grant": <span class="text-violet-300">"DRAC IdF — Résidence"</span>,       "score": <span class="text-emerald-300">81</span>, ... }
+  ]
+<span class="text-[color:var(--muted)]">}</span>
+    </pre>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="max-w-3xl mx-auto px-6 py-32 text-center border-t border-[color:var(--border)]">
+  <div class="text-xs mono text-[color:var(--accent)] mb-4">› ready when you are</div>
+  <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">Essayez-le en 4 minutes.</h2>
+  <p class="text-[color:var(--muted)] mt-4">Gratuit pendant la beta. Aucune carte requise.</p>
+  <a href="#" class="btn-primary inline-block mt-10 px-6 py-3.5 rounded-md font-medium">Lancer le diagnostic →</a>
+</section>
+
+<footer class="border-t border-[color:var(--border)]">
+  <div class="max-w-6xl mx-auto px-6 py-8 flex flex-wrap justify-between gap-4 text-xs mono text-[color:var(--muted)]">
+    <span>© 2026 mecene.app</span>
+    <span class="flex gap-6"><a href="#" class="hover:text-white">github</a><a href="#" class="hover:text-white">status</a><a href="#" class="hover:text-white">legal</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

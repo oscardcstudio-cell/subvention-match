@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matching en cours — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_theme-dark.css" />
+<style>
+  .shimmer { background: linear-gradient(90deg, transparent 0%, rgba(6,214,160,.12) 50%, transparent 100%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .progress-track { position:relative; height:6px; background:var(--border); border-radius:999px; overflow:hidden; }
+  .progress-fill { position:absolute; inset:0 auto 0 0; background:var(--primary); border-radius:999px; transition: width .4s ease; width:0%; }
+  .pulse-dot { width:8px; height:8px; border-radius:999px; background:var(--primary); box-shadow:0 0 0 0 rgba(6,214,160,.6); animation: pulseDot 1.4s ease-out infinite; display:inline-block; }
+  @keyframes pulseDot { 0% { box-shadow:0 0 0 0 rgba(6,214,160,.6) } 100% { box-shadow:0 0 0 10px rgba(6,214,160,0) } }
+  .spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation: spin .8s linear infinite; display:inline-block; vertical-align:middle; }
+  .spinner-sm { width:10px; height:10px; border-width:1.5px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .grants-queue { overflow:hidden; height:232px; /* 4 rows × 58px */ }
+  .grants-queue-inner { animation: queueScroll 16s linear infinite; }
+  @keyframes queueScroll { to { transform: translateY(-50%); } }
+  .stage-row { transition: background .2s ease; }
+  .stage-row.active { background: var(--primary-soft); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-loader" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-database" viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M9 2v2M15 20v2M9 20v2M20 9h2M20 15h2M2 9h2M2 15h2"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2s8 4 8 10c0 6-8 10-8 10s-8-4-8-10c0-6 8-10 8-10z"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="8" cy="8" r="6"/><path d="M18.1 10.1c2.2 1 3.9 2.9 3.9 5.4 0 3.3-3.6 6-8 6-1.8 0-3.5-.5-4.9-1.3"/></symbol>
+<symbol id="i-drama" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 11h.01M14 7h.01M10 15a2 2 0 0 0 4 0"/><path d="M6 15s-2-1-2-5 1-5 4-5h8c3 0 4 1 4 5s-2 5-2 5"/><path d="M8 19a2 2 0 0 1 4 0 2 2 0 0 1 4 0"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></symbol>
+</defs></svg>
+
+<div class="text-center text-xs py-2 px-4 mono" style="background:#FFD166;color:#0A0A0A;">
+  [ BETA ] &nbsp;&nbsp; Le matching prend 10 à 20 secondes. Ne fermez pas cette page.
+</div>
+
+<header class="section-rule">
+  <div class="max-w-6xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="style-01-swiss-dark.html" class="display text-lg">Mecene<span style="color:var(--primary)">.</span></a>
+    <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex items-center gap-2">
+      <span class="pulse-dot"></span> Pipeline actif
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section>
+  <div class="max-w-7xl mx-auto px-8 py-16">
+    <div class="flex items-center gap-3 mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-8">
+      <svg class="icon animate-spin"><use href="#i-loader"/></svg>
+      Matching en cours
+      <span class="text-[color:var(--muted-2)]">·</span>
+      <span class="text-[color:var(--muted)]" id="elapsed">0.0 s écoulées</span>
+      <span class="text-[color:var(--muted-2)]">·</span>
+      <span class="text-[color:var(--muted)]" id="remaining">~ 16 s restantes</span>
+    </div>
+    <h1 class="display text-[64px] md:text-[92px]">
+      ON CROISE VOTRE PROFIL<br>
+      AVEC 473 AIDES<span style="color:var(--primary)">.</span>
+    </h1>
+
+    <!-- Master progress -->
+    <div class="mt-10 grid md:grid-cols-12 gap-6 items-end">
+      <div class="md:col-span-9">
+        <div class="flex items-baseline justify-between mb-3">
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]" id="master-stage">Étape 05 / 12 · Classement IA</div>
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)]"><span id="master-pct">0</span> %</div>
+        </div>
+        <div class="progress-track shimmer" style="height:12px">
+          <div class="progress-fill" id="master-fill"></div>
+        </div>
+      </div>
+      <div class="md:col-span-3 text-right">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)] mb-1">ETA</div>
+        <div class="display text-4xl"><span id="eta-value">00:16</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECT SUMMARY + KPIS -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-12 grid grid-cols-12 gap-6">
+
+    <!-- Project summary -->
+    <div class="col-span-12 md:col-span-7">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-4 flex items-center justify-between">
+        <span>/ On a bien compris votre projet ?</span>
+        <a href="style-01-swiss-dark-form.html" class="inline-flex items-center gap-1.5 text-[color:var(--accent)] hover:text-white">
+          <svg class="icon-sm"><use href="#i-edit"/></svg> Modifier
+        </a>
+      </div>
+      <div class="card p-6 md:p-8">
+        <div class="grid sm:grid-cols-2 gap-x-8 gap-y-5">
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1 flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-drama"/></svg> Profil
+            </div>
+            <div class="text-sm">Compagnie de théâtre contemporain</div>
+          </div>
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1 flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-sparkles"/></svg> Disciplines
+            </div>
+            <div class="text-sm">Spectacle vivant · Musique · Audiovisuel</div>
+          </div>
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1 flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-target"/></svg> Type de projet
+            </div>
+            <div class="text-sm">Création · Production · <span class="text-[color:var(--muted)]">(en cours)</span></div>
+          </div>
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1 flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-pin"/></svg> Localisation
+            </div>
+            <div class="text-sm">Lyon · Auvergne-Rhône-Alpes</div>
+          </div>
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1 flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-coins"/></svg> Budget
+            </div>
+            <div class="text-sm">25 000 € – 60 000 €</div>
+          </div>
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1 flex items-center gap-2">
+              <svg class="icon-sm"><use href="#i-globe"/></svg> International
+            </div>
+            <div class="text-sm">Tournée / coproduction envisagée</div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t" style="border-color:var(--border)">
+          <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-2">Description</div>
+          <p class="text-sm text-[color:var(--muted)] leading-relaxed italic">
+            « Je suis une compagnie de théâtre contemporain basée à Lyon. Nous préparons une création
+            sur la mémoire collective qui mêle théâtre, vidéo et musique live. »
+          </p>
+        </div>
+      </div>
+      <p class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)] mt-3">
+        Si quelque chose cloche, cliquez sur « Modifier » — le matching sera relancé.
+      </p>
+    </div>
+
+    <!-- KPIs compact -->
+    <div class="col-span-12 md:col-span-5">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-4 flex items-center gap-2">
+        <span class="pulse-dot"></span> Chiffres du matching en direct
+      </div>
+      <div class="card divide-border">
+        <div class="p-5 flex items-baseline justify-between">
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)]">Dispositifs scannés</div>
+            <div class="text-xs text-[color:var(--primary)] mt-1">✓ base complète</div>
+          </div>
+          <div class="display text-4xl">473</div>
+        </div>
+        <div class="p-5 flex items-baseline justify-between">
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)]">Passent le quality gate</div>
+            <div class="text-xs text-[color:var(--muted)] mt-1">Seuil 60 / 100</div>
+          </div>
+          <div class="display text-4xl">241</div>
+        </div>
+        <div class="p-5 flex items-baseline justify-between">
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)]">Candidats retenus</div>
+            <div class="text-xs text-[color:var(--muted)] mt-1">Filtre sectoriel appliqué</div>
+          </div>
+          <div class="display text-4xl">34</div>
+        </div>
+        <div class="p-5 flex items-baseline justify-between">
+          <div>
+            <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted)]">Matches trouvés</div>
+            <div class="text-xs text-[color:var(--primary)] mt-1" id="matches-label">top 5 en route…</div>
+          </div>
+          <div class="display text-4xl" style="color:var(--primary)" id="kpi-matches">0</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PIPELINE STAGES -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-12">
+    <div class="card divide-y" style="border-color:var(--border)">
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">01</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--primary)]"><use href="#i-database"/></svg>
+          <div class="text-sm">Chargement du profil</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--primary)]">✓ 0.1 s</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">02</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--primary)]"><use href="#i-globe"/></svg>
+          <div class="text-sm">Aides Territoires (API officielle)</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--primary)]">✓ 312 trouvés</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">03</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--primary)]"><use href="#i-globe"/></svg>
+          <div class="text-sm">Scrapers (CNM · ADAMI · DRAC ×12)</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--primary)]">✓ 161 trouvés</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">04</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--primary)]"><use href="#i-shield"/></svg>
+          <div class="text-sm">Quality gate (score 0–100)</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--primary)]">✓ 241 passent</div>
+      </div>
+      <div class="stage-row active p-4 grid grid-cols-12 gap-4 items-center" id="stage-active">
+        <div class="col-span-1 mono text-sm text-[color:var(--primary)]">05</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--primary)]"><use href="#i-cpu"/></svg>
+          <div class="text-sm">Classement IA (DeepSeek v3)</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"><div class="progress-fill shimmer" id="stage5-fill" style="width:42%"></div></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--primary)] flex items-center justify-end gap-2">
+          <span class="spinner spinner-sm"></span> <span id="stage5-pct">42</span> %
+        </div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">06</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-sparkles"/></svg>
+          <div class="text-sm">Enrichissement par IA (×10)</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">07</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-target"/></svg>
+          <div class="text-sm">Scoring personnalisé</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">08</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-zap"/></svg>
+          <div class="text-sm">Estimation de difficulté</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">09</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-database"/></svg>
+          <div class="text-sm">Cross-match deadlines</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">10</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-cpu"/></svg>
+          <div class="text-sm">Détection de cumul</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">11</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-file"/></svg>
+          <div class="text-sm">Génération du rapport</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+      <div class="stage-row p-4 grid grid-cols-12 gap-4 items-center opacity-60">
+        <div class="col-span-1 mono text-sm text-[color:var(--muted)]">12</div>
+        <div class="col-span-5 md:col-span-4 flex items-center gap-3">
+          <svg class="icon text-[color:var(--muted)]"><use href="#i-file"/></svg>
+          <div class="text-sm">Rendu PDF</div>
+        </div>
+        <div class="col-span-4 md:col-span-5"><div class="progress-track"></div></div>
+        <div class="col-span-2 text-right mono text-xs text-[color:var(--muted)]">en attente</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE CANDIDATES -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-12">
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 md:col-span-5">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-3 flex items-center gap-2">
+          <span class="pulse-dot"></span> Candidats en évaluation
+        </div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+          Chaque dispositif est évalué un par un. Ceux qui ne correspondent pas sont écartés,
+          les autres sont enrichis pour vous. Les top 5 apparaissent en temps réel dans vos résultats.
+        </p>
+      </div>
+      <div class="col-span-12 md:col-span-7">
+        <div class="card overflow-hidden">
+          <div class="grants-queue">
+            <div class="grants-queue-inner divide-border">
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">ADSV — Aides équipes indépendantes</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">Ministère de la Culture</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 92</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">DRAC ARA — Aide à la création</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">DRAC Auvergne-Rhône-Alpes</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 84</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">SCAM — Brouillon d'un rêve</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">SCAM</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 78</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">Ville de Lyon — Spectacle vivant</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">Ville de Lyon</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 71</span>
+              </div>
+              <!-- repeat for seamless loop -->
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">ADSV — Aides équipes indépendantes</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">Ministère de la Culture</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 92</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">DRAC ARA — Aide à la création</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">DRAC Auvergne-Rhône-Alpes</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 84</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">SCAM — Brouillon d'un rêve</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">SCAM</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 78</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="spinner spinner-sm"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm truncate">Ville de Lyon — Spectacle vivant</div>
+                    <div class="mono text-[10px] text-[color:var(--muted)]">Ville de Lyon</div>
+                  </div>
+                </div>
+                <span class="mono text-xs text-[color:var(--primary)]">✓ 71</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-12">
+    <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-5">Pendant que vous attendez</div>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="card p-5">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2">Le saviez-vous ?</div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+          La DRAC Auvergne-Rhône-Alpes instruit environ 800 dossiers par an et en finance un sur trois.
+          Un bon dossier change la donne.
+        </p>
+      </div>
+      <div class="card p-5">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2">Conseil de pro</div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+          Une subvention ne couvre jamais 100 % d'un budget. Prévoyez 30 à 50 % de cofinancement
+          (apport en nature, billetterie, coproduction).
+        </p>
+      </div>
+      <div class="card p-5">
+        <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2">Ressource</div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+          Le guide <em>« Monter un dossier ADSV »</em> est en cours de rédaction. On vous l'enverra
+          quand il sortira.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-6 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene</span>
+    <span>Résultats dans ~14 s. Ne fermez pas la page.</span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const on = b.dataset.fb === active;
+      b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+      b.style.background = on ? 'var(--primary-soft)' : '';
+      b.style.color = on ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mentions légales — Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_theme-dark.css" />
+<style>
+  .legal h2 { font-family:'Archivo',sans-serif; font-weight:800; letter-spacing:-0.02em; font-size:1.75rem; margin-top:3rem; margin-bottom:1rem; }
+  .legal h3 { font-weight:600; margin-top:2rem; margin-bottom:.5rem; font-size:1.05rem; color:var(--text); }
+  .legal p, .legal li { color:var(--muted); line-height:1.7; font-size:.95rem; }
+  .legal p + p { margin-top:.75rem; }
+  .legal ul { list-style:disc; padding-left:1.25rem; margin:.5rem 0; }
+  .legal a { color:var(--primary); }
+  .legal a:hover { text-decoration: underline; }
+  .legal strong { color:var(--text); font-weight:600; }
+  .tab { padding:.6rem 1.2rem; border:1px solid var(--border); border-radius:999px; font-size:.8rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.08em; transition:all .15s ease; cursor:pointer; }
+  .tab:hover { border-color:var(--primary); color:var(--primary); }
+  .tab.active { background:var(--primary); color:#0A0A0A; border-color:var(--primary); }
+  .panel { display:none; }
+  .panel.active { display:block; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+</defs></svg>
+
+<header class="section-rule">
+  <div class="max-w-6xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="style-01-swiss-dark.html" class="display text-lg">Mecene<span style="color:var(--primary)">.</span></a>
+    <nav class="hidden md:flex items-center gap-6 mono text-xs uppercase tracking-widest text-[color:var(--muted)]">
+      <a href="style-01-swiss-dark.html" class="hover:text-white">Accueil</a>
+      <a href="style-01-swiss-dark-form.html" class="hover:text-white">Démarrer</a>
+    </nav>
+  </div>
+</header>
+
+<section>
+  <div class="max-w-4xl mx-auto px-8 py-20">
+    <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-10">/ Mentions légales · CGV · Confidentialité</div>
+    <h1 class="display text-5xl md:text-7xl">INFORMATIONS<br>LÉGALES<span style="color:var(--primary)">.</span></h1>
+    <p class="mt-8 text-[color:var(--muted)] max-w-2xl leading-relaxed">
+      Dernière mise à jour : 17 avril 2026. Trois documents, une même intention : être clair,
+      court, honnête. Pas de jargon juridique là où un mot simple suffit.
+    </p>
+
+    <!-- Tabs -->
+    <div class="mt-12 flex flex-wrap gap-2">
+      <button class="tab active" data-tab="mentions">Mentions légales</button>
+      <button class="tab" data-tab="cgv">CGV</button>
+      <button class="tab" data-tab="privacy">Confidentialité</button>
+    </div>
+  </div>
+</section>
+
+<section class="legal">
+  <div class="max-w-4xl mx-auto px-8 pb-28">
+
+    <!-- MENTIONS -->
+    <div class="panel active" id="mentions">
+      <h2>Mentions légales</h2>
+
+      <h3>Éditeur du site</h3>
+      <p>
+        <strong>Mecene</strong> est édité par Oscar D.C. Studio, entrepreneur individuel immatriculé
+        au RCS de Paris sous le n° XXX XXX XXX. Siège social : Paris, France.
+        Directeur de la publication : Oscar D.C.
+      </p>
+
+      <h3>Contact</h3>
+      <p>
+        Email : <a href="mailto:contact@mecene.app">contact@mecene.app</a><br>
+        Pour tout problème, bug, ou subvention oubliée : utilisez le bouton « Feedback » en bas à droite.
+      </p>
+
+      <h3>Hébergement</h3>
+      <p>
+        Le site est hébergé par <strong>Railway</strong> (Railway Corporation, 2261 Market Street #4059,
+        San Francisco, CA 94114, USA). La base de données est hébergée par <strong>Supabase</strong>
+        (Supabase Inc., USA).
+      </p>
+
+      <h3>Propriété intellectuelle</h3>
+      <p>
+        Le contenu éditorial (textes, logos, interface) est la propriété de Mecene. Les informations
+        sur les dispositifs de subvention proviennent de sources publiques (Aides Territoires, sites
+        officiels des ministères et organismes). Leur reproduction reste soumise aux conditions
+        de leur émetteur d'origine.
+      </p>
+
+      <h3>Responsabilité</h3>
+      <p>
+        Mecene s'efforce de maintenir la base de données à jour. Nous ne garantissons cependant
+        pas l'exhaustivité ou l'exactitude des informations. <strong>Toujours vérifier les
+        conditions auprès de l'organisme émetteur avant tout dépôt de dossier.</strong>
+      </p>
+    </div>
+
+    <!-- CGV -->
+    <div class="panel" id="cgv">
+      <h2>Conditions Générales de Vente</h2>
+
+      <h3>1. Objet</h3>
+      <p>
+        Les présentes CGV régissent l'utilisation du service Mecene : moteur de matching entre
+        profils de créateurs culturels et dispositifs de subvention publique. Le service est
+        accessible à l'adresse <a href="#">mecene.app</a>.
+      </p>
+
+      <h3>2. Accès au service</h3>
+      <p>
+        <strong>Pendant la phase beta</strong> (en cours), l'intégralité du service est gratuite,
+        sans carte bancaire et sans abonnement. Aucune donnée de paiement n'est collectée.
+      </p>
+      <p>
+        À l'issue de la beta (V1), un accès premium sera proposé. Les beta-testeurs bénéficieront
+        d'un tarif de lancement dédié.
+      </p>
+
+      <h3>3. Utilisation du service</h3>
+      <p>L'utilisateur s'engage à :</p>
+      <ul>
+        <li>fournir des informations exactes lors du diagnostic ;</li>
+        <li>ne pas utiliser le service à des fins automatisées ou de scraping massif ;</li>
+        <li>ne pas tenter de contourner les limites techniques du service.</li>
+      </ul>
+
+      <h3>4. Limitation de responsabilité</h3>
+      <p>
+        Mecene est un outil d'aide à la décision. Les matches proposés sont indicatifs : l'utilisateur
+        reste seul responsable du dépôt effectif de son dossier, de la véracité des informations
+        communiquées à l'organisme émetteur, et du respect des critères d'éligibilité.
+      </p>
+
+      <h3>5. Rétractation & remboursement</h3>
+      <p>
+        La version beta étant gratuite, aucune rétractation n'est applicable. Pour la V1 payante,
+        un délai légal de rétractation de 14 jours sera applicable conformément au Code de la
+        consommation, sauf exécution immédiate du service demandée par l'utilisateur.
+      </p>
+
+      <h3>6. Modifications</h3>
+      <p>
+        Mecene peut faire évoluer les CGV. Toute modification sera notifiée via l'interface
+        et par email aux utilisateurs inscrits sur la waitlist.
+      </p>
+
+      <h3>7. Droit applicable</h3>
+      <p>
+        Droit français. En cas de litige, une tentative de résolution amiable sera toujours
+        privilégiée. À défaut, les tribunaux compétents sont ceux de Paris.
+      </p>
+    </div>
+
+    <!-- PRIVACY -->
+    <div class="panel" id="privacy">
+      <h2>Politique de confidentialité</h2>
+
+      <h3>Ce qu'on collecte</h3>
+      <ul>
+        <li>Les <strong>réponses au formulaire</strong> (profil, discipline, description du projet, budget) nécessaires pour matcher.</li>
+        <li>Votre <strong>email</strong> si vous choisissez de recevoir les résultats par email ou de rejoindre la waitlist.</li>
+        <li>Des <strong>données techniques</strong> minimales : page visitée, durée de session, type de navigateur (via logs serveur).</li>
+      </ul>
+
+      <h3>Ce qu'on ne collecte pas</h3>
+      <ul>
+        <li>Pas de cookies publicitaires.</li>
+        <li>Pas de trackers tiers (Facebook Pixel, Google Analytics, etc.).</li>
+        <li>Pas de carte bancaire (beta gratuite).</li>
+      </ul>
+
+      <h3>Ce qu'on en fait</h3>
+      <p>
+        Les réponses au formulaire sont envoyées à notre modèle IA (DeepSeek via OpenRouter)
+        pour produire votre rapport. Elles sont ensuite stockées anonymement sur Supabase (UE),
+        uniquement pour améliorer la qualité du matching.
+      </p>
+      <p>
+        Votre email, s'il est fourni, sert uniquement à vous envoyer les résultats et/ou à
+        vous prévenir de la sortie de la V1. Il ne sera jamais revendu ni partagé.
+      </p>
+
+      <h3>Durée de conservation</h3>
+      <p>
+        Réponses anonymisées : 24 mois pour amélioration du service. Email waitlist : jusqu'à
+        désinscription (lien dans chaque email).
+      </p>
+
+      <h3>Vos droits</h3>
+      <p>
+        Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de portabilité
+        et de suppression de vos données. Écrivez-nous à
+        <a href="mailto:privacy@mecene.app">privacy@mecene.app</a> avec l'email utilisé lors de
+        votre inscription. Réponse sous 30 jours.
+      </p>
+
+      <h3>Transferts hors UE</h3>
+      <p>
+        Le traitement par le modèle IA implique un transfert vers des serveurs hors UE (OpenRouter).
+        Les données transmises sont limitées au strict nécessaire et ne contiennent ni nom ni
+        information directement identifiante.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-8 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene · Paris</span>
+    <span class="flex gap-6">
+      <a href="style-01-swiss-dark.html" class="hover:text-white">Accueil</a>
+      <a href="#" class="hover:text-white">Contact</a>
+    </span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const on = b.dataset.fb === active;
+      b.style.borderColor = on ? 'var(--primary)' : 'var(--border)';
+      b.style.background = on ? 'var(--primary-soft)' : '';
+      b.style.color = on ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

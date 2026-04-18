@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Style 01 — Swiss Grid</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .display { font-family: 'Archivo', sans-serif; font-weight:900; letter-spacing:-0.035em; line-height:0.88; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .top-link { position: fixed; top: 12px; left: 12px; z-index: 99; font-family:'JetBrains Mono', monospace; font-size:11px; background:#000; color:#fff; padding:4px 10px; border-radius:999px; }
+</style>
+</head>
+<body class="bg-white text-black">
+
+<a href="index.html" class="top-link">← mockups · style 01</a>
+
+<!-- HEADER -->
+<header class="border-b border-black">
+  <div class="max-w-7xl mx-auto px-8 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <span class="display text-xl">MÉCÈNE.</span>
+      <span class="mono text-[10px] text-neutral-500 uppercase tracking-widest hidden md:inline">v0.9 / beta</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-8 mono text-xs uppercase tracking-widest">
+      <a href="#">Méthode</a><a href="#">Répertoire</a><a href="#">Tarifs</a><a href="#">Contact</a>
+    </nav>
+    <button class="bg-black text-white px-4 py-1.5 text-xs uppercase tracking-widest mono">Commencer →</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="border-b border-black">
+  <div class="max-w-7xl mx-auto px-8 py-24 grid grid-cols-12 gap-6 items-end min-h-[560px]">
+    <div class="col-span-12 md:col-span-2 mono text-xs uppercase tracking-widest text-neutral-500">
+      <div>№ 001</div><div class="mt-1">FR / EN</div>
+    </div>
+    <div class="col-span-12 md:col-span-8">
+      <div class="mono text-xs uppercase tracking-widest text-neutral-500 mb-12">Mécène — Printemps 2026</div>
+      <h1 class="display text-[96px]">
+        SUBVENTIONS.<br>SIMPLIFIÉES.
+      </h1>
+    </div>
+    <div class="col-span-12 md:col-span-2 mono text-xs">
+      <div class="uppercase tracking-widest text-neutral-500 mb-2">Status</div>
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAND -->
+<section class="border-b border-black">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-black">
+    <div class="p-8"><div class="display text-5xl">470</div><div class="mono text-xs uppercase tracking-widest text-neutral-500 mt-2">Dispositifs</div></div>
+    <div class="p-8"><div class="display text-5xl">241</div><div class="mono text-xs uppercase tracking-widest text-neutral-500 mt-2">Actifs</div></div>
+    <div class="p-8"><div class="display text-5xl">04<span class="text-neutral-400">m</span></div><div class="mono text-xs uppercase tracking-widest text-neutral-500 mt-2">Temps moyen</div></div>
+    <div class="p-8"><div class="display text-5xl">00<span class="text-neutral-400">€</span></div><div class="mono text-xs uppercase tracking-widest text-neutral-500 mt-2">Beta publique</div></div>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section class="border-b border-black">
+  <div class="max-w-7xl mx-auto px-8 py-24 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-3">
+      <div class="mono text-xs uppercase tracking-widest text-neutral-500">/ 02</div>
+      <h2 class="display text-4xl mt-4">LA<br>MÉTHODE.</h2>
+    </div>
+    <div class="col-span-12 md:col-span-9 grid md:grid-cols-3 gap-8">
+      <div class="border-t-2 border-black pt-6">
+        <div class="mono text-xs uppercase tracking-widest mb-4">Étape 01</div>
+        <h3 class="text-xl font-semibold mb-3">L'entretien</h3>
+        <p class="text-sm text-neutral-700 leading-relaxed">Formulaire conversationnel en 4 minutes. Pas de SIRET obligatoire, pas de jargon administratif.</p>
+      </div>
+      <div class="border-t-2 border-black pt-6">
+        <div class="mono text-xs uppercase tracking-widest mb-4">Étape 02</div>
+        <h3 class="text-xl font-semibold mb-3">Le matching</h3>
+        <p class="text-sm text-neutral-700 leading-relaxed">L'IA croise votre profil avec 470 dispositifs. Pertinence sectorielle stricte, aucune recommandation hors-sujet.</p>
+      </div>
+      <div class="border-t-2 border-black pt-6">
+        <div class="mono text-xs uppercase tracking-widest mb-4">Étape 03</div>
+        <h3 class="text-xl font-semibold mb-3">Le rapport</h3>
+        <p class="text-sm text-neutral-700 leading-relaxed">PDF actionnable : top 10 subventions, critères, deadlines, conseils personnalisés, estimation de difficulté.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDEX -->
+<section class="border-b border-black">
+  <div class="max-w-7xl mx-auto px-8 py-20 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-3">
+      <div class="mono text-xs uppercase tracking-widest text-neutral-500">/ 03</div>
+      <h2 class="display text-4xl mt-4">LE<br>RÉPERTOIRE.</h2>
+      <p class="text-sm text-neutral-700 mt-6 max-w-xs">470 dispositifs actualisés en continu — sources publiques, scrapers, API officielles.</p>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <table class="w-full mono text-sm">
+        <thead>
+          <tr class="border-b-2 border-black text-xs uppercase tracking-widest text-neutral-500">
+            <th class="text-left py-3">Domaine</th><th class="text-right py-3">Nombre</th><th class="text-right py-3">Actifs</th><th class="text-right py-3">Prochain deadline</th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr]:border-b [&_tr]:border-neutral-200">
+          <tr><td class="py-3">Arts visuels</td><td class="text-right">62</td><td class="text-right">38</td><td class="text-right text-neutral-500">14 juin</td></tr>
+          <tr><td class="py-3">Musique</td><td class="text-right">84</td><td class="text-right">47</td><td class="text-right text-neutral-500">02 mai</td></tr>
+          <tr><td class="py-3">Cinéma &amp; audiovisuel</td><td class="text-right">97</td><td class="text-right">51</td><td class="text-right text-neutral-500">28 avril</td></tr>
+          <tr><td class="py-3">Livre &amp; édition</td><td class="text-right">53</td><td class="text-right">29</td><td class="text-right text-neutral-500">20 mai</td></tr>
+          <tr><td class="py-3">Spectacle vivant</td><td class="text-right">78</td><td class="text-right">41</td><td class="text-right text-neutral-500">09 juin</td></tr>
+          <tr class="!border-b-0"><td class="py-3">Transversal</td><td class="text-right">96</td><td class="text-right">35</td><td class="text-right text-neutral-500">variable</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="border-b border-black bg-black text-white">
+  <div class="max-w-7xl mx-auto px-8 py-32 grid grid-cols-12 gap-6 items-end">
+    <div class="col-span-12 md:col-span-9">
+      <div class="mono text-xs uppercase tracking-widest text-neutral-500 mb-8">/ 04 — Commencer</div>
+      <h2 class="display text-[112px]">PRÊT ?<br>C'EST PARTI.</h2>
+    </div>
+    <div class="col-span-12 md:col-span-3">
+      <button class="bg-white text-black w-full py-5 mono text-sm uppercase tracking-widest">Lancer →</button>
+      <p class="mono text-xs mt-4 text-neutral-500">4 min · gratuit · sans CB</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="max-w-7xl mx-auto px-8 py-6 mono text-xs uppercase tracking-widest text-neutral-500 flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mécène / Paris</span>
+    <span class="flex gap-6"><a href="#">Mentions</a><a href="#">CGU</a><a href="#">Contact</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

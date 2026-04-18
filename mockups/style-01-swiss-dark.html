@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Style 01 — Swiss Dark · Mecene</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0A0A;            /* pure dark gray, no blue */
+    --panel:#141416;
+    --panel-2:#1A1A1D;
+    --border:#26262A;
+    --border-soft:#1C1C1F;
+    --text:#F5F5F6;
+    --muted:#8B8B92;
+    --muted-2:#5D5D63;
+    --primary:#06D6A0;       /* brand teal green */
+    --primary-soft:rgba(6,214,160,.1);
+    --accent:#118AB2;        /* brand blue (for Coming Soon) */
+    --accent-soft:rgba(17,138,178,.12);
+    --warn:#FFD166;          /* brand yellow (for beta) */
+    --danger:#EF476F;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  .display { font-family:'Archivo',sans-serif; font-weight:900; letter-spacing:-0.035em; line-height:0.88; }
+  .mono { font-family:'JetBrains Mono', monospace; }
+  .top-link { position:fixed; bottom:12px; left:12px; z-index:99; font-family:'JetBrains Mono',monospace; font-size:11px; background:#fff; color:#000; padding:4px 10px; border-radius:999px; opacity:.6; transition:opacity .15s ease; }
+  .top-link:hover { opacity:1; }
+  .hover-accent:hover { border-color: var(--primary); color: var(--text); }
+  .divide-border > * + * { border-top:1px solid var(--border); }
+  .chip-beta { background: rgba(255,209,102,.12); color: var(--warn); border:1px solid rgba(255,209,102,.3); }
+  .chip-accent { background: rgba(17,138,178,.1); color: var(--accent); border:1px solid rgba(17,138,178,.3); }
+  .chip-muted { background: var(--panel); color: var(--muted); border:1px solid var(--border); }
+  .dot-pulse { width:6px; height:6px; border-radius:999px; background: var(--primary); box-shadow:0 0 0 4px rgba(6,214,160,.18); animation: pulse 2s ease infinite; display:inline-block; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 10px rgba(6,214,160,0); } }
+  .section-rule { border-top:1px solid var(--border); }
+  .card { background: var(--panel); border:1px solid var(--border); border-radius: 12px; }
+  .card-soft { background: var(--panel-2); border:1px solid var(--border); border-radius: 12px; }
+  .btn-primary { background: var(--primary); color: #0A0A0A; font-weight:600; }
+  .btn-primary:hover { background:#05B88A; }
+  .btn-ghost { border:1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+  .icon { width:18px; height:18px; stroke-width:1.75; flex-shrink:0; }
+  .icon-sm { width:14px; height:14px; stroke-width:2; flex-shrink:0; }
+  .icon-lg { width:28px; height:28px; stroke-width:1.5; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<!-- SVG sprite (Lucide-style) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-music" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+    <symbol id="i-headphones" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1v-6a9 9 0 0 1 18 0v6a1 1 0 0 1-1 1h-2a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.1-.8-.4-1-.3-.3-.4-.7-.4-1 0-.9.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.9-4.5-9-10-9Z"/></symbol>
+    <symbol id="i-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+    <symbol id="i-drama" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 11h.01M14 7h.01M10 15a2 2 0 0 0 4 0"/><path d="M6 15s-2-1-2-5 1-5 4-5h8c3 0 4 1 4 5s-2 5-2 5"/><path d="M8 19a2 2 0 0 1 4 0 2 2 0 0 1 4 0"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2m0 4v2m0 4v2"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M9 2v2M15 20v2M9 20v2M20 9h2M20 15h2M2 9h2M2 15h2"/></symbol>
+    <symbol id="i-landmark" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M2 11h20M12 2 2 7h20z"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 6h.01M9 10h.01M9 14h.01M15 6h.01M15 10h.01M15 14h.01"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 18-5v12L3 14zM11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+    <symbol id="i-gallery" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></symbol>
+    <symbol id="i-disc" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="8" cy="8" r="6"/><path d="M18.1 10.1c2.2 1 3.9 2.9 3.9 5.4 0 3.3-3.6 6-8 6-1.8 0-3.5-.5-4.9-1.3"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  </defs>
+</svg>
+
+<!-- BETA BANNER -->
+<div class="text-center text-xs py-2 px-4 mono" style="background:#FFD166;color:#0A0A0A;">
+  [ BETA ] &nbsp;&nbsp; Version beta — vos retours sont précieux, utilisez le bouton « Feedback » en bas à droite
+</div>
+
+<!-- HEADER -->
+<header class="section-rule sticky top-0 z-40 backdrop-blur" style="background: rgba(10,10,10,.85)">
+  <div class="max-w-7xl mx-auto px-8 h-14 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-3">
+      <div class="display text-lg">Mecene<span class="text-[color:var(--primary)]">.</span></div>
+      <span class="mono text-[10px] uppercase tracking-widest chip-beta px-2 py-0.5 rounded-full">v0.9 / beta</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 mono text-xs uppercase tracking-widest text-[color:var(--muted)]">
+      <a href="#comparaison" class="hover:text-white">Méthode</a>
+      <a href="#how" class="hover:text-white">3 étapes</a>
+      <a href="#example" class="hover:text-white">Exemple</a>
+      <a href="#pricing" class="hover:text-white">Tarifs</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <button class="btn-ghost text-xs uppercase tracking-widest mono px-3 py-1.5 rounded-full">FR · EN</button>
+      <a href="style-01-swiss-dark-form.html" class="btn-primary text-xs uppercase tracking-widest mono px-4 py-1.5 rounded-full">Commencer →</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section>
+  <div class="max-w-7xl mx-auto px-8 py-24 md:py-32 grid grid-cols-12 gap-6">
+    <!-- Col titre -->
+    <div class="col-span-12 md:col-span-9">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)] mb-10">— l'IA qui a lu les 473 PDFs pour vous</div>
+      <h1 class="display text-[88px] md:text-[108px]">
+        VOUS AVEZ<br>
+        L'ŒUVRE<span class="text-[color:var(--primary)]">.</span><br>
+        ON TROUVE<br>
+        L'ARGENT<span class="text-[color:var(--primary)]">.</span>
+      </h1>
+      <p class="mt-10 max-w-xl text-lg text-[color:var(--muted)] leading-relaxed">
+        Chaque aide vérifiée une à une par nos équipes : deadline réelle, montant précis,
+        lien direct vers le bon dossier. Vous décrivez votre projet, vous recevez votre top 5
+        matché — en 3 minutes.
+      </p>
+
+      <div class="mt-10 flex flex-wrap gap-2">
+        <span class="chip-accent inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full">
+          <span class="dot-pulse" style="background:var(--accent);box-shadow:0 0 0 4px rgba(17,138,178,.15)"></span>
+          Base mise à jour cette semaine
+        </span>
+        <span class="chip-beta text-xs px-3 py-1.5 rounded-full font-semibold">
+          Gratuit pendant la beta
+        </span>
+        <span class="chip-muted text-xs px-3 py-1.5 rounded-full">Sans carte bancaire · Sans abonnement</span>
+      </div>
+    </div>
+
+    <!-- Col stats -->
+    <div class="col-span-12 md:col-span-3">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-6">Index · temps réel</div>
+      <div class="divide-border">
+        <div class="py-4 flex items-baseline justify-between">
+          <span class="text-xs uppercase tracking-widest text-[color:var(--muted)]">Subventions</span>
+          <span class="display text-4xl text-[color:var(--primary)]">473</span>
+        </div>
+        <div class="py-4 flex items-baseline justify-between">
+          <span class="text-xs uppercase tracking-widest text-[color:var(--muted)]">Organismes</span>
+          <span class="display text-4xl">30<span class="text-[color:var(--muted)]">+</span></span>
+        </div>
+        <div class="py-4 flex items-baseline justify-between">
+          <span class="text-xs uppercase tracking-widest text-[color:var(--muted)]">Budget accessible</span>
+          <span class="display text-4xl">30M<span class="text-[color:var(--muted)]">€</span></span>
+        </div>
+        <div class="py-4 flex items-baseline justify-between">
+          <span class="text-xs uppercase tracking-widest text-[color:var(--muted)]">Montant médian</span>
+          <span class="display text-4xl">60K<span class="text-[color:var(--muted)]">€</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- "JE SUIS..." -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-20">
+    <div class="grid grid-cols-12 gap-6 mb-10">
+      <div class="col-span-12 md:col-span-3">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 01</div>
+        <h2 class="display text-5xl mt-3">JE SUIS...</h2>
+      </div>
+      <div class="col-span-12 md:col-span-9 flex items-end">
+        <p class="text-[color:var(--muted)] max-w-xl">Cliquez sur votre profil pour pré-remplir le formulaire. 13 questions adaptées à votre domaine, pas une de plus.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-music"/></svg><span>un musicien</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-headphones"/></svg><span>un DJ / producteur</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-pen"/></svg><span>un écrivain</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-palette"/></svg><span>un artiste</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-tool"/></svg><span>un artisan d'art</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-drama"/></svg><span>un comédien</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-sparkles"/></svg><span>un danseur</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-ticket"/></svg><span>une compagnie</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-film"/></svg><span>un cinéaste</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-cpu"/></svg><span>un artiste numérique</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-landmark"/></svg><span>dans le patrimoine</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-building"/></svg><span>un lieu culturel</span></a>
+      <a href="#" class="card hover-accent transition px-5 py-4 flex items-center gap-3"><svg class="icon text-[color:var(--muted)]"><use href="#i-megaphone"/></svg><span>organisateur d'événements</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- POURQUOI PAS CHATGPT -->
+<section id="comparaison" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-24">
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 md:col-span-4">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 02 — La question qu'on nous pose le plus</div>
+        <h2 class="display text-4xl md:text-5xl mt-4">
+          « ET POURQUOI<br>
+          PAS JUSTE<br>
+          CHATGPT ? »
+        </h2>
+        <p class="mt-8 text-[color:var(--muted)] max-w-sm leading-relaxed">
+          On adore les IA généralistes. Imbattables pour rédiger votre dossier, reformuler votre note d'intention, ou traduire votre CV.
+          <br><br>
+          Mais pour <span class="text-white">trouver la bonne subvention</span>, il y a trois choses qu'elles ne peuvent pas faire — et on les fait.
+        </p>
+      </div>
+
+      <div class="col-span-12 md:col-span-8 space-y-4">
+        <!-- Row 01 -->
+        <div class="card overflow-hidden">
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] px-6 py-3 border-b border-[color:var(--border)]">
+            01 — Une base à jour
+          </div>
+          <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[color:var(--border)]">
+            <div class="p-6">
+              <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)] mb-2">Une IA généraliste</div>
+              <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+                Sa connaissance s'arrête début 2025. Elle peut citer des aides qui n'existent plus, ou donner des informations qui ne sont plus valables.
+              </p>
+            </div>
+            <div class="p-6" style="background: var(--primary-soft);">
+              <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2 flex items-center gap-2"><span class="dot-pulse"></span>Mecene</div>
+              <p class="text-sm leading-relaxed">
+                <span class="text-[color:var(--primary)] font-semibold">473 subventions</span> vérifiées une à une par nos équipes. Base revue chaque semaine, nouvelles aides ajoutées en continu.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 02 -->
+        <div class="card overflow-hidden">
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] px-6 py-3 border-b border-[color:var(--border)]">
+            02 — Des montants et deadlines précis
+          </div>
+          <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[color:var(--border)]">
+            <div class="p-6">
+              <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)] mb-2">Une IA généraliste</div>
+              <p class="text-sm text-[color:var(--muted)] italic leading-relaxed">
+                « Le montant se situe entre 5 000 et 50 000 € environ. La date limite varie selon les sessions, renseignez-vous sur le site officiel. »
+              </p>
+            </div>
+            <div class="p-6" style="background: var(--primary-soft);">
+              <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2 flex items-center gap-2"><span class="dot-pulse"></span>Mecene</div>
+              <p class="text-sm leading-relaxed">
+                « <span class="text-[color:var(--primary)]">8 000 € – 45 000 €</span>. Prochaine deadline : <span class="text-white">23 juin 2026</span>. Dossier à déposer ici. »
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 03 -->
+        <div class="card overflow-hidden">
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] px-6 py-3 border-b border-[color:var(--border)]">
+            03 — La finesse métier
+          </div>
+          <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[color:var(--border)]">
+            <div class="p-6">
+              <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)] mb-2">Une IA généraliste</div>
+              <p class="text-sm text-[color:var(--muted)] leading-relaxed">
+                Propose les mêmes aides à un DJ électro, un quatuor à cordes et un compositeur de musique de film. Mélange souvent spectacle vivant et audiovisuel.
+              </p>
+            </div>
+            <div class="p-6" style="background: var(--primary-soft);">
+              <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2 flex items-center gap-2"><span class="dot-pulse"></span>Mecene</div>
+              <p class="text-sm leading-relaxed">
+                Entraîné uniquement sur la culture. Sait qu'un DJ, un compositeur classique et un musicien de film n'ont pas accès aux mêmes dispositifs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note finale -->
+    <div class="mt-10 card-soft p-6 md:p-8 text-center">
+      <p class="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
+        Utilisez <span class="font-bold text-white">ChatGPT</span> pour rédiger votre dossier.<br>
+        Utilisez <span class="font-bold text-[color:var(--primary)]">Mecene</span> pour savoir lequel remplir.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-24 grid grid-cols-12 gap-6">
+    <div class="col-span-12 md:col-span-4">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 03</div>
+      <h2 class="display text-4xl md:text-5xl mt-4">COMMENT<br>ÇA MARCHE.</h2>
+    </div>
+
+    <div class="col-span-12 md:col-span-8 space-y-0 divide-border">
+      <div class="py-8 grid grid-cols-[auto_1fr] gap-6">
+        <div class="display text-6xl text-[color:var(--muted-2)]">01</div>
+        <div>
+          <h3 class="text-2xl font-bold mb-2">Remplissez le formulaire</h3>
+          <p class="text-[color:var(--muted)] text-lg leading-relaxed">13 questions sur votre profil, projet, budget et besoins.</p>
+        </div>
+      </div>
+      <div class="py-8 grid grid-cols-[auto_1fr] gap-6">
+        <div class="display text-6xl text-[color:var(--muted-2)]">02</div>
+        <div>
+          <h3 class="text-2xl font-bold mb-2">Notre IA croise votre profil avec la base</h3>
+          <p class="text-[color:var(--muted)] text-lg leading-relaxed">Elle compare votre profil, votre discipline et votre budget aux 473 aides répertoriées. Deadline, éligibilité, montant : chaque critère est vérifié avant de vous proposer un match.</p>
+        </div>
+      </div>
+      <div class="py-8 grid grid-cols-[auto_1fr] gap-6">
+        <div class="display text-6xl text-[color:var(--primary)]">03</div>
+        <div>
+          <h3 class="text-2xl font-bold mb-2">Recevez votre top 5 personnalisé</h3>
+          <p class="text-[color:var(--muted)] text-lg leading-relaxed">Vos matches s'affichent avec deadline, montant, éligibilité et lien direct vers le bon dossier. 100 % gratuit pendant toute la durée de la beta.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAMPLE -->
+<section id="example" class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-24">
+    <div class="grid grid-cols-12 gap-6 mb-10">
+      <div class="col-span-12 md:col-span-4">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">/ 04</div>
+        <h2 class="display text-4xl md:text-5xl mt-4">VOIR LE<br>MATCHING<br>EN ACTION.</h2>
+      </div>
+      <div class="col-span-12 md:col-span-8 flex items-end">
+        <p class="text-[color:var(--muted)] max-w-xl">Un exemple réel : compagnie de théâtre contemporain, Lyon, création pluridisciplinaire, budget 45k€.</p>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="card p-8 mb-6">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-3">INPUT · Décrivez votre projet</div>
+      <p class="text-lg italic text-[color:var(--muted)] leading-relaxed">
+        « Je suis une compagnie de théâtre contemporain basée à Lyon. Nous préparons une création sur la mémoire collective qui mêle théâtre, vidéo et musique live. Budget estimé : 45 000€. »
+      </p>
+    </div>
+
+    <div class="flex justify-center py-4">
+      <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)]">── matching ──</div>
+    </div>
+
+    <!-- Output -->
+    <div class="card overflow-hidden" style="border-color: var(--primary);">
+      <div class="p-8" style="background: var(--primary-soft)">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded-full bg-[color:var(--primary)] text-[color:var(--bg)] flex items-center justify-center">
+            <svg class="icon-sm"><use href="#i-check"/></svg>
+          </div>
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--primary)]">MATCH · 92 %</div>
+        </div>
+        <h3 class="display text-4xl mb-3">ADSV — AIDES AUX ÉQUIPES INDÉPENDANTES</h3>
+        <div class="text-[color:var(--muted)] mb-6">Ministère de la Culture</div>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+          <div class="card-soft p-4">
+            <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1">
+              <svg class="icon-sm"><use href="#i-coins"/></svg> Montant
+            </div>
+            <div class="text-xl font-bold">Variable selon projet</div>
+            <div class="text-xs text-[color:var(--muted)] mt-1">56M€ distribués en 2021 à 1 412 équipes</div>
+          </div>
+          <div class="card-soft p-4">
+            <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1">
+              <svg class="icon-sm"><use href="#i-calendar"/></svg> Deadline
+            </div>
+            <div class="text-xl font-bold text-[color:var(--primary)]">Permanente</div>
+            <div class="text-xs text-[color:var(--muted)] mt-1">Dossier acceptable à tout moment</div>
+          </div>
+          <div class="card-soft p-4">
+            <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--muted)] mb-1">
+              <svg class="icon-sm"><use href="#i-zap"/></svg> Difficulté
+            </div>
+            <div class="text-xl font-bold">Modérée</div>
+            <div class="text-xs text-[color:var(--muted)] mt-1">Budget 45k€ compatible</div>
+          </div>
+        </div>
+
+        <div class="border-l-2 border-[color:var(--primary)] pl-5 py-2 mb-6">
+          <div class="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-2">
+            <svg class="icon-sm"><use href="#i-target"/></svg> Pourquoi cette subvention ?
+          </div>
+          <p class="text-sm leading-relaxed text-[color:var(--muted)]">
+            Votre projet de création pluridisciplinaire correspond parfaitement aux critères ADSV.
+            Cette aide permanente soutient les équipes indépendantes en danse, théâtre, musique, cirque
+            et arts de la rue. Budget de 45k€ compatible.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button class="btn-ghost px-5 py-3 rounded-lg text-sm flex-1">Voir tous les détails ↓</button>
+          <button class="btn-primary px-5 py-3 rounded-lg text-sm flex-1 inline-flex items-center justify-center gap-2">
+            Accéder à la subvention <svg class="icon-sm"><use href="#i-external"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BETA / PRICING -->
+<section id="pricing" class="section-rule">
+  <div class="max-w-5xl mx-auto px-8 py-24 text-center">
+    <div class="chip-beta inline-flex items-center gap-2 mono text-xs uppercase tracking-widest px-3 py-1.5 rounded-full mb-8">
+      [ BETA ] — Version en test
+    </div>
+    <h2 class="display text-6xl md:text-7xl">
+      100 % GRATUIT<br>
+      <span class="text-[color:var(--primary)]">PENDANT LA BETA.</span>
+    </h2>
+    <p class="mt-8 text-lg text-[color:var(--muted)] max-w-2xl mx-auto leading-relaxed">
+      Le matching s'améliore de jour en jour avec chaque projet testé. Tant qu'on n'atteint pas
+      80 % de résultats vraiment pertinents, tout reste gratuit.
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-14">
+      <div class="card p-6 text-left">
+        <div class="flex items-center gap-3 mb-3">
+          <svg class="icon-lg text-[color:var(--primary)]"><use href="#i-target"/></svg>
+          <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)]">01</div>
+        </div>
+        <div class="text-xl font-bold mb-2">Tous vos matches</div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">Aucun résultat flouté. Tout est débloqué.</p>
+      </div>
+      <div class="card p-6 text-left">
+        <div class="flex items-center gap-3 mb-3">
+          <svg class="icon-lg text-[color:var(--primary)]"><use href="#i-file"/></svg>
+          <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)]">02</div>
+        </div>
+        <div class="text-xl font-bold mb-2">Votre rapport PDF</div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">Téléchargeable, partageable avec votre équipe.</p>
+      </div>
+      <div class="card p-6 text-left">
+        <div class="flex items-center gap-3 mb-3">
+          <svg class="icon-lg text-[color:var(--primary)]"><use href="#i-message"/></svg>
+          <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)]">03</div>
+        </div>
+        <div class="text-xl font-bold mb-2">Un canal direct</div>
+        <p class="text-sm text-[color:var(--muted)] leading-relaxed">Vos retours nous font progresser. Chaque avis compte.</p>
+      </div>
+    </div>
+
+    <!-- Waitlist -->
+    <div class="card mt-12 p-8 md:p-10 text-left">
+      <div class="grid md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-6">
+          <div class="mono text-xs uppercase tracking-widest text-[color:var(--muted)] mb-3">/ V1 — à venir</div>
+          <h3 class="display text-3xl">PRÉVENEZ-MOI<br>QUAND LA V1 SORT.</h3>
+        </div>
+        <div class="md:col-span-6">
+          <p class="text-sm text-[color:var(--muted)] mb-4 leading-relaxed">
+            Vous serez informé(e) en avant-première, avec un tarif de lancement réservé aux beta-testeurs.
+          </p>
+          <form class="flex flex-col sm:flex-row gap-3">
+            <input type="email" placeholder="votre@email.com"
+              class="flex-1 bg-[color:var(--panel-2)] border border-[color:var(--border)] text-white placeholder:text-[color:var(--muted-2)] px-4 py-3 rounded-full text-sm focus:outline-none focus:border-[color:var(--primary)]"/>
+            <button type="submit" class="btn-primary px-6 py-3 rounded-full text-sm">Me prévenir →</button>
+          </form>
+          <p class="text-xs text-[color:var(--muted-2)] mt-3">Email uniquement pour la notification V1. Aucun spam, aucune revente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMING SOON -->
+<section class="section-rule">
+  <div class="max-w-7xl mx-auto px-8 py-24">
+    <div class="grid grid-cols-12 gap-6 mb-10">
+      <div class="col-span-12 md:col-span-4">
+        <div class="mono text-xs uppercase tracking-widest text-[color:var(--accent)] mb-3 flex items-center gap-2">
+          <span class="dot-pulse" style="background:var(--accent);box-shadow:0 0 0 4px rgba(17,138,178,.15)"></span>
+          / 05 — Bientôt disponible
+        </div>
+        <h2 class="display text-4xl md:text-5xl">
+          TROUVEZ AUSSI<br>
+          <span class="text-[color:var(--accent)]">QUI REPRÉSENTE<br>VOTRE ART.</span>
+        </h2>
+      </div>
+      <div class="col-span-12 md:col-span-8 flex items-end">
+        <p class="text-[color:var(--muted)] max-w-2xl leading-relaxed">
+          Une subvention finance votre projet. Mais il vous faut aussi les bonnes personnes pour le représenter
+          et le diffuser. Bientôt, Mecene vous connectera directement avec les professionnels de votre secteur.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-4">
+      <div class="card p-6">
+        <svg class="icon-lg text-[color:var(--accent)] mb-4"><use href="#i-gallery"/></svg>
+        <div class="font-bold mb-1">Galeries d'art</div>
+        <div class="text-sm text-[color:var(--muted)]">Par style, région et ouverture aux émergents</div>
+      </div>
+      <div class="card p-6">
+        <svg class="icon-lg text-[color:var(--accent)] mb-4"><use href="#i-disc"/></svg>
+        <div class="font-bold mb-1">Labels &amp; producteurs</div>
+        <div class="text-sm text-[color:var(--muted)]">Par genre musical et type de contrat</div>
+      </div>
+      <div class="card p-6">
+        <svg class="icon-lg text-[color:var(--accent)] mb-4"><use href="#i-book"/></svg>
+        <div class="font-bold mb-1">Maisons d'édition</div>
+        <div class="text-sm text-[color:var(--muted)]">Par genre littéraire et politique éditoriale</div>
+      </div>
+      <div class="card p-6">
+        <svg class="icon-lg text-[color:var(--accent)] mb-4"><use href="#i-users"/></svg>
+        <div class="font-bold mb-1">Agents &amp; tourneurs</div>
+        <div class="text-sm text-[color:var(--muted)]">Par discipline et réseau de diffusion</div>
+      </div>
+    </div>
+
+    <p class="mt-8 text-sm text-[color:var(--muted-2)] italic">
+      Le même matching IA que pour vos subventions, appliqué à l'écosystème artistique professionnel.
+    </p>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section-rule" style="background: var(--text); color: var(--bg);">
+  <div class="max-w-7xl mx-auto px-8 py-28 grid grid-cols-12 gap-6 items-end">
+    <div class="col-span-12 md:col-span-9">
+      <div class="mono text-xs uppercase tracking-widest text-black/50 mb-8">/ 06 — Commencer</div>
+      <h2 class="display text-[96px] md:text-[128px]">PRÊT ?<br>C'EST PARTI.</h2>
+    </div>
+    <div class="col-span-12 md:col-span-3">
+      <a href="style-01-swiss-dark-form.html" class="block w-full text-center bg-[color:var(--bg)] text-white py-5 mono text-sm uppercase tracking-widest rounded-full hover:bg-[color:var(--primary)] hover:text-[color:var(--bg)] transition">
+        Lancer le matching →
+      </a>
+      <p class="mono text-xs mt-4 text-black/60">3 min · gratuit · sans CB</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="max-w-7xl mx-auto px-8 py-10 mono text-xs uppercase tracking-widest text-[color:var(--muted)] flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mecene</span>
+    <span class="flex flex-wrap gap-4 md:gap-6">
+      <a href="#" class="inline-flex items-center gap-1.5 hover:text-[color:var(--danger)]"><svg class="icon-sm"><use href="#i-message"/></svg>Retour</a>
+      <a href="#" class="hover:text-white">API status</a>
+      <a href="#" class="inline-flex items-center gap-1.5 hover:text-white"><svg class="icon-sm"><use href="#i-file"/></svg>Exemple PDF</a>
+      <a href="#" class="hover:text-white">Qualité des données</a>
+      <a href="#" class="hover:text-white">Mentions légales</a>
+      <a href="#" class="hover:text-white">CGV</a>
+      <a href="#" class="hover:text-white">Confidentialité</a>
+    </span>
+  </div>
+</footer>
+
+<!-- FEEDBACK WIDGET -->
+<button aria-label="Donner un retour"
+  class="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full transition-all hover:scale-[1.03]"
+  style="background:var(--primary);color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 10px 40px rgba(6,214,160,.35),0 0 0 1px rgba(6,214,160,.5)"
+  onclick="document.getElementById('feedback-panel').classList.toggle('hidden')">
+  <svg class="icon-sm" style="stroke-width:2.5"><use href="#i-message"/></svg> Feedback
+</button>
+
+<div id="feedback-panel" class="hidden fixed bottom-20 right-5 z-50 w-80 card p-5" style="box-shadow:0 20px 60px rgba(0,0,0,.6)">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--primary)] mb-1">Beta · vos retours</div>
+      <div class="font-semibold text-sm">Dites-nous tout.</div>
+    </div>
+    <button onclick="document.getElementById('feedback-panel').classList.add('hidden')" class="text-[color:var(--muted)] hover:text-white text-lg leading-none">×</button>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="suggestion">Suggestion</button>
+    <button class="fb-tab mono text-[10px] uppercase tracking-widest py-2 rounded-full border" data-fb="bug">Bug</button>
+  </div>
+  <textarea id="fb-textarea" placeholder="Ce qui marche, ce qui manque, ce qui cloche."
+    class="w-full bg-[color:var(--bg)] border border-[color:var(--border)] text-white text-sm rounded-lg px-3 py-2 min-h-[90px] focus:outline-none focus:border-[color:var(--primary)]"></textarea>
+  <div class="flex items-center justify-between mt-3">
+    <div class="mono text-[10px] uppercase tracking-widest text-[color:var(--muted-2)]">Anonyme</div>
+    <button class="btn-primary px-4 py-2 rounded-full text-xs mono uppercase tracking-widest">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.fb-tab');
+  const ta = document.getElementById('fb-textarea');
+  const placeholders = {
+    suggestion: "Une idée pour améliorer Mecene ? On est à l'écoute.",
+    bug: "Décrivez le problème. Page + action qui déclenche le bug si possible."
+  };
+  const apply = (active) => {
+    tabs.forEach(b => {
+      const isActive = b.dataset.fb === active;
+      b.style.borderColor = isActive ? 'var(--primary)' : 'var(--border)';
+      b.style.background = isActive ? 'var(--primary-soft)' : '';
+      b.style.color = isActive ? 'var(--primary)' : 'var(--muted)';
+    });
+    if (ta) ta.placeholder = placeholders[active];
+  };
+  apply('suggestion');
+  tabs.forEach(t => t.addEventListener('click', () => apply(t.dataset.fb)));
+})();
+</script>
+
+</body>
+</html>

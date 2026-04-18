@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Style 09 — Split Two-Tone</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Inter',sans-serif; }
+  .serif { font-family:'Fraunces', serif; }
+  .display { font-family:'Instrument Serif', serif; }
+  .mono { font-family:'JetBrains Mono', monospace; }
+  .ink { background:#0A0A0B; color:#F5EFE6; }
+  .paper { background:#F5EFE6; color:#2B1810; }
+  .accent { color:#B8341E; }
+  .top-link { position: fixed; top: 12px; left: 12px; z-index: 99; font-family:'JetBrains Mono',monospace; font-size:11px; background:rgba(43,24,16,.85); color:#F5EFE6; padding:4px 10px; border-radius:999px; }
+</style>
+</head>
+<body class="paper">
+
+<a href="index.html" class="top-link">← mockups · style 09</a>
+
+<!-- HEADER paper -->
+<header class="border-b border-[#D9CFBD]">
+  <div class="max-w-6xl mx-auto px-8 h-16 flex items-center justify-between">
+    <div class="flex items-baseline gap-4">
+      <span class="display italic text-2xl">Mécène</span>
+      <span class="mono text-xs uppercase tracking-widest text-[#6B4E3D] hidden md:inline">avant / après</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#">Méthode</a><a href="#">Subventions</a><a href="#">Tarifs</a>
+    </nav>
+    <button class="bg-[#2B1810] text-[#F5EFE6] px-4 py-2 rounded-full text-sm">Commencer →</button>
+  </div>
+</header>
+
+<!-- HERO SPLIT -->
+<section>
+  <div class="grid md:grid-cols-2 min-h-[560px]">
+    <div class="ink px-10 py-24 flex flex-col justify-center">
+      <div class="mono text-xs text-red-400 mb-8">01 / HIER</div>
+      <div class="space-y-2 text-3xl leading-snug text-neutral-500 line-through">
+        <div>40 PDFs à lire.</div>
+        <div>Un Cerfa 15059.</div>
+        <div>Trois appels à la DRAC.</div>
+        <div>Une deadline ratée.</div>
+        <div>Un projet abandonné.</div>
+      </div>
+    </div>
+    <div class="paper px-10 py-24 flex flex-col justify-center">
+      <div class="mono text-xs accent mb-8">02 / AUJOURD'HUI</div>
+      <h1 class="serif text-[80px] leading-[0.98]">
+        Répondre à<br>quatre questions.<br>
+        <em class="accent">C'est tout.</em>
+      </h1>
+      <button class="mt-8 self-start bg-[#2B1810] text-[#F5EFE6] px-6 py-3 rounded-full text-sm">Essayer maintenant →</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRAST METRICS -->
+<section>
+  <div class="grid md:grid-cols-2">
+    <div class="ink px-10 py-16">
+      <div class="mono text-xs text-red-400 uppercase tracking-widest mb-6">Avant Mécène</div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-baseline border-b border-neutral-800 pb-3">
+          <span class="text-sm text-neutral-400">Temps moyen</span>
+          <span class="serif text-3xl text-neutral-500 line-through">12 h</span>
+        </div>
+        <div class="flex justify-between items-baseline border-b border-neutral-800 pb-3">
+          <span class="text-sm text-neutral-400">Dispositifs consultés</span>
+          <span class="serif text-3xl text-neutral-500 line-through">15 en moyenne</span>
+        </div>
+        <div class="flex justify-between items-baseline border-b border-neutral-800 pb-3">
+          <span class="text-sm text-neutral-400">Dossiers inadaptés envoyés</span>
+          <span class="serif text-3xl text-neutral-500 line-through">60 %</span>
+        </div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-neutral-400">Frustration</span>
+          <span class="serif text-3xl text-neutral-500 line-through">importante</span>
+        </div>
+      </div>
+    </div>
+    <div class="paper px-10 py-16">
+      <div class="mono text-xs accent uppercase tracking-widest mb-6">Avec Mécène</div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-baseline border-b border-[#D9CFBD] pb-3">
+          <span class="text-sm text-[#6B4E3D]">Temps moyen</span>
+          <span class="serif text-3xl accent">4 min</span>
+        </div>
+        <div class="flex justify-between items-baseline border-b border-[#D9CFBD] pb-3">
+          <span class="text-sm text-[#6B4E3D]">Dispositifs scannés</span>
+          <span class="serif text-3xl accent">470</span>
+        </div>
+        <div class="flex justify-between items-baseline border-b border-[#D9CFBD] pb-3">
+          <span class="text-sm text-[#6B4E3D]">Pertinence du matching</span>
+          <span class="serif text-3xl accent">93 %</span>
+        </div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-[#6B4E3D]">Frustration</span>
+          <span class="serif text-3xl accent">nulle.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section class="paper border-t border-[#D9CFBD]">
+  <div class="max-w-6xl mx-auto px-8 py-24">
+    <div class="flex justify-between items-end mb-14">
+      <h2 class="serif text-5xl">La méthode.</h2>
+      <div class="mono text-xs uppercase tracking-widest text-[#6B4E3D]">— trois étapes</div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-10">
+      <div class="border-t-2 border-[#2B1810] pt-6">
+        <div class="mono text-xs uppercase tracking-widest mb-4">01</div>
+        <h3 class="serif text-2xl mb-3">Entretien</h3>
+        <p class="text-sm text-[#6B4E3D] leading-relaxed">Un formulaire conversationnel, adapté à votre domaine. Rien n'est demandé deux fois.</p>
+      </div>
+      <div class="border-t-2 border-[#B8341E] pt-6">
+        <div class="mono text-xs uppercase tracking-widest mb-4 accent">02</div>
+        <h3 class="serif text-2xl mb-3">Matching</h3>
+        <p class="text-sm text-[#6B4E3D] leading-relaxed">470 dispositifs passés au crible. L'IA écarte les hors-sujets et classe les plus pertinents.</p>
+      </div>
+      <div class="border-t-2 border-[#2B1810] pt-6">
+        <div class="mono text-xs uppercase tracking-widest mb-4">03</div>
+        <h3 class="serif text-2xl mb-3">Rapport</h3>
+        <p class="text-sm text-[#6B4E3D] leading-relaxed">Un PDF actionnable : dix subventions, critères, deadlines, conseils de dépôt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL split -->
+<section>
+  <div class="grid grid-rows-[auto_auto]">
+    <div class="paper px-8 md:px-16 py-20">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-12 gap-8 items-end">
+        <div class="md:col-span-8">
+          <div class="mono text-xs uppercase tracking-widest accent mb-6">Pour les créateurs qui n'ont pas le temps</div>
+          <h2 class="serif text-7xl leading-[0.98]">
+            Le mécénat,<br>
+            <em class="accent">sans la bureaucratie</em>.
+          </h2>
+        </div>
+        <div class="md:col-span-4 text-sm text-[#6B4E3D]">
+          <p>Nous lisons les appels à projets pour vous. Vous recevez un rapport actionnable en 4 minutes.</p>
+          <button class="mt-6 bg-[#2B1810] text-[#F5EFE6] px-5 py-2.5 rounded-full text-sm">Commencer →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ink px-8 md:px-16 py-12">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-6">
+        <blockquote class="serif italic text-2xl max-w-2xl text-[#F5EFE6]">
+          "La première fois qu'un outil comprend la différence entre un projet
+          d'auteur et une demande de guichet."
+        </blockquote>
+        <div class="mono text-xs text-orange-200/70 tracking-widest uppercase">— Anne L., réalisatrice</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SPLIT inversé -->
+<section>
+  <div class="grid md:grid-cols-2 min-h-[400px]">
+    <div class="paper px-10 py-20 flex flex-col justify-center">
+      <div class="mono text-xs uppercase tracking-widest text-[#6B4E3D] mb-6">Aujourd'hui</div>
+      <h2 class="serif text-5xl leading-tight">
+        Vous avez<br>un projet.
+      </h2>
+    </div>
+    <div class="ink px-10 py-20 flex flex-col justify-center">
+      <div class="mono text-xs uppercase tracking-widest text-orange-300 mb-6">Dans 4 minutes</div>
+      <h2 class="serif text-5xl leading-tight">
+        Vous aurez<br>
+        <em class="accent">une feuille de route</em>.
+      </h2>
+      <button class="mt-8 self-start bg-[#F5EFE6] text-[#2B1810] px-6 py-3 rounded-full text-sm">Lancer maintenant →</button>
+    </div>
+  </div>
+</section>
+
+<footer class="paper border-t border-[#D9CFBD]">
+  <div class="max-w-6xl mx-auto px-8 py-8 flex flex-wrap justify-between gap-4 text-xs text-[#6B4E3D]">
+    <span>© 2026 Mécène · Paris</span>
+    <span class="flex gap-6"><a href="#">Mentions</a><a href="#">CGU</a><a href="#">Contact</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V1 — Editorial Motion</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:#1E40AF;
+    --accent:#EA580C;
+    --bg:#F8FAFC;
+    --fg:#0F172A;
+    --muted:#E9EFF8;
+    --border:#E2E8F0;
+  }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--fg); }
+  .serif { font-family:'Playfair Display', serif; }
+  .fade-in { opacity:0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+  .fade-in.in { opacity:1; transform:none; }
+  .underline-anim { background: linear-gradient(currentColor,currentColor) bottom / 0 1px no-repeat; transition: background-size .4s ease; }
+  .underline-anim:hover { background-size: 100% 1px; }
+  .shine { background: linear-gradient(90deg, transparent 0%, rgba(234,88,12,.15) 50%, transparent 100%); background-size: 200% 100%; animation: shine 3s linear infinite; }
+  @keyframes shine { to { background-position:-200% 0; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- NAV -->
+<header class="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-[color:var(--border)]">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[color:var(--primary)]"><path d="M4 20 L12 4 L20 20 Z"/></svg>
+      <span class="serif text-xl">Mécène</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#" class="underline-anim">Comment ça marche</a>
+      <a href="#" class="underline-anim">Subventions</a>
+      <a href="#" class="underline-anim">Tarifs</a>
+      <a href="#" class="underline-anim">Blog</a>
+    </nav>
+    <a href="#cta" class="text-sm bg-[color:var(--primary)] text-white px-4 py-2 rounded-full hover:bg-blue-800 transition">Commencer</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="relative overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 py-28 md:py-36 grid md:grid-cols-12 gap-10 items-end">
+    <div class="md:col-span-8">
+      <div class="text-xs uppercase tracking-[0.2em] text-[color:var(--primary)] mb-6 fade-in">— Financer les arts, autrement</div>
+      <h1 class="serif text-5xl md:text-7xl leading-[1.05] fade-in">
+        Trouvez la subvention<br>
+        <em>parfaite</em> en <span class="shine px-1">4 minutes</span>.
+      </h1>
+      <p class="mt-8 max-w-xl text-lg text-neutral-600 fade-in">
+        Répondez à quelques questions. Notre IA lit 470+ dispositifs publics
+        et vous rend un dossier prêt à envoyer. Pas de promesse,
+        juste du signal.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4 fade-in">
+        <a href="#cta" class="inline-flex items-center gap-2 bg-[color:var(--accent)] text-white px-6 py-3.5 rounded-full hover:-translate-y-0.5 transition shadow-lg shadow-orange-500/20">
+          Lancer le diagnostic
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#" class="text-sm text-neutral-700 underline-anim">Voir un exemple de rapport →</a>
+      </div>
+    </div>
+    <div class="md:col-span-4 fade-in">
+      <div class="border-l border-[color:var(--border)] pl-6 space-y-6">
+        <div><div class="serif text-4xl">470<span class="text-[color:var(--accent)]">.</span></div><div class="text-sm text-neutral-500">dispositifs analysés en continu</div></div>
+        <div><div class="serif text-4xl">4<span class="text-[color:var(--accent)]">m</span></div><div class="text-sm text-neutral-500">pour un rapport personnalisé</div></div>
+        <div><div class="serif text-4xl">0<span class="text-[color:var(--accent)]">€</span></div><div class="text-sm text-neutral-500">pendant la phase beta</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<section class="border-y border-[color:var(--border)] bg-white">
+  <div class="max-w-6xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-6 text-xs uppercase tracking-widest text-neutral-400">
+    <span>Couverture</span>
+    <span>CNC</span><span>CNM</span><span>DRAC</span><span>ADAMI</span><span>SACEM</span><span>SPEDIDAM</span><span>Europe Créative</span>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="max-w-6xl mx-auto px-6 py-28">
+  <div class="max-w-2xl mb-16">
+    <div class="text-xs uppercase tracking-[0.2em] text-[color:var(--primary)] mb-4">Méthode</div>
+    <h2 class="serif text-4xl md:text-5xl leading-tight">Un entretien. Un rapport. Zéro paperasse inutile.</h2>
+  </div>
+  <div class="grid md:grid-cols-3 gap-10">
+    <div class="fade-in">
+      <div class="serif text-6xl text-[color:var(--accent)] leading-none mb-4">01</div>
+      <div class="font-medium mb-2">Vous racontez votre projet</div>
+      <p class="text-neutral-600 text-sm leading-relaxed">Formulaire conversationnel. Pas de jargon, pas de numéro SIRET obligatoire. On adapte les questions à votre domaine.</p>
+    </div>
+    <div class="fade-in">
+      <div class="serif text-6xl text-[color:var(--accent)] leading-none mb-4">02</div>
+      <div class="font-medium mb-2">L'IA croise 470 dispositifs</div>
+      <p class="text-neutral-600 text-sm leading-relaxed">Sélection par pertinence sectorielle stricte. Pas de recommandation hors-sujet : un écrivain ne reçoit pas d'aide au mobilier.</p>
+    </div>
+    <div class="fade-in">
+      <div class="serif text-6xl text-[color:var(--accent)] leading-none mb-4">03</div>
+      <div class="font-medium mb-2">Vous recevez un PDF actionnable</div>
+      <p class="text-neutral-600 text-sm leading-relaxed">Top 10 subventions, critères d'éligibilité, deadlines, conseils personnalisés, estimation de difficulté.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="bg-[color:var(--muted)]">
+  <div class="max-w-4xl mx-auto px-6 py-28 text-center">
+    <svg width="32" height="32" viewBox="0 0 24 24" class="mx-auto text-[color:var(--accent)]" fill="currentColor"><path d="M7 7h4v4H7V7zm6 0h4v4h-4V7zM5 21c0-4 3-7 7-7v-3c-5 0-8 4-8 10h1zm12 0c0-4 3-7 7-7v-3c-5 0-8 4-8 10h1z"/></svg>
+    <blockquote class="serif italic text-2xl md:text-3xl leading-snug mt-6">
+      Un outil qui ne me parle pas comme à un usager, mais comme à un auteur.
+      C'est la première fois qu'une IA culturelle comprend la différence.
+    </blockquote>
+    <div class="mt-6 text-sm text-neutral-500">— Réalisatrice documentaire, Marseille</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="max-w-3xl mx-auto px-6 py-32 text-center">
+  <h2 class="serif text-5xl md:text-6xl leading-tight">Prêt à trouver la vôtre ?</h2>
+  <p class="text-neutral-600 mt-6 text-lg">4 minutes. Gratuit pendant la beta. Pas de carte bleue.</p>
+  <a href="#" class="inline-flex items-center gap-2 mt-10 bg-[color:var(--accent)] text-white px-8 py-4 rounded-full hover:-translate-y-0.5 transition shadow-xl shadow-orange-500/20 text-lg">
+    Démarrer le diagnostic
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<footer class="border-t border-[color:var(--border)] text-xs text-neutral-500">
+  <div class="max-w-6xl mx-auto px-6 py-8 flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mécène — Paris</span>
+    <span class="flex gap-6"><a href="#" class="underline-anim">Mentions légales</a><a href="#" class="underline-anim">CGU</a><a href="#" class="underline-anim">Contact</a></span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), { threshold: .15 });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

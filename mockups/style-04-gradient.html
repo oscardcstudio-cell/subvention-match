@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Style 04 — Soft Gradient</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Inter',sans-serif; color:#1A1410; }
+  .display { font-family:'DM Serif Display', serif; font-weight:400; letter-spacing:-0.01em; }
+  .hero-bg { background: linear-gradient(180deg, #FFF9F3 0%, #FFE8D9 100%); }
+  .soft-bg { background: linear-gradient(180deg, #FFE8D9 0%, #FFD6C2 100%); }
+  .top-link { position: fixed; top: 12px; left: 12px; z-index: 99; font-family: monospace; font-size:11px; background:rgba(0,0,0,.75); color:#fff; padding:4px 10px; border-radius:999px; }
+  .card { background: rgba(255,255,255,0.55); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.7); }
+  .pill { background: rgba(255,255,255,0.4); backdrop-filter: blur(8px); border: 1px solid rgba(234,88,12,.2); }
+</style>
+</head>
+<body class="hero-bg">
+
+<a href="index.html" class="top-link">← mockups · style 04</a>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-40 backdrop-blur bg-[#FFF9F3]/70 border-b border-orange-100">
+  <div class="max-w-6xl mx-auto px-8 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded-md" style="background:linear-gradient(135deg,#FF8A5C,#D4631F)"></div>
+      <span class="font-semibold">Mécène</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-8 text-sm text-neutral-700">
+      <a href="#">Comment ça marche</a><a href="#">Subventions</a><a href="#">Tarifs</a><a href="#">Blog</a>
+    </nav>
+    <button class="bg-neutral-900 text-white px-4 py-2 rounded-full text-sm">Commencer</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section>
+  <div class="max-w-4xl mx-auto px-8 py-28 min-h-[560px] flex flex-col items-center justify-center text-center">
+    <div class="pill inline-flex items-center gap-2 text-xs tracking-widest uppercase text-orange-800 px-3 py-1.5 rounded-full mb-10">
+      <span class="w-1.5 h-1.5 rounded-full bg-orange-600"></span> Nouveau · Beta publique
+    </div>
+    <h1 class="display text-[104px] leading-[0.98]">
+      Financez votre<br>
+      <em class="text-orange-800">prochain projet</em>.
+    </h1>
+    <p class="mt-8 text-lg max-w-lg text-neutral-700">
+      Un entretien de 4 minutes, un rapport personnalisé par IA, 470 dispositifs passés au crible.
+    </p>
+    <div class="mt-10 flex items-center gap-3">
+      <button class="bg-neutral-900 text-white px-6 py-3 rounded-full text-sm hover:bg-black">Commencer le diagnostic</button>
+      <button class="border border-neutral-300 bg-white/50 backdrop-blur px-6 py-3 rounded-full text-sm">Voir un exemple</button>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS BAND -->
+<section class="soft-bg">
+  <div class="max-w-6xl mx-auto px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="card rounded-2xl p-6 text-center"><div class="display text-5xl">470</div><div class="text-xs tracking-widest uppercase text-neutral-700 mt-2">Dispositifs</div></div>
+    <div class="card rounded-2xl p-6 text-center"><div class="display text-5xl">241</div><div class="text-xs tracking-widest uppercase text-neutral-700 mt-2">Actifs</div></div>
+    <div class="card rounded-2xl p-6 text-center"><div class="display text-5xl">4m</div><div class="text-xs tracking-widest uppercase text-neutral-700 mt-2">Par diagnostic</div></div>
+    <div class="card rounded-2xl p-6 text-center"><div class="display text-5xl">0€</div><div class="text-xs tracking-widest uppercase text-neutral-700 mt-2">Pendant la beta</div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="bg-[#FFF4EA]">
+  <div class="max-w-6xl mx-auto px-8 py-24">
+    <div class="max-w-xl mb-16">
+      <div class="text-xs tracking-widest uppercase text-orange-800 mb-4">La méthode</div>
+      <h2 class="display text-5xl leading-tight">Trois étapes, quatre minutes.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="card rounded-3xl p-8">
+        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-800 font-semibold mb-4">1</div>
+        <h3 class="display text-2xl mb-2">Racontez</h3>
+        <p class="text-sm text-neutral-700 leading-relaxed">Un formulaire conversationnel adapté à votre domaine. Pas de SIRET, pas de Cerfa.</p>
+      </div>
+      <div class="card rounded-3xl p-8">
+        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-800 font-semibold mb-4">2</div>
+        <h3 class="display text-2xl mb-2">On croise</h3>
+        <p class="text-sm text-neutral-700 leading-relaxed">L'IA passe au crible 470 dispositifs et ne garde que ceux qui correspondent vraiment à votre projet.</p>
+      </div>
+      <div class="card rounded-3xl p-8">
+        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-800 font-semibold mb-4">3</div>
+        <h3 class="display text-2xl mb-2">Vous recevez</h3>
+        <p class="text-sm text-neutral-700 leading-relaxed">Un rapport PDF : top 10 subventions, critères, deadlines, conseils personnalisés.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE SPOTLIGHT -->
+<section class="soft-bg">
+  <div class="max-w-6xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="text-xs tracking-widest uppercase text-orange-800 mb-4">Quality gate</div>
+      <h2 class="display text-5xl leading-tight">Pas de bruit, que du signal.</h2>
+      <p class="mt-6 text-lg text-neutral-700 max-w-md">
+        Chaque dispositif passe un score de qualité 0–100. Les éligibilités floues, les descriptions trop génériques, les liens morts sont écartés avant même d'arriver à l'IA.
+      </p>
+      <button class="mt-8 bg-neutral-900 text-white px-6 py-3 rounded-full text-sm">En savoir plus →</button>
+    </div>
+    <div class="card rounded-3xl p-8">
+      <div class="text-xs tracking-widest uppercase text-neutral-500 mb-4">Distribution des scores</div>
+      <div class="space-y-3">
+        <div class="flex items-center gap-3"><span class="w-16 text-xs">90-100</span><div class="flex-1 h-2 bg-white/50 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:22%"></div></div><span class="text-xs text-neutral-600 w-8 text-right">53</span></div>
+        <div class="flex items-center gap-3"><span class="w-16 text-xs">75-89</span><div class="flex-1 h-2 bg-white/50 rounded-full overflow-hidden"><div class="h-full bg-emerald-400" style="width:38%"></div></div><span class="text-xs text-neutral-600 w-8 text-right">91</span></div>
+        <div class="flex items-center gap-3"><span class="w-16 text-xs">60-74</span><div class="flex-1 h-2 bg-white/50 rounded-full overflow-hidden"><div class="h-full bg-orange-400" style="width:42%"></div></div><span class="text-xs text-neutral-600 w-8 text-right">97</span></div>
+        <div class="flex items-center gap-3"><span class="w-16 text-xs">&lt; 60</span><div class="flex-1 h-2 bg-white/50 rounded-full overflow-hidden"><div class="h-full bg-red-300" style="width:98%"></div></div><span class="text-xs text-neutral-400 w-8 text-right">229</span></div>
+      </div>
+      <div class="mt-6 pt-4 border-t border-white/50 text-xs text-neutral-600">
+        Seuls les scores ≥ 60 passent le filtre. <span class="text-orange-800 font-semibold">241 / 470</span> dispositifs actifs ce mois.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="max-w-3xl mx-auto px-8 py-32 text-center">
+    <h2 class="display text-7xl leading-[1.02]">
+      Prêt à trouver<br>la vôtre ?
+    </h2>
+    <p class="mt-6 text-lg text-neutral-700">4 minutes · gratuit pendant la beta · pas de carte bleue.</p>
+    <button class="mt-10 bg-neutral-900 text-white px-8 py-4 rounded-full hover:bg-black text-sm">
+      Commencer le diagnostic →
+    </button>
+  </div>
+</section>
+
+<footer class="border-t border-orange-100 text-xs text-neutral-600">
+  <div class="max-w-6xl mx-auto px-8 py-8 flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mécène · Paris</span>
+    <span class="flex gap-6"><a href="#">Mentions</a><a href="#">CGU</a><a href="#">Contact</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

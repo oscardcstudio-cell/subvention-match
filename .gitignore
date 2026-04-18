@@ -43,6 +43,10 @@ desktop.ini
 test-*.pdf
 *.bak
 
+# Playwright
+playwright-report/
+test-results/
+
 # Editor
 .vscode/
 .idea/

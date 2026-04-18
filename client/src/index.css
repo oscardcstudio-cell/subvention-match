@@ -2,18 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+/* === Mecene Swiss Dark — design tokens (non-HSL, used alongside the shadcn HSL system) === */
+:root {
+  /* Raw palette */
+  --mc-bg: #0A0A0A;
+  --mc-panel: #141416;
+  --mc-panel-2: #1A1A1D;
+  --mc-border: #26262A;
+  --mc-border-soft: #1C1C1F;
+  --mc-text: #F5F5F6;
+  --mc-muted: #8B8B92;
+  --mc-muted-2: #5D5D63;
+  --mc-primary: #06D6A0;
+  --mc-primary-soft: rgba(6, 214, 160, 0.10);
+  --mc-accent: #118AB2;
+  --mc-accent-soft: rgba(17, 138, 178, 0.12);
+  --mc-warn: #FFD166;
+  --mc-danger: #EF476F;
+}
+
 @layer components {
-  .colorful-gradient {
-    @apply bg-gradient-to-br from-blue-600 via-emerald-500 to-teal-700;
+  /* Mecene display type — Archivo Black */
+  .mc-display {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    line-height: 0.88;
   }
-  
-  .white-card {
-    @apply bg-white/95 backdrop-blur rounded-2xl shadow-xl;
+  /* Mecene mono — JetBrains Mono */
+  .mc-mono {
+    font-family: 'JetBrains Mono', monospace;
   }
-  
-  .primary-btn {
-    @apply bg-primary hover:bg-primary/90 text-primary-foreground;
+  /* Mecene surfaces */
+  .mc-card {
+    background: var(--mc-panel);
+    border: 1px solid var(--mc-border);
+    border-radius: 12px;
   }
+  .mc-card-soft {
+    background: var(--mc-panel-2);
+    border: 1px solid var(--mc-border);
+    border-radius: 12px;
+  }
+  /* Mecene buttons */
+  .mc-btn-primary {
+    background: var(--mc-primary);
+    color: #0A0A0A;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+  .mc-btn-primary:hover { background: #05B88A; }
+  .mc-btn-ghost {
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .mc-btn-ghost:hover { border-color: var(--mc-primary); color: var(--mc-primary); }
+  /* Section rule (horizontal divider between sections) */
+  .mc-section-rule { border-top: 1px solid var(--mc-border); }
+  /* Chips */
+  .mc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--mc-border);
+  }
+  .mc-chip-primary {
+    background: var(--mc-primary-soft);
+    color: var(--mc-primary);
+    border-color: rgba(6, 214, 160, 0.3);
+  }
+  .mc-chip-accent {
+    background: var(--mc-accent-soft);
+    color: var(--mc-accent);
+    border-color: rgba(17, 138, 178, 0.3);
+  }
+  .mc-chip-warn {
+    background: rgba(255, 209, 102, 0.12);
+    color: var(--mc-warn);
+    border-color: rgba(255, 209, 102, 0.3);
+  }
+}
+
+@layer utilities {
+  .mc-divide-border > * + * { border-top: 1px solid var(--mc-border); }
+}
+
+/* Mecene pulse dot */
+.mc-pulse-dot {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: var(--mc-primary);
+  box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.6);
+  animation: mc-pulse 1.4s ease-out infinite;
+  display: inline-block;
+}
+@keyframes mc-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.6); }
+  100% { box-shadow: 0 0 0 10px rgba(6, 214, 160, 0); }
+}
+
+/* Placeholder styling for Mecene inputs */
+input.mc-input::placeholder,
+textarea.mc-input::placeholder {
+  color: var(--mc-muted-2);
+  opacity: 1;
 }
 
 @keyframes checkbox-bounce {
@@ -170,71 +265,83 @@
 
   --opaque-button-border-intensity: 9;  /* In terms of percentages */
 
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
+  /* Mecene Swiss Dark — neutral base, teal primary, blue accent */
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 194 100% 8%;
+  /* #0A0A0A pure neutral */
+  --background: 0 0% 4%;
 
-  --foreground: 0 0% 95%;
+  /* #F5F5F6 */
+  --foreground: 240 9% 97%;
 
-  --border: 210 15% 20%;
+  /* #26262A */
+  --border: 240 4% 16%;
 
-  --card: 194 80% 12%;
+  /* #141416 */
+  --card: 240 4% 8%;
 
-  --card-foreground: 0 0% 95%;
+  --card-foreground: 240 9% 97%;
 
-  --card-border: 194 60% 16%;
+  --card-border: 240 4% 16%;
 
-  --sidebar: 194 90% 10%;
+  --sidebar: 240 5% 8%;
 
-  --sidebar-foreground: 0 0% 95%;
+  --sidebar-foreground: 240 9% 97%;
 
-  --sidebar-border: 194 70% 14%;
+  --sidebar-border: 240 4% 16%;
 
-  --sidebar-primary: 199 84% 60%;
+  /* Teal #06D6A0 */
+  --sidebar-primary: 165 94% 43%;
 
-  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-primary-foreground: 0 0% 4%;
 
-  --sidebar-accent: 194 50% 18%;
+  --sidebar-accent: 240 5% 11%;
 
-  --sidebar-accent-foreground: 0 0% 95%;
+  --sidebar-accent-foreground: 240 9% 97%;
 
-  --sidebar-ring: 199 84% 60%;
+  --sidebar-ring: 165 94% 43%;
 
-  --popover: 194 80% 14%;
+  /* #141416 */
+  --popover: 240 4% 8%;
 
-  --popover-foreground: 0 0% 95%;
+  --popover-foreground: 240 9% 97%;
 
-  --popover-border: 194 60% 18%;
+  --popover-border: 240 4% 16%;
 
-  --primary: 199 84% 60%;
+  /* Teal #06D6A0 */
+  --primary: 165 94% 43%;
 
-  --primary-foreground: 0 0% 100%;
+  --primary-foreground: 0 0% 4%;
 
-  --secondary: 162 82% 55%;
+  /* Blue #118AB2 */
+  --secondary: 194 82% 38%;
 
-  --secondary-foreground: 0 0% 100%;
+  --secondary-foreground: 240 9% 97%;
 
-  --muted: 194 40% 16%;
+  /* #1A1A1D */
+  --muted: 240 5% 11%;
 
-  --muted-foreground: 0 0% 70%;
+  /* #8B8B92 */
+  --muted-foreground: 240 3% 56%;
 
-  --accent: 45 100% 75%;
+  /* Yellow #FFD166 (pour les badges beta, etc.) */
+  --accent: 45 100% 70%;
 
-  --accent-foreground: 194 100% 14%;
+  --accent-foreground: 0 0% 4%;
 
-  --destructive: 350 89% 65%;
+  /* Red/pink #EF476F */
+  --destructive: 349 84% 61%;
 
-  --destructive-foreground: 0 0% 100%;
+  --destructive-foreground: 240 9% 97%;
 
-  --input: 210 15% 32%;
-  --ring: 199 84% 60%;
-  --chart-1: 199 84% 60%;
-  --chart-2: 162 82% 55%;
-  --chart-3: 45 100% 75%;
-  --chart-4: 350 89% 65%;
-  --chart-5: 194 100% 20%;
+  --input: 240 4% 16%;
+  --ring: 165 94% 43%;
+  --chart-1: 165 94% 43%;
+  --chart-2: 194 82% 38%;
+  --chart-3: 45 100% 70%;
+  --chart-4: 349 84% 61%;
+  --chart-5: 240 3% 56%;
 
   --shadow-2xs: 0px 1px 2px 0px hsl(40 40% 4% / 0.30);
   --shadow-xs: 0px 1px 3px 0px hsl(40 40% 4% / 0.40);

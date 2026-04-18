@@ -1,269 +1,127 @@
-import { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formDataSchema, type FormData } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { trackFormStarted, trackFormSubmitted } from "@/lib/analytics";
+import {
+  Music, Headphones, Pen, Palette, Wrench, Drama, Sparkles, Ticket, Film, Cpu,
+  Landmark, Building, Megaphone, ArrowLeft, ArrowRight, Check, Loader2,
+} from "lucide-react";
 
-const frenchRegions = [
-  "Auvergne-Rhône-Alpes",
-  "Bourgogne-Franche-Comté",
-  "Bretagne",
-  "Centre-Val de Loire",
-  "Corse",
-  "Grand Est",
-  "Hauts-de-France",
-  "Île-de-France",
-  "Normandie",
-  "Nouvelle-Aquitaine",
-  "Occitanie",
-  "Pays de la Loire",
-  "Provence-Alpes-Côte d'Azur",
+const REGIONS = [
+  "Auvergne-Rhône-Alpes", "Bourgogne-Franche-Comté", "Bretagne", "Centre-Val de Loire",
+  "Corse", "Grand Est", "Hauts-de-France", "Île-de-France", "Normandie",
+  "Nouvelle-Aquitaine", "Occitanie", "Pays de la Loire", "Provence-Alpes-Côte d'Azur", "Outre-mer",
 ];
 
-// Phrases rassurantes pour chaque question
-const helpTexts = {
-  status: {
-    fr: "On demande ça pour trouver des aides adaptées à votre structure juridique. Pas de jugement, juste du matching intelligent.",
-    en: "We ask this to find grants that match your legal structure. No judgment, just smart matching."
-  },
-  artisticDomain: {
-    fr: "Votre discipline artistique nous aide à filtrer les 342 subventions. Les cases à cocher évitent les fautes de frappe.",
-    en: "Your artistic discipline helps us filter the 342 grants. Checkboxes prevent typos."
-  },
-  projectDescription: {
-    fr: "Quelques lignes suffisent. L'IA comprend le contexte, pas besoin d'un roman. Vos mots, votre style.",
-    en: "A few lines are enough. The AI understands context, no need for a novel. Your words, your style."
-  },
-  projectType: {
-    fr: "Création, production, résidence... Ça change tout niveau éligibilité. Plusieurs choix possibles, on sait que les projets sont hybrides.",
-    en: "Creation, production, residency... It changes everything eligibility-wise. Multiple choices allowed, we know projects are hybrid."
-  },
-  projectStage: {
-    fr: "Certaines aides ne financent que les projets naissants, d'autres préfèrent le concret. Soyez honnête, on est là pour matcher.",
-    en: "Some grants only fund early-stage projects, others prefer concrete ones. Be honest, we're here to match."
-  },
-  region: {
-    fr: "Beaucoup de subventions sont régionales. Votre localisation = des aides que d'autres n'ont pas. Géo-avantage.",
-    en: "Many grants are regional. Your location = grants others don't have. Geo-advantage."
-  },
-  isInternational: {
-    fr: "Les projets internationaux débloquent des budgets spécifiques. Oui/Non, simple et efficace.",
-    en: "International projects unlock specific budgets. Yes/No, simple and effective."
-  },
-  innovation: {
-    fr: "L'innovation débloque des financements tech, artistiques ou écolo. Si rien ne matche, skip et scrollez.",
-    en: "Innovation unlocks tech, artistic or eco funding. If nothing matches, skip and scroll."
-  },
-  socialDimension: {
-    fr: "Inclusion, éducation, territoire... Les projets à impact social ont leurs propres lignes budgétaires. Optionnel, mais puissant.",
-    en: "Inclusion, education, territory... Social impact projects have their own budgets. Optional, but powerful."
-  },
-  urgency: {
-    fr: "Les deadlines des aides varient. Votre timing nous aide à prioriser les subventions encore ouvertes.",
-    en: "Grant deadlines vary. Your timing helps us prioritize open grants."
-  },
-  aidTypes: {
-    fr: "Subvention cash, résidence logée, accompagnement... Chaque type a ses avantages. Cochez ce qui vous intéresse.",
-    en: "Cash grant, residency, mentoring... Each type has advantages. Check what interests you."
-  },
-  geographicScope: {
-    fr: "Local, national, européen... L'échelle de votre projet ouvre des portes différentes. Pensez grand ou petit, les deux marchent.",
-    en: "Local, national, European... Your project's scale opens different doors. Think big or small, both work."
-  },
-  email: {
-    fr: "Votre email pour recevoir les résultats. On ne spam pas, on ne revend rien. Juste vos subventions matchées, point.",
-    en: "Your email to receive results. We don't spam, we don't sell. Just your matched grants, period."
-  }
+type StepId = "status" | "domain" | "description" | "type" | "region" | "email" | "optional";
+const STEPS: { id: StepId; num: string; label: string }[] = [
+  { id: "status",      num: "01", label: "Profil" },
+  { id: "domain",      num: "02", label: "Discipline" },
+  { id: "description", num: "03", label: "Description" },
+  { id: "type",        num: "04", label: "Type projet" },
+  { id: "region",      num: "05", label: "Région" },
+  { id: "email",       num: "06", label: "Email" },
+  { id: "optional",    num: "07", label: "Optionnel" },
+];
+
+const STATUS_OPTIONS = [
+  { value: "compagnie", icon: Drama, label: "Compagnie / collectif" },
+  { value: "artiste-auteur", icon: Music, label: "Artiste individuel" },
+  { value: "lieu-culturel", icon: Building, label: "Lieu culturel / structure" },
+  { value: "collectif", icon: Megaphone, label: "Organisateur d'événements" },
+  { value: "label", icon: Headphones, label: "Label / maison d'édition" },
+  { value: "association", icon: Sparkles, label: "Association culturelle" },
+];
+
+const DOMAIN_OPTIONS = [
+  { value: "spectacle-vivant", label: "Spectacle vivant", icon: Drama },
+  { value: "musique", label: "Musique", icon: Music },
+  { value: "audiovisuel", label: "Audiovisuel", icon: Film },
+  { value: "arts-plastiques", label: "Arts visuels", icon: Palette },
+  { value: "ecriture", label: "Livre & édition", icon: Pen },
+  { value: "arts-numeriques", label: "Arts numériques", icon: Cpu },
+  { value: "patrimoine", label: "Patrimoine", icon: Landmark },
+  { value: "metiers-art", label: "Métiers d'art", icon: Wrench },
+  { value: "transversal", label: "Transversal", icon: Ticket },
+];
+
+const TYPE_OPTIONS = [
+  { value: "creation", label: "Création", desc: "Écriture, composition, répétition" },
+  { value: "production", label: "Production", desc: "Captation, fabrication" },
+  { value: "diffusion", label: "Diffusion", desc: "Tournée, exposition" },
+  { value: "residence", label: "Résidence", desc: "Accueil, R&D artistique" },
+  { value: "education", label: "Éducation & médiation", desc: "Ateliers, transmission" },
+  { value: "evenementiel", label: "Festival / événement", desc: "Organisation, programmation" },
+];
+
+const STAGE_OPTIONS = [
+  { value: "idee", label: "Idée / concept" },
+  { value: "en-cours", label: "En cours" },
+  { value: "finalisation", label: "Finalisation" },
+  { value: "pret", label: "Prêt à diffuser" },
+];
+
+const PROFILE_PRESETS: Record<string, { status?: string[]; artisticDomain?: string[]; projectType?: string[] }> = {
+  "orga-soiree":    { status: ["collectif"], artisticDomain: ["musique"], projectType: ["evenementiel"] },
+  "dj-producteur":  { status: ["artiste-auteur"], artisticDomain: ["musique"], projectType: ["production", "diffusion"] },
+  "danseur":        { status: ["artiste-auteur"], artisticDomain: ["spectacle-vivant"], projectType: ["creation"] },
+  "compagnie":      { status: ["compagnie"], artisticDomain: ["spectacle-vivant"], projectType: ["creation", "production"] },
+  "lieu-culturel":  { status: ["lieu-culturel"], projectType: ["evenementiel"] },
+  "artisan-art":    { status: ["artiste-auteur"], artisticDomain: ["metiers-art"] },
 };
 
 export default function FormWizard() {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isExtended, setIsExtended] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Analytics: track que l'utilisateur a ouvert le formulaire
   useEffect(() => { trackFormStarted(); }, []);
 
-  // Extraire le paramètre domain de l'URL
   const urlParams = new URLSearchParams(window.location.search);
-  const domainParam = urlParams.get('domain') || '';
-  const profileParam = urlParams.get('profile') || '';
-  
-  // États pour les questions optionnelles dépliables
-  const [showInnovation, setShowInnovation] = useState(false);
-  const [showSocial, setShowSocial] = useState(false);
-  const [showUrgency, setShowUrgency] = useState(false);
-  const [showProjectStage, setShowProjectStage] = useState(false);
-  const [showAidTypes, setShowAidTypes] = useState(false);
-  const [showScope, setShowScope] = useState(false);
-  
-  // États pour dérouler les options supplémentaires
-  const [showMoreStatus, setShowMoreStatus] = useState(false);
-  const [showMoreDomain, setShowMoreDomain] = useState(false);
-  const [showMoreType, setShowMoreType] = useState(false);
-  
-  // Toasts déjà affichés pour éviter les doublons
-  const [shownToasts, setShownToasts] = useState<Set<string>>(new Set());
+  const domainParam = urlParams.get("domain") || "";
+  const profileParam = urlParams.get("profile") || "";
 
   const form = useForm<FormData>({
     resolver: zodResolver(formDataSchema),
     mode: "onChange",
     defaultValues: {
       status: [],
-      statusOther: "",
       artisticDomain: [],
-      artisticDomainOther: "",
       projectDescription: "",
       projectType: [],
-      projectTypeOther: "",
       projectStage: "",
       region: "Île-de-France",
       isInternational: "",
       innovation: [],
-      innovationOther: "",
       socialDimension: [],
-      socialDimensionOther: "",
       urgency: "",
       aidTypes: [],
-      aidTypesOther: "",
       geographicScope: [],
       email: "",
     },
   });
 
-  // Tags suggérés par domaine artistique - basés sur les termes réels des subventions
-  const tagsByDomain: Record<string, { fr: string[], en: string[] }> = {
-    musique: {
-      fr: ["album", "EP", "concert", "tournée", "festival", "enregistrement", "studio", "mixage", "mastering", "composition", "arrangement", "clip", "live", "streaming", "résidence musicale", "coproduction", "diffusion", "label", "production", "showcase"],
-      en: ["album", "EP", "concert", "tour", "festival", "recording", "studio", "mixing", "mastering", "composition", "arrangement", "music video", "live", "streaming", "musical residency", "coproduction", "distribution", "label", "production", "showcase"]
-    },
-    ecriture: {
-      fr: ["roman", "nouvelle", "essai", "poésie", "BD", "bande dessinée", "scénario", "théâtre", "biographie", "récit", "publication", "édition", "manuscrit", "écriture", "livre", "ouvrage", "traduction", "résidence d'écriture", "atelier d'écriture", "prix littéraire"],
-      en: ["novel", "short story", "essay", "poetry", "comic", "graphic novel", "screenplay", "theater", "biography", "narrative", "publication", "publishing", "manuscript", "writing", "book", "work", "translation", "writing residency", "writing workshop", "literary prize"]
-    },
-    "arts-plastiques": {
-      fr: ["exposition", "installation", "peinture", "sculpture", "photographie", "art contemporain", "galerie", "vernissage", "œuvre", "série", "catalogue", "commissariat", "résidence artistique", "atelier", "plasticien", "création", "art visuel", "performance", "collection", "biennale"],
-      en: ["exhibition", "installation", "painting", "sculpture", "photography", "contemporary art", "gallery", "opening", "artwork", "series", "catalog", "curating", "artistic residency", "studio", "visual artist", "creation", "visual art", "performance", "collection", "biennial"]
-    },
-    "spectacle-vivant": {
-      fr: ["spectacle", "théâtre", "mise en scène", "représentation", "tournée", "création scénique", "compagnie", "festival", "résidence", "atelier", "masterclass", "diffusion", "scène", "troupe", "danse", "cirque", "marionnettes", "arts de la rue", "performance", "dramaturgie"],
-      en: ["show", "theater", "staging", "performance", "tour", "stage creation", "company", "festival", "residency", "workshop", "masterclass", "distribution", "stage", "troupe", "dance", "circus", "puppetry", "street arts", "performance", "dramaturgy"]
-    },
-    audiovisuel: {
-      fr: ["film", "documentaire", "court-métrage", "long-métrage", "réalisation", "production", "scénario", "tournage", "montage", "post-production", "festival", "diffusion", "animation", "web-série", "podcast", "vidéo", "image", "son", "cinéma", "création audiovisuelle"],
-      en: ["film", "documentary", "short film", "feature film", "directing", "production", "screenplay", "shooting", "editing", "post-production", "festival", "distribution", "animation", "web series", "podcast", "video", "image", "sound", "cinema", "audiovisual creation"]
-    },
-    "arts-numeriques": {
-      fr: ["art numérique", "installation interactive", "réalité virtuelle", "VR", "AR", "réalité augmentée", "jeu vidéo", "création numérique", "média art", "web art", "net art", "vidéo mapping", "son interactif", "performance numérique", "intelligence artificielle", "IA", "NFT", "blockchain", "métavers", "création digitale"],
-      en: ["digital art", "interactive installation", "virtual reality", "VR", "AR", "augmented reality", "video game", "digital creation", "media art", "web art", "net art", "video mapping", "interactive sound", "digital performance", "artificial intelligence", "AI", "NFT", "blockchain", "metaverse", "digital creation"]
-    },
-    patrimoine: {
-      fr: ["restauration", "conservation", "patrimoine culturel", "monument historique", "valorisation", "sauvegarde", "rénovation", "inventaire", "archive", "collection", "musée", "médiation culturelle", "transmission", "mémoire", "patrimoine matériel", "patrimoine immatériel", "site culturel", "histoire", "tradition", "exposition patrimoniale"],
-      en: ["restoration", "conservation", "cultural heritage", "historical monument", "enhancement", "preservation", "renovation", "inventory", "archive", "collection", "museum", "cultural mediation", "transmission", "memory", "tangible heritage", "intangible heritage", "cultural site", "history", "tradition", "heritage exhibition"]
-    }
-  };
-
-  // Récupérer les tags contextuels selon le domaine sélectionné
-  const getContextualTags = () => {
-    if (domainParam && tagsByDomain[domainParam]) {
-      return tagsByDomain[domainParam][language as 'fr' | 'en'];
-    }
-    // Tags génériques si pas de domaine spécifié
-    return [
-      ...(tagsByDomain.musique[language as 'fr' | 'en'].slice(0, 5)),
-      ...(tagsByDomain.ecriture[language as 'fr' | 'en'].slice(0, 5)),
-      ...(tagsByDomain['arts-plastiques'][language as 'fr' | 'en'].slice(0, 5)),
-      ...(tagsByDomain['spectacle-vivant'][language as 'fr' | 'en'].slice(0, 5))
-    ];
-  };
-
-  const suggestedTags = getContextualTags();
-
-  const [suggestedTagsVisible, setSuggestedTagsVisible] = useState<string[]>([]);
-  const projectDescription = form.watch("projectDescription");
-
-  // Pré-remplir le domaine artistique selon le paramètre URL
+  // Pre-fill from URL params
   useEffect(() => {
-    if (domainParam) {
-      // Mapper les paramètres URL vers les valeurs du formulaire
-      const domainMapping: Record<string, string> = {
-        'musique': 'musique',
-        'ecriture': 'ecriture',
-        'arts-plastiques': 'arts-plastiques',
-        'spectacle-vivant': 'spectacle-vivant',
-        'audiovisuel': 'audiovisuel',
-        'arts-numeriques': 'arts-numeriques',
-        'patrimoine': 'patrimoine'
-      };
-      
-      const mappedDomain = domainMapping[domainParam];
-      if (mappedDomain) {
-        form.setValue('artisticDomain', [mappedDomain]);
-      }
-    }
-  }, [domainParam, form]);
-
-  // Pré-remplir un profil complet (raccourcis depuis la home "Je suis...")
-  useEffect(() => {
-    const profiles: Record<string, { status?: string[]; artisticDomain?: string[]; projectType?: string[] }> = {
-      'orga-soiree': {
-        status: ['collectif'],
-        artisticDomain: ['musique'],
-        projectType: ['evenementiel'],
-      },
-      'dj-producteur': {
-        status: ['artiste-auteur'],
-        artisticDomain: ['musique'],
-        projectType: ['enregistrement', 'diffusion'],
-      },
-      'danseur': {
-        status: ['artiste-auteur'],
-        artisticDomain: ['spectacle-vivant'],
-        projectType: ['creation'],
-      },
-      'compagnie': {
-        status: ['compagnie'],
-        artisticDomain: ['spectacle-vivant'],
-        projectType: ['creation', 'production'],
-      },
-      'lieu-culturel': {
-        status: ['lieu-culturel'],
-        projectType: ['evenementiel', 'investissement'],
-      },
-      'artisan-art': {
-        status: ['artiste-auto'],
-        artisticDomain: ['metiers-art'],
-      },
-    };
-
-    const preset = profiles[profileParam];
+    if (domainParam) form.setValue("artisticDomain", [domainParam]);
+    const preset = PROFILE_PRESETS[profileParam];
     if (preset) {
-      if (preset.status) form.setValue('status', preset.status);
-      if (preset.artisticDomain) form.setValue('artisticDomain', preset.artisticDomain);
-      if (preset.projectType) form.setValue('projectType', preset.projectType);
+      if (preset.status) form.setValue("status", preset.status);
+      if (preset.artisticDomain) form.setValue("artisticDomain", preset.artisticDomain);
+      if (preset.projectType) form.setValue("projectType", preset.projectType);
     }
-  }, [profileParam, form]);
+  }, [domainParam, profileParam, form]);
 
   const submitMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await apiRequest("POST", "/api/submit-form", data);
-      return response.json();
+      const res = await apiRequest("POST", "/api/submit-form", data);
+      return res.json();
     },
     onSuccess: (data) => {
       setLocation(`/loading?sessionId=${data.sessionId}`);
@@ -278,39 +136,26 @@ export default function FormWizard() {
     },
   });
 
-  const totalSteps = isExtended ? 7 : 6;
-  // Steps: 0=Statut, 1=Domaine, 2=Description, 3=Type, 4=Région, 5=Email+Submit, 6=OptionalExtended
+  const [stepIdx, setStepIdx] = useState(0);
+  const currentStep = STEPS[stepIdx];
 
-  // Detect scroll position
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      
-      const scrollTop = containerRef.current.scrollTop;
-      const sectionHeight = window.innerHeight;
-      const rawStep = Math.round(scrollTop / sectionHeight);
-      
-      // Limiter strictement entre 0 et totalSteps - 1
-      const newStep = Math.max(0, Math.min(rawStep, totalSteps - 1));
-      
-      if (newStep !== currentStep) {
-        setCurrentStep(newStep);
-        // Déclenche le mode étendu dès qu'on dépasse l'étape email (5)
-        if (newStep >= 5 && !isExtended) {
-          setIsExtended(true);
-        }
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
+  const handleNext = () => {
+    if (stepIdx < STEPS.length - 1) {
+      setStepIdx(stepIdx + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
     }
-  }, [currentStep, totalSteps, isExtended]);
-
-  const onSubmit = async (data: FormData) => {
-    console.log("🚀 Soumission du formulaire:", data);
+    // Last step -> submit
+    const data = form.getValues();
+    if (!data.email || !data.region) {
+      toast({
+        title: language === "fr" ? "Champs requis" : "Required fields",
+        description: language === "fr" ? "Email et région sont obligatoires." : "Email and region are required.",
+        variant: "destructive",
+        duration: 2500,
+      });
+      return;
+    }
     trackFormSubmitted({
       artisticDomain: data.artisticDomain?.join(", "),
       region: data.region,
@@ -318,1259 +163,503 @@ export default function FormWizard() {
     submitMutation.mutate(data);
   };
 
-  // Log des erreurs de validation (seulement les clés pour éviter les références circulaires)
-  const errors = form.formState.errors;
-  if (Object.keys(errors).length > 0) {
-    const errorKeys = Object.keys(errors);
-    const errorMessages = errorKeys.map(key => `${key}: ${(errors as any)[key]?.message || 'invalide'}`);
-    console.log("❌ Erreurs de validation:", errorMessages.join(", "));
-  }
-
-  const status = form.watch("status");
-  const artisticDomain = form.watch("artisticDomain");
-  const projectType = form.watch("projectType");
-  const projectStage = form.watch("projectStage");
-  const region = form.watch("region");
-  const innovation = form.watch("innovation");
-  const socialDimension = form.watch("socialDimension");
-  const urgency = form.watch("urgency");
-  const aidTypes = form.watch("aidTypes");
-  const geographicScope = form.watch("geographicScope");
-
-  const helpTextKeys = ["status", "artisticDomain", "projectDescription", "projectType", "projectStage", "region", "isInternational", "innovation", "socialDimension", "urgency", "aidTypes", "geographicScope", "email"] as const;
-
-  // Nombre réel de subventions actives (fetch au mount)
-  const [totalGrants, setTotalGrants] = useState(264);
-  useEffect(() => {
-    fetch("/api/grants/stats")
-      .then(r => r.json())
-      .then(d => { if (d?.total) setTotalGrants(d.total); })
-      .catch(() => { /* fallback: keep 264 */ });
-  }, []);
-
-  const grantCount = totalGrants;
-
-  // Fonction de gamification - Affiche un toast encourageant selon le choix
-  const showUnlockToast = (choice: string, field: string) => {
-    const toastKey = `${field}-${choice}`;
-    
-    // Éviter les doublons
-    if (shownToasts.has(toastKey)) return;
-    
-    // Messages de gamification (désactivés — les chiffres hardcoded
-    // étaient potentiellement trompeurs vs la vraie DB)
-    const unlockMessages: Record<string, { fr: { title: string; description: string }, en: { title: string; description: string } }> = {};
-
-    const message = unlockMessages[toastKey];
-    if (message) {
-      const content = language === 'fr' ? message.fr : message.en;
-      toast({
-        title: content.title,
-        description: content.description,
-        duration: 2500,
-      });
-      
-      // Marquer comme affiché
-      setShownToasts(prev => new Set(prev).add(toastKey));
+  const handlePrev = () => {
+    if (stepIdx > 0) {
+      setStepIdx(stepIdx - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-8 py-6 bg-white shadow-sm">
-        <div className="flex flex-col items-center gap-4 max-w-6xl mx-auto w-full">
-          <div className="flex flex-col items-center gap-1">
-            <a href="/" className="text-xl font-light tracking-tight text-black" data-testid="link-home">
-              Subvention<span className="font-bold">Match</span>
-            </a>
-            <motion.span 
-              key={grantCount}
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="text-xs text-gray-400 font-medium tracking-wide"
+    <div className="min-h-screen" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
+      {/* Banner */}
+      <div className="mc-mono text-xs text-center py-2 px-4" style={{ background: "var(--mc-warn)", color: "var(--mc-bg)" }}>
+        [ BETA ] &nbsp;&nbsp;
+        {language === "fr"
+          ? "Vos réponses ne sont jamais partagées. Bouton « Feedback » pour tout retour."
+          : "Your answers are never shared. \"Feedback\" button for anything."}
+      </div>
+
+      {/* Header */}
+      <header
+        className="sticky top-0 z-40 backdrop-blur border-b"
+        style={{ background: "rgba(10,10,10,0.85)", borderColor: "var(--mc-border)" }}
+      >
+        <div className="max-w-6xl mx-auto px-6 md:px-8 min-h-14 py-3 flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
+          <a href="/" className="flex items-center gap-3 flex-shrink-0" style={{ textDecoration: "none", color: "var(--mc-text)" }}>
+            <div className="mc-display text-lg">Mecene<span style={{ color: "var(--mc-primary)" }}>.</span></div>
+            <span
+              className="mc-chip mc-chip-warn mc-mono text-[10px] uppercase tracking-widest px-2 py-0.5 hidden sm:inline-flex"
             >
-              {language === "fr" 
-                ? `${grantCount} subvention${grantCount > 1 ? 's' : ''} disponible${grantCount > 1 ? 's' : ''}` 
-                : `${grantCount} grant${grantCount > 1 ? 's' : ''} available`}
-            </motion.span>
+              {language === "fr" ? "Formulaire" : "Form"}
+            </span>
+          </a>
+          <div className="mc-mono text-xs uppercase tracking-widest whitespace-nowrap" style={{ color: "var(--mc-muted)" }}>
+            {language === "fr" ? "Étape" : "Step"} <span style={{ color: "var(--mc-text)" }}>{currentStep.num}</span> <span style={{ color: "var(--mc-muted-2)" }}>/</span> 07
           </div>
-          
-          {/* Progress Bar */}
-          <div className="flex items-center justify-center gap-3 relative w-full max-w-md mx-auto">
-            {Array.from({ length: totalSteps }).map((_, index) => (
-                <motion.div
-                  key={index}
-                  className="relative"
-                  initial={index > 5 ? { opacity: 0, scale: 0 } : false}
-                  animate={{
-                    scale: currentStep === index ? 1.5 : 1,
-                    opacity: 1,
-                  }}
-                  transition={
-                    index > 5 && isExtended
-                      ? {
-                          opacity: { duration: 0.3, delay: (index - 6) * 0.1 },
-                          scale: {
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 20,
-                            delay: (index - 6) * 0.1,
-                          },
-                        }
-                      : {
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 20,
-                        }
-                  }
-                >
-                  <div 
-                    className={`rounded-full transition-colors ${
-                      currentStep === index 
-                        ? 'bg-black' 
-                        : currentStep > index 
-                          ? 'bg-black/60' 
-                          : 'bg-black/20'
-                    }`}
-                    style={{
-                      width: index > 5 ? `${Math.max(4, 8 - (index - 5) * 1)}px` : '8px',
-                      height: index > 5 ? `${Math.max(4, 8 - (index - 5) * 1)}px` : '8px',
-                    }}
-                  />
-                </motion.div>
-            ))}
-            
-            {/* Bouton rond de validation au bout de la timeline - uniquement quand étendu */}
-            <AnimatePresence>
-              {isExtended && (
-                <motion.button
-                  onClick={form.handleSubmit(onSubmit)}
-                  disabled={submitMutation.isPending}
-                  className="bg-black text-white rounded-full hover:bg-gray-800 transition-all shadow-lg hover:scale-110 active:scale-95 flex items-center justify-center ml-2"
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                  }}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ 
-                    duration: 0.3,
-                    ease: [0.16, 1, 0.3, 1]
-                  }}
-                  data-testid="button-timeline-submit"
-                >
-                  {submitMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <span className="text-sm font-bold">✓</span>
-                  )}
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
+          <button
+            onClick={() => setLocation("/")}
+            className="mc-btn-ghost text-xs uppercase tracking-widest mc-mono px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0"
+          >
+            {language === "fr" ? "Sauvegarder" : "Save"}{" "}
+            <span className="hidden md:inline">&amp; {language === "fr" ? "quitter" : "quit"}</span>
+          </button>
         </div>
       </header>
 
-      {/* Scroll Hint - Centered */}
-      {currentStep < totalSteps - 1 && (
-        <motion.div
-          className="fixed bottom-8 left-0 right-0 z-40 pointer-events-none"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <div className="flex flex-col items-center gap-2 text-gray-400 max-w-7xl mx-auto">
-            <span className="text-xs uppercase tracking-widest">
-              {language === "fr" ? "Scroll" : "Scroll"}
-            </span>
-            <ChevronDown className="h-5 w-5 animate-bounce" />
-          </div>
-        </motion.div>
-      )}
-
-
-      {/* Scrollable Container with Snap */}
-      <div 
-        ref={containerRef}
-        className="h-screen overflow-y-scroll snap-y snap-proximity scroll-smooth"
-      >
-        {/* Section 1: Status */}
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
-            {currentStep === 0 && (
-              <motion.div
-                key="step-0"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-6xl w-full flex flex-col items-center"
-              >
-                {/* Question - Centré */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-8 w-full max-w-2xl"
-                >
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-black">
-                    {language === "fr" ? "Quel est votre statut ?" : "What is your status?"}
-                  </h2>
-                  
-                  <div className="space-y-3">
-                    {/* Top 3 choices */}
-                    {["porteur-projet", "artiste-auteur", "association"].map((item, idx) => (
-                      <motion.label
-                        key={item}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.3 + idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
-                        data-testid={`checkbox-status-${item}`}
-                      >
-                        <Checkbox
-                          checked={status?.includes(item)}
-                          onCheckedChange={(checked) => {
-                            const newValue = checked ? [...(status || []), item] : status?.filter((value) => value !== item) || [];
-                            form.setValue("status", newValue, { shouldValidate: true });
-                            
-                            // Gamification toast
-                            if (checked) {
-                              showUnlockToast(item, 'status');
-                            }
-                          }}
-
-                        />
-                        <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
-                          {item === "porteur-projet" && t.porteurProjet}
-                          {item === "artiste-auteur" && t.artisteAuteur}
-                          {item === "association" && t.association}
-                        </span>
-                      </motion.label>
-                    ))}
-                    
-                    {/* Additional options */}
-                    <AnimatePresence>
-                      {showMoreStatus && (
-                        <motion.div
-                          key="more-status"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden"
-                        >
-                          {["artiste-auto", "micro-entreprise", "collectif", "lieu-culturel", "compagnie", "label", "festival-structure", "galerie", "maison-edition", "tourneur-producteur"].map((item, idx) => (
-                            <motion.label
-                              key={item}
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3, delay: idx * 0.03 }}
-                              className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
-                              data-testid={`checkbox-status-${item}`}
-                            >
-                              <Checkbox
-                                checked={status?.includes(item)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked ? [...(status || []), item] : status?.filter((value) => value !== item) || [];
-                                  form.setValue("status", newValue, { shouldValidate: true });
-                                  
-                                  // Gamification toast
-                                  if (checked) {
-                                    showUnlockToast(item, 'status');
-                                  }
-                                }}
-                              />
-                              <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
-                                {item === "artiste-auto" && t.artisteAutoEntrepreneur}
-                                {item === "micro-entreprise" && t.microEntreprise}
-                                {item === "collectif" && t.collectif}
-                                {item === "lieu-culturel" && t.lieuCulturel}
-                                {item === "compagnie" && t.compagnie}
-                                {item === "label" && t.label}
-                                {item === "festival-structure" && t.festivalStructure}
-                                {item === "galerie" && t.galerie}
-                                {item === "maison-edition" && t.maisonEdition}
-                                {item === "tourneur-producteur" && t.tourneurProducteur}
-                              </span>
-                            </motion.label>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    
-                    {/* Show more button */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setShowMoreStatus(!showMoreStatus)}
-                        className="w-full text-sm text-gray-500 hover:text-black"
-                      >
-                        {showMoreStatus 
-                          ? (language === "fr" ? "Voir moins d'options" : "See fewer options")
-                          : (language === "fr" ? "Voir plus d'options" : "See more options")
-                        }
-                        <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMoreStatus ? 'rotate-180' : ''}`} />
-                      </Button>
-                    </motion.div>
-                  </div>
-                </motion.div>
-
-                {/* Help Text - En bas */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-12 max-w-2xl w-full text-center space-y-4"
-                >
-                  <p className="text-base text-gray-600 leading-relaxed">
-                    {helpTexts.status[language as 'fr' | 'en']}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {language === "fr" ? "🔒 Vos données restent privées" : "🔒 Your data stays private"}
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Section 2: Artistic Domain (NEW) */}
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
-            {currentStep === 1 && (
-              <motion.div
-                key="step-1-domain"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-6xl w-full flex flex-col items-center"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-8 w-full max-w-2xl"
-                >
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-black">
-                    {language === "fr" ? "Votre domaine artistique ?" : "Your artistic domain?"}
-                  </h2>
-
-                  <div className="space-y-3">
-                    {/* Top 3 choices */}
-                    {["musique", "arts-plastiques", "spectacle-vivant"].map((item, idx) => (
-                      <motion.label
-                        key={item}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.3 + idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
-                        data-testid={`checkbox-domain-${item}`}
-                      >
-                        <Checkbox
-                          checked={artisticDomain?.includes(item)}
-                          onCheckedChange={(checked) => {
-                            const newValue = checked ? [...(artisticDomain || []), item] : artisticDomain?.filter((value) => value !== item) || [];
-                            form.setValue("artisticDomain", newValue, { shouldValidate: true });
-                          }}
-                        />
-                        <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
-                          {item === "musique" && t.musique}
-                          {item === "arts-plastiques" && t.artsPlastiques}
-                          {item === "spectacle-vivant" && t.spectacleVivant}
-                        </span>
-                      </motion.label>
-                    ))}
-
-                    {/* Additional options */}
-                    <AnimatePresence>
-                      {showMoreDomain && (
-                        <motion.div
-                          key="more-domain"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden"
-                        >
-                          {["ecriture", "audiovisuel", "arts-numeriques", "patrimoine", "metiers-art"].map((item, idx) => (
-                            <motion.label
-                              key={item}
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3, delay: idx * 0.03 }}
-                              className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
-                              data-testid={`checkbox-domain-${item}`}
-                            >
-                              <Checkbox
-                                checked={artisticDomain?.includes(item)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked ? [...(artisticDomain || []), item] : artisticDomain?.filter((value) => value !== item) || [];
-                                  form.setValue("artisticDomain", newValue, { shouldValidate: true });
-                                }}
-                              />
-                              <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
-                                {item === "ecriture" && t.ecriture}
-                                {item === "audiovisuel" && t.audiovisuel}
-                                {item === "arts-numeriques" && t.artsNumeriques}
-                                {item === "patrimoine" && t.patrimoine}
-                                {item === "metiers-art" && t.metiersArt}
-                              </span>
-                            </motion.label>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setShowMoreDomain(!showMoreDomain)}
-                        className="w-full text-sm text-gray-500 hover:text-black"
-                      >
-                        {showMoreDomain
-                          ? (language === "fr" ? "Voir moins d'options" : "See fewer options")
-                          : (language === "fr" ? "Voir plus d'options" : "See more options")
-                        }
-                        <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMoreDomain ? 'rotate-180' : ''}`} />
-                      </Button>
-                    </motion.div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-12 max-w-2xl w-full text-center space-y-4"
-                >
-                  <p className="text-base text-gray-600 leading-relaxed">
-                    {helpTexts.artisticDomain[language as 'fr' | 'en']}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {language === "fr" ? "🔒 Vos données restent privées" : "🔒 Your data stays private"}
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Section 3: Project Description */}
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
-            {currentStep === 2 && (
-              <motion.div
-                key="step-2-desc"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-6xl w-full flex flex-col items-center"
-              >
-                {/* Question - Centré */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-8 w-full max-w-2xl"
-                >
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-black">
-                    {language === "fr" ? "Décrivez votre projet" : "Describe your project"}
-                  </h2>
-                  
-                  <div className="space-y-4">
-                    <Textarea
-                      value={projectDescription || ""}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        form.setValue("projectDescription", value, { shouldValidate: true });
-                        
-                        // Générer des suggestions basées sur le texte
-                        const text = value.toLowerCase();
-                        
-                        // Afficher les tags qui ne sont pas déjà dans le texte
-                        const relevant = suggestedTags.filter((tag: string) => 
-                          !text.includes(tag.toLowerCase()) && 
-                          text.length > 5 // Seulement si l'utilisateur a tapé quelque chose
-                        ).slice(0, 6); // Max 6 suggestions
-                        
-                        setSuggestedTagsVisible(relevant);
-                      }}
-                      placeholder={language === "fr" ? "Quelques mots suffisent..." : "A few words are enough..."}
-                      className="w-full min-h-[200px] text-lg p-4 bg-white backdrop-blur-sm border-gray-200 text-black placeholder:text-gray-400 resize-none"
-                      data-testid="textarea-project-description"
-                    />
-                    
-                    {/* Tags suggérés */}
-                    {suggestedTagsVisible.length > 0 && projectDescription && projectDescription.length > 5 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-wrap gap-2"
-                      >
-                        <span className="text-xs text-gray-400 w-full mb-1">
-                          {language === "fr" ? "Suggestions :" : "Suggestions:"}
-                        </span>
-                        {suggestedTagsVisible.map((tag) => (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => {
-                              const currentText = form.getValues("projectDescription");
-                              const newText = currentText ? `${currentText} ${tag}` : tag;
-                              form.setValue("projectDescription", newText);
-                              
-                              // Retirer le tag des suggestions
-                              setSuggestedTagsVisible(prev => prev.filter(t => t !== tag));
-                            }}
-                            className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-[#06D6A0] hover:text-white text-gray-700 rounded-full transition-all border border-gray-200 hover:border-[#06D6A0]"
-                            data-testid={`tag-${tag}`}
-                          >
-                            + {tag}
-                          </button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </div>
-                </motion.div>
-
-                {/* Help Text - En bas */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-12 max-w-2xl w-full text-center space-y-4"
-                >
-                  <p className="text-base text-gray-600 leading-relaxed">
-                    {helpTexts.projectDescription[language as 'fr' | 'en']}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {language === "fr" ? "🔒 Vos données restent privées" : "🔒 Your data stays private"}
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Section 4: Project Type */}
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
-            {currentStep === 3 && (
-              <motion.div
-                key="step-3-type"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-6xl w-full flex flex-col items-center"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-8 w-full max-w-2xl"
-                >
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-black">
-                    {language === "fr" ? "Type de projet ?" : "Project type?"}
-                  </h2>
-                  
-                  <div className="space-y-3">
-                    {/* Top 3 choices */}
-                    {["creation", "production", "diffusion"].map((item, idx) => (
-                      <motion.label
-                        key={item}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.3 + idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
-                        data-testid={`checkbox-type-${item}`}
-                      >
-                        <Checkbox
-                          checked={projectType?.includes(item)}
-                          onCheckedChange={(checked) => {
-                            const newValue = checked ? [...(projectType || []), item] : projectType?.filter((value) => value !== item) || [];
-                            form.setValue("projectType", newValue, { shouldValidate: true });
-                          }}
-
-                        />
-                        <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
-                          {item === "creation" && (language === "fr" ? "Création" : "Creation")}
-                          {item === "production" && (language === "fr" ? "Production" : "Production")}
-                          {item === "diffusion" && (language === "fr" ? "Diffusion" : "Distribution")}
-                        </span>
-                      </motion.label>
-                    ))}
-                    
-                    {/* Additional options */}
-                    <AnimatePresence>
-                      {showMoreType && (
-                        <motion.div
-                          key="more-type"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden"
-                        >
-                          {["evenementiel", "residence", "formation", "edition", "investissement", "tournee", "enregistrement", "promotion"].map((item, idx) => (
-                            <motion.label
-                              key={item}
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3, delay: idx * 0.03 }}
-                              className="flex items-center gap-4 p-4 bg-white border border-gray-200 hover:border-black cursor-pointer transition-all group"
-                              data-testid={`checkbox-type-${item}`}
-                            >
-                              <Checkbox
-                                checked={projectType?.includes(item)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked ? [...(projectType || []), item] : projectType?.filter((value) => value !== item) || [];
-                                  form.setValue("projectType", newValue, { shouldValidate: true });
-                                }}
-                              />
-                              <span className="text-base font-medium text-black group-hover:translate-x-1 transition-transform">
-                                {item === "evenementiel" && (language === "fr" ? "Événementiel / Festival" : "Event / Festival")}
-                                {item === "residence" && (language === "fr" ? "Résidence" : "Residency")}
-                                {item === "formation" && (language === "fr" ? "Formation" : "Training")}
-                                {item === "edition" && (language === "fr" ? "Édition / Publication" : "Publishing")}
-                                {item === "investissement" && (language === "fr" ? "Investissement / Équipement" : "Investment / Equipment")}
-                                {item === "tournee" && (language === "fr" ? "Tournée" : "Tour")}
-                                {item === "enregistrement" && (language === "fr" ? "Enregistrement / Studio" : "Recording / Studio")}
-                                {item === "promotion" && (language === "fr" ? "Promotion / Communication" : "Promotion / Communication")}
-                              </span>
-                            </motion.label>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    
-                    {/* Show more button */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setShowMoreType(!showMoreType)}
-                        className="w-full text-sm text-gray-500 hover:text-black"
-                      >
-                        {showMoreType 
-                          ? (language === "fr" ? "Voir moins d'options" : "See fewer options")
-                          : (language === "fr" ? "Voir plus d'options" : "See more options")
-                        }
-                        <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMoreType ? 'rotate-180' : ''}`} />
-                      </Button>
-                    </motion.div>
-                  </div>
-                </motion.div>
-
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-12 max-w-2xl w-full text-center space-y-4"
-                >
-                  <p className="text-base text-gray-600 leading-relaxed">
-                    {helpTexts.projectType[language as 'fr' | 'en']}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {language === "fr" ? "🔒 Vos données restent privées" : "🔒 Your data stays private"}
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Section 5: Région */}
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
-            {currentStep === 4 && (
-              <motion.div
-                key="step-4-region"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-6xl w-full flex flex-col items-center"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-8 w-full max-w-2xl"
-                >
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-black">
-                    {language === "fr" ? "Région ?" : "Region?"}
-                  </h2>
-                  
-                  <Select
-                    value={form.watch("region")}
-                    onValueChange={(value) => form.setValue("region", value, { shouldValidate: true })}
-                  >
-                    <SelectTrigger 
-                      className="w-full text-lg px-6 py-6 bg-white border-2 border-gray-200 focus:border-black text-black h-auto"
-                      data-testid="select-region"
-                    >
-                      <SelectValue placeholder={language === "fr" ? "Sélectionnez votre région" : "Select your region"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {frenchRegions.map((region) => (
-                        <SelectItem 
-                          key={region} 
-                          value={region}
-                          className="text-base py-3 cursor-pointer hover:bg-gray-100"
-                        >
-                          {region}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </motion.div>
-
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-12 max-w-2xl w-full text-center space-y-4"
-                >
-                  <p className="text-base text-gray-600 leading-relaxed">
-                    {helpTexts.region[language as 'fr' | 'en']}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {language === "fr" ? "🔒 Vos données restent privées" : "🔒 Your data stays private"}
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Section 6: Email + Submit (always accessible, extended mode shows optional questions after) */}
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 w-full max-w-7xl mx-auto">
-          <AnimatePresence mode="wait">
-            {currentStep === 5 && (
-              <motion.div
-                key="step-5-email"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-2xl w-full mx-auto text-center"
-              >
-                <motion.h2
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-black mb-6"
-                >
-                  {language === "fr" ? "Votre email ?" : "Your email?"}
-                </motion.h2>
-
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="text-lg text-gray-600 mb-8"
-                >
-                  {language === "fr"
-                    ? "Pour recevoir votre PDF personnalisé avec toutes les subventions matchées."
-                    : "To receive your personalized PDF with all matched grants."
-                  }
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="mb-6"
-                >
-                  <Input
-                    {...form.register("email")}
-                    type="email"
-                    placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
-                    className="w-full text-lg px-8 py-6 bg-white border-2 border-gray-200 focus:border-black text-black placeholder:text-gray-400 rounded-full text-center"
-                    data-testid="input-email"
-                  />
-                </motion.div>
-
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="text-sm text-gray-400 leading-relaxed mb-8 max-w-md mx-auto"
-                >
-                  {language === "fr"
-                    ? "🔒 Vos données restent privées. Pas de spam."
-                    : "🔒 Your data stays private. No spam."
-                  }
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center gap-4"
-                >
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const formErrors = form.formState.errors;
-                      if (Object.keys(formErrors).length > 0) {
-                        toast({
-                          title: language === "fr" ? "Formulaire incomplet" : "Incomplete form",
-                          description: language === "fr"
-                            ? "Veuillez remplir tous les champs obligatoires"
-                            : "Please fill all required fields",
-                          variant: "destructive",
-                          duration: 2500,
-                        });
-                        return;
-                      }
-                      form.handleSubmit(onSubmit)();
-                    }}
-                    disabled={submitMutation.isPending}
-                    className="px-12 py-5 bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-white font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                    data-testid="button-submit-early"
-                  >
-                    {submitMutation.isPending ? (
-                      <div className="flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>{language === "fr" ? "Analyse en cours..." : "Analyzing..."}</span>
-                      </div>
-                    ) : (
-                      language === "fr" ? "Voir mes résultats" : "See my results"
-                    )}
-                  </button>
-
-                  <motion.button
-                    type="button"
-                    onClick={() => {
-                      if (!isExtended) setIsExtended(true);
-                      // Smooth scroll to next section
-                      setTimeout(() => {
-                        if (containerRef.current) {
-                          containerRef.current.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group inline-flex items-center gap-3 px-6 py-4 mt-4 bg-indigo-50 border-2 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-500 rounded-xl shadow-sm hover:shadow-md transition-all"
-                    data-testid="button-refine"
-                  >
-                    <span className="text-base md:text-lg font-semibold text-indigo-900">
-                      {language === "fr" ? "Ou affiner avec des questions optionnelles" : "Or refine with optional questions"}
-                    </span>
-                    <motion.span
-                      animate={{ y: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                      className="text-xl text-indigo-600 group-hover:text-indigo-800"
-                    >
-                      ↓
-                    </motion.span>
-                  </motion.button>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-
-        {/* Section 7: Questions optionnelles (toutes sur une page avec toggles) */}
-        {isExtended && (
-        <section className="min-h-screen snap-start snap-always flex items-start justify-center px-8 pt-32 pb-16 bg-gray-50 relative w-full max-w-7xl mx-auto">
-          <motion.div
-            key="step-6"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-4xl w-full space-y-12 py-20"
-          >
-            <motion.h2
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-black text-center mb-12 bg-white px-8 py-6 rounded-lg shadow-sm"
-            >
-              {language === "fr" ? "Questions optionnelles" : "Optional questions"}
-            </motion.h2>
-
-            {/* Innovation */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowInnovation(!showInnovation)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-innovation"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Innovation ?" : "Innovation?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showInnovation ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showInnovation && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3 px-6 pb-6"
-                  >
-                    {["numerique", "technologique", "sociale", "artistique"].map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                        data-testid={`checkbox-innovation-${item}`}
-                      >
-                        <Checkbox
-                          checked={innovation?.includes(item) ?? false}
-                          onCheckedChange={(checked) => {
-                            const currentValue = innovation ?? [];
-                            const newValue = checked ? [...currentValue, item] : currentValue.filter((value) => value !== item);
-                            form.setValue("innovation", newValue, { shouldValidate: true });
-                            
-                            // Gamification toast
-                            if (checked) {
-                              showUnlockToast(item, 'innovation');
-                            }
-                          }}
-
-                        />
-                        <span className="text-base font-medium text-black">
-                          {item === "numerique" && (language === "fr" ? "Numérique" : "Digital")}
-                          {item === "technologique" && (language === "fr" ? "Technologique" : "Technological")}
-                          {item === "sociale" && (language === "fr" ? "Sociale" : "Social")}
-                          {item === "artistique" && (language === "fr" ? "Artistique" : "Artistic")}
-                        </span>
-                      </label>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Dimension sociale */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowSocial(!showSocial)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-social"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Dimension sociale ?" : "Social dimension?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showSocial ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showSocial && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3 px-6 pb-6"
-                  >
-                    {["inclusion", "accessibilite", "education", "environnement"].map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                        data-testid={`checkbox-social-${item}`}
-                      >
-                        <Checkbox
-                          checked={socialDimension?.includes(item)}
-                          onCheckedChange={(checked) => {
-                            const newValue = checked ? [...(socialDimension || []), item] : socialDimension?.filter((value) => value !== item) || [];
-                            form.setValue("socialDimension", newValue, { shouldValidate: true });
-                          }}
-
-                        />
-                        <span className="text-base font-medium text-black">
-                          {item === "inclusion" && (language === "fr" ? "Inclusion" : "Inclusion")}
-                          {item === "accessibilite" && (language === "fr" ? "Accessibilité" : "Accessibility")}
-                          {item === "education" && (language === "fr" ? "Éducation" : "Education")}
-                          {item === "environnement" && (language === "fr" ? "Environnement" : "Environment")}
-                        </span>
-                      </label>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Urgence */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowUrgency(!showUrgency)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-urgency"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Urgence ?" : "Urgency?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showUrgency ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showUrgency && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="px-6 pb-6"
-                  >
-                    <RadioGroup
-                      value={urgency}
-                      onValueChange={(value) => form.setValue("urgency", value, { shouldValidate: true })}
-                      className="space-y-3"
-                    >
-                      {["immediat", "court-terme", "long-terme"].map((item) => (
-                        <label
-                          key={item}
-                          className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                          data-testid={`radio-urgency-${item}`}
-                        >
-                          <RadioGroupItem value={item} className="" />
-                          <span className="text-base font-medium text-black">
-                            {item === "immediat" && (language === "fr" ? "Immédiat (< 1 mois)" : "Immediate (< 1 month)")}
-                            {item === "court-terme" && (language === "fr" ? "Court terme (1-6 mois)" : "Short term (1-6 months)")}
-                            {item === "long-terme" && (language === "fr" ? "Long terme (> 6 mois)" : "Long term (> 6 months)")}
-                          </span>
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Stade du projet */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowProjectStage(!showProjectStage)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-projectstage"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Stade du projet ?" : "Project stage?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showProjectStage ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showProjectStage && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="px-6 pb-6"
-                  >
-                    <RadioGroup
-                      value={projectStage}
-                      onValueChange={(value) => form.setValue("projectStage", value, { shouldValidate: true })}
-                      className="space-y-3"
-                    >
-                      {["idee", "en-cours", "finalise"].map((item) => (
-                        <label
-                          key={item}
-                          className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                          data-testid={`radio-stage-${item}`}
-                        >
-                          <RadioGroupItem value={item} className="" />
-                          <span className="text-base font-medium text-black">
-                            {item === "idee" && (language === "fr" ? "Idée / Concept" : "Idea / Concept")}
-                            {item === "en-cours" && (language === "fr" ? "En cours de développement" : "In development")}
-                            {item === "finalise" && (language === "fr" ? "Projet finalisé" : "Finalized project")}
-                          </span>
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Types d'aides */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowAidTypes(!showAidTypes)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-aidtypes"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Types d'aides ?" : "Aid types?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showAidTypes ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showAidTypes && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3 px-6 pb-6"
-                  >
-                    {["subvention", "pret", "bourse", "prix", "residence", "accompagnement", "appel-projets"].map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                        data-testid={`checkbox-aidtype-${item}`}
-                      >
-                        <Checkbox
-                          checked={aidTypes?.includes(item) ?? false}
-                          onCheckedChange={(checked) => {
-                            const currentValue = aidTypes ?? [];
-                            const newValue = checked ? [...currentValue, item] : currentValue.filter((value) => value !== item);
-                            form.setValue("aidTypes", newValue, { shouldValidate: true });
-                          }}
-
-                        />
-                        <span className="text-base font-medium text-black">
-                          {item === "subvention" && (language === "fr" ? "Subvention" : "Grant")}
-                          {item === "pret" && (language === "fr" ? "Prêt" : "Loan")}
-                          {item === "bourse" && (language === "fr" ? "Bourse" : "Scholarship")}
-                          {item === "prix" && (language === "fr" ? "Prix" : "Award")}
-                          {item === "residence" && (language === "fr" ? "Résidence" : "Residency")}
-                          {item === "accompagnement" && (language === "fr" ? "Accompagnement / Mentorat" : "Mentoring / Coaching")}
-                          {item === "appel-projets" && (language === "fr" ? "Appel à projets" : "Call for projects")}
-                        </span>
-                      </label>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Portée géographique */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setShowScope(!showScope)}
-                className="w-full text-left p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                data-testid="toggle-scope"
-              >
-                <h3 className="text-2xl font-bold text-black group-hover:text-indigo-600 transition-colors">
-                  {language === "fr" ? "Portée géographique ?" : "Geographic scope?"}
-                </h3>
-                <span className="text-2xl text-gray-400 group-hover:text-indigo-600 transition-all transform group-hover:scale-110">
-                  {showScope ? "−" : "+"}
-                </span>
-              </button>
-              <AnimatePresence>
-                {showScope && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3 px-6 pb-6"
-                  >
-                    {["local", "regional", "national", "europeen", "international"].map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 hover:border-black cursor-pointer transition-all group rounded-lg"
-                        data-testid={`checkbox-scope-${item}`}
-                      >
-                        <Checkbox
-                          checked={geographicScope?.includes(item) ?? false}
-                          onCheckedChange={(checked) => {
-                            const currentValue = geographicScope ?? [];
-                            const newValue = checked ? [...currentValue, item] : currentValue.filter((value) => value !== item);
-                            form.setValue("geographicScope", newValue, { shouldValidate: true });
-                          }}
-
-                        />
-                        <span className="text-base font-medium text-black">
-                          {item === "local" && (language === "fr" ? "Local" : "Local")}
-                          {item === "regional" && (language === "fr" ? "Régional" : "Regional")}
-                          {item === "national" && (language === "fr" ? "National" : "National")}
-                          {item === "europeen" && (language === "fr" ? "Européen" : "European")}
-                          {item === "international" && (language === "fr" ? "International" : "International")}
-                        </span>
-                      </label>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            {/* Submit button at the bottom of optional questions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex justify-center pt-8"
-            >
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  const formErrors = form.formState.errors;
-                  const emailValue = form.getValues("email");
-                  if (Object.keys(formErrors).length > 0 || !emailValue) {
-                    toast({
-                      title: language === "fr" ? "Email manquant" : "Email required",
-                      description: language === "fr"
-                        ? "Remontez en haut pour renseigner votre email"
-                        : "Scroll up to enter your email",
-                      variant: "destructive",
-                      duration: 2500,
-                    });
-                    // Scroll jusqu'au champ email et le focus
-                    const emailInput = document.querySelector<HTMLInputElement>('[data-testid="input-email"]');
-                    if (emailInput) {
-                      emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      setTimeout(() => emailInput.focus(), 600);
-                    }
-                    return;
-                  }
-                  form.handleSubmit(onSubmit)();
-                }}
-                disabled={submitMutation.isPending}
-                className="px-12 py-5 bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-white font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                data-testid="button-submit-refined"
-              >
-                {submitMutation.isPending ? (
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>{language === "fr" ? "Analyse en cours..." : "Analyzing..."}</span>
-                  </div>
-                ) : (
-                  language === "fr" ? "Découvrir mes résultats affinés" : "Discover my refined results"
-                )}
-              </button>
-            </motion.div>
-          </motion.div>
-        </section>
-        )}
+      {/* Progress */}
+      <div className="max-w-6xl mx-auto px-6 md:px-8 pt-6">
+        <div className="flex gap-1.5">
+          {STEPS.map((s, i) => (
+            <div
+              key={s.id}
+              className="h-1 flex-1 rounded-full"
+              style={{ background: i <= stepIdx ? "var(--mc-primary)" : "var(--mc-border)" }}
+            />
+          ))}
+        </div>
       </div>
+
+      {/* Question */}
+      <section>
+        <div className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-20">
+          {currentStep.id === "status" && <StepStatus form={form} />}
+          {currentStep.id === "domain" && <StepDomain form={form} />}
+          {currentStep.id === "description" && <StepDescription form={form} />}
+          {currentStep.id === "type" && <StepType form={form} />}
+          {currentStep.id === "region" && <StepRegion form={form} />}
+          {currentStep.id === "email" && <StepEmail form={form} />}
+          {currentStep.id === "optional" && <StepOptional form={form} />}
+
+          {/* Nav */}
+          <div className="mt-14 pt-8 border-t flex items-center justify-between gap-4" style={{ borderColor: "var(--mc-border)" }}>
+            <button
+              onClick={handlePrev}
+              disabled={stepIdx === 0}
+              className="mc-btn-ghost inline-flex items-center gap-2 px-5 py-3 rounded-full mc-mono text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              {language === "fr" ? "Précédent" : "Previous"}
+            </button>
+            <div className="hidden md:block text-xs mc-mono uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+              {language === "fr" ? "Auto-sauvegardé" : "Auto-saved"}
+            </div>
+            <button
+              onClick={handleNext}
+              disabled={submitMutation.isPending}
+              className="mc-btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-full mc-mono text-xs uppercase tracking-widest disabled:opacity-60"
+            >
+              {submitMutation.isPending
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {language === "fr" ? "Envoi…" : "Submitting…"}</>
+                : (stepIdx === STEPS.length - 1
+                    ? <>{language === "fr" ? "Lancer le matching" : "Launch matching"} <ArrowRight className="w-3.5 h-3.5" /></>
+                    : <>{language === "fr" ? "Question suivante" : "Next"} <ArrowRight className="w-3.5 h-3.5" /></>)}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Step overview */}
+      <section className="mc-section-rule">
+        <div className="max-w-6xl mx-auto px-6 md:px-8 py-12">
+          <div className="mc-mono text-xs uppercase tracking-widest mb-6" style={{ color: "var(--mc-muted)" }}>
+            {language === "fr" ? "/ Progression · cliquez pour sauter" : "/ Progress · click to jump"}
+          </div>
+          <div className="grid md:grid-cols-7 gap-2">
+            {STEPS.map((s, i) => {
+              const state = i < stepIdx ? "done" : i === stepIdx ? "active" : "future";
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setStepIdx(i)}
+                  className={`mc-card p-4 text-left ${state === "future" ? "opacity-60" : ""}`}
+                  style={state === "active" ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)" } : undefined}
+                >
+                  <div
+                    className="mc-mono text-[10px] uppercase tracking-widest mb-2 flex items-center gap-1.5"
+                    style={{ color: state === "done" || state === "active" ? "var(--mc-primary)" : "var(--mc-muted)" }}
+                  >
+                    {state === "done" && <Check className="w-3 h-3" strokeWidth={3} />}
+                    {state === "active" && "•"}
+                    {s.num}
+                  </div>
+                  <div className="text-xs" style={{ color: state === "active" ? "var(--mc-text)" : "var(--mc-muted)" }}>
+                    {s.label}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mc-mono text-[10px] uppercase tracking-widest mt-6 text-center" style={{ color: "var(--mc-muted-2)" }}>
+            {language === "fr"
+              ? "7 questions · 3 minutes · aucune réponse n'est stockée sans votre email"
+              : "7 questions · 3 minutes · no answer stored without your email"}
+          </p>
+        </div>
+      </section>
+
+      <footer className="border-t" style={{ borderColor: "var(--mc-border)" }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-8 mc-mono text-xs uppercase tracking-widest flex flex-wrap justify-between gap-4" style={{ color: "var(--mc-muted)" }}>
+          <span>© 2026 Mecene · {language === "fr" ? "Formulaire" : "Form"} v0.9</span>
+          <span className="flex gap-6">
+            <a href="/mentions-legales" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>
+              {language === "fr" ? "Mentions légales" : "Legal"}
+            </a>
+            <a href="/confidentialite" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>
+              {language === "fr" ? "Confidentialité" : "Privacy"}
+            </a>
+            <a href="/cgv" className="hover:text-white transition" style={{ textDecoration: "none", color: "inherit" }}>CGV</a>
+          </span>
+        </div>
+      </footer>
     </div>
+  );
+}
+
+/* === STEP COMPONENTS === */
+
+function Hero({ num, eyebrow, title, intro, tip }: { num: string; eyebrow: string; title: React.ReactNode; intro: string; tip?: string }) {
+  return (
+    <>
+      <div className="mc-mono text-xs uppercase tracking-widest mb-6" style={{ color: "var(--mc-primary)" }}>/ {num} — {eyebrow}</div>
+      <h1 className="mc-display text-4xl md:text-6xl mb-6">{title}</h1>
+      <p className="text-lg leading-relaxed max-w-xl" style={{ color: "var(--mc-muted)" }}>{intro}</p>
+      {tip && (
+        <div className="mt-8 mc-card-soft p-5 flex gap-3 items-start">
+          <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-accent)" }} />
+          <div className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+            <span className="font-medium" style={{ color: "var(--mc-text)" }}>Conseil : </span>{tip}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function StepStatus({ form }: { form: any }) {
+  const values: string[] = form.watch("status") || [];
+  const toggle = (v: string) => {
+    const next = values.includes(v) ? values.filter(x => x !== v) : [v]; // single select
+    form.setValue("status", next);
+  };
+  return (
+    <>
+      <Hero num="01" eyebrow="Qui êtes-vous ?"
+        title={<>VOUS ÊTES<br />QUOI AU JUSTE<span style={{ color: "var(--mc-primary)" }}>?</span></>}
+        intro="On adapte les questions à votre domaine. Pas de jargon administratif, on demande juste ce qu'il faut pour matcher."
+        tip="On ne demande jamais de n° SIRET. Votre statut juridique (indépendant, collectif, association…) suffit."
+      />
+      <div className="mt-10">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Votre profil principal</label>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {STATUS_OPTIONS.map(({ value, icon: Icon, label }) => {
+            const selected = values.includes(value);
+            return (
+              <button
+                key={value}
+                onClick={() => toggle(value)}
+                className="mc-card px-5 py-4 text-left flex items-center gap-3 transition"
+                style={selected
+                  ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                  : { borderColor: "var(--mc-border)" }
+                }
+              >
+                <Icon className="w-4 h-4" style={{ color: selected ? "var(--mc-primary)" : "var(--mc-muted)" }} strokeWidth={1.75} />
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StepDomain({ form }: { form: any }) {
+  const values: string[] = form.watch("artisticDomain") || [];
+  const toggle = (v: string) => {
+    const next = values.includes(v) ? values.filter(x => x !== v) : [...values, v];
+    form.setValue("artisticDomain", next);
+  };
+  return (
+    <>
+      <Hero num="02" eyebrow="Votre domaine artistique"
+        title={<>QUELLE EST<br />VOTRE DISCIPLINE<span style={{ color: "var(--mc-primary)" }}>?</span></>}
+        intro="Cochez tout ce qui s'applique. On sait que les projets sont souvent hybrides — un spectacle peut être musique + théâtre + audiovisuel à la fois."
+        tip="Plusieurs choix possibles. La discipline détermine quelles aides sectorielles sont vérifiées en priorité."
+      />
+      <div className="mt-10">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Cochez vos disciplines</label>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {DOMAIN_OPTIONS.map(({ value, label }) => {
+            const selected = values.includes(value);
+            return (
+              <button
+                key={value}
+                onClick={() => toggle(value)}
+                className="mc-card px-4 py-3 text-sm flex items-center gap-2 transition"
+                style={selected
+                  ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                  : { borderColor: "var(--mc-border)" }
+                }
+              >
+                {selected && <Check className="w-3.5 h-3.5" style={{ color: "var(--mc-primary)" }} strokeWidth={3} />}
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StepDescription({ form }: { form: any }) {
+  const v = form.watch("projectDescription") || "";
+  return (
+    <>
+      <Hero num="03" eyebrow="Votre projet"
+        title={<>DÉCRIVEZ<br />VOTRE PROJET<span style={{ color: "var(--mc-primary)" }}>.</span></>}
+        intro="Quelques lignes suffisent. L'IA comprend le contexte, pas besoin d'un roman. Vos mots, votre style."
+        tip="Mentionnez votre discipline, votre intention artistique, l'étape du projet, et si possible un budget approximatif. Plus c'est précis, meilleurs sont les matches."
+      />
+      <div className="mt-10">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Description du projet</label>
+        <textarea
+          {...form.register("projectDescription")}
+          placeholder="Ex : Je suis une compagnie de théâtre contemporain basée à Lyon. Nous préparons une création sur la mémoire collective qui mêle théâtre, vidéo et musique live. Budget estimé : 45 000 €. Deadline souhaitée : rentrée 2026."
+          className="mc-input w-full text-sm rounded-lg focus:outline-none"
+          style={{
+            background: "var(--mc-bg)",
+            border: "1px solid var(--mc-border)",
+            color: "var(--mc-text)",
+            padding: "1.1rem 1.35rem",
+            lineHeight: 1.55,
+            minHeight: 180,
+            resize: "vertical",
+          }}
+        />
+        <div className="mt-2 flex justify-between mc-mono text-[10px] uppercase tracking-widest" style={{ color: "var(--mc-muted-2)" }}>
+          <span>Max. 1500 caractères</span>
+          <span>{v.length} / 1500</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StepType({ form }: { form: any }) {
+  const types: string[] = form.watch("projectType") || [];
+  const stage: string = form.watch("projectStage") || "";
+  const toggle = (v: string) => {
+    const next = types.includes(v) ? types.filter(x => x !== v) : [...types, v];
+    form.setValue("projectType", next);
+  };
+  return (
+    <>
+      <Hero num="04" eyebrow="Nature du projet"
+        title={<>CRÉATION,<br />PRODUCTION,<br />DIFFUSION<span style={{ color: "var(--mc-primary)" }}>?</span></>}
+        intro="Ça change tout côté éligibilité. Une aide à la création n'est pas la même qu'une aide à la diffusion. Plusieurs choix possibles."
+        tip="Les projets hybrides sont courants. Cochez tout ce qui s'applique — on priorise ensuite selon votre description."
+      />
+      <div className="mt-10">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Nature du projet (plusieurs choix)</label>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {TYPE_OPTIONS.map(({ value, label, desc }) => {
+            const selected = types.includes(value);
+            return (
+              <button
+                key={value}
+                onClick={() => toggle(value)}
+                className="mc-card px-5 py-4 text-left transition"
+                style={selected
+                  ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)" }
+                  : undefined}
+              >
+                <div className="font-medium mb-1">{label}</div>
+                <div className="text-xs" style={{ color: "var(--mc-muted)" }}>{desc}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="mt-8">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Stade d'avancement</label>
+        <div className="flex flex-wrap gap-2">
+          {STAGE_OPTIONS.map(({ value, label }) => {
+            const selected = stage === value;
+            return (
+              <button
+                key={value}
+                onClick={() => form.setValue("projectStage", selected ? "" : value)}
+                className="mc-card px-4 py-2 text-sm rounded-full transition"
+                style={selected
+                  ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                  : undefined}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StepRegion({ form }: { form: any }) {
+  const inter: string = form.watch("isInternational") || "";
+  return (
+    <>
+      <Hero num="05" eyebrow="Où êtes-vous ?"
+        title={<>VOUS ÊTES<br />OÙ EN FRANCE<span style={{ color: "var(--mc-primary)" }}>?</span></>}
+        intro="Beaucoup de subventions sont régionales ou municipales. Votre localisation = des aides que d'autres n'ont pas. Géo-avantage."
+        tip="On utilise votre région et votre ville. Les DRAC et les mairies ont des enveloppes distinctes."
+      />
+      <div className="mt-10">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Région administrative</label>
+        <select
+          {...form.register("region")}
+          className="mc-input w-full text-sm rounded-lg focus:outline-none"
+          style={{ background: "var(--mc-bg)", border: "1px solid var(--mc-border)", color: "var(--mc-text)", padding: "0.9rem 1.25rem" }}
+        >
+          {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+        </select>
+      </div>
+      <div className="mt-8">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Votre projet a une dimension internationale ?</label>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { v: "non", l: "Non, uniquement France" },
+            { v: "tournee", l: "Oui, tournée ou coproduction" },
+            { v: "export", l: "Oui, export / diffusion à l'étranger" },
+          ].map(({ v, l }) => {
+            const sel = inter === v;
+            return (
+              <button
+                key={v}
+                onClick={() => form.setValue("isInternational", sel ? "" : v)}
+                className="mc-card px-4 py-2 text-sm rounded-full transition"
+                style={sel
+                  ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                  : undefined}
+              >
+                {l}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mc-mono text-[10px] uppercase tracking-widest mt-3" style={{ color: "var(--mc-muted-2)" }}>
+          → Si oui, on débloque Europe Créative et les aides Institut Français.
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StepEmail({ form }: { form: any }) {
+  return (
+    <>
+      <Hero num="06" eyebrow="Où envoyer votre rapport ?"
+        title={<>ON VOUS ENVOIE<br />LE RAPPORT OÙ<span style={{ color: "var(--mc-primary)" }}>?</span></>}
+        intro="Vos matches sont prêts. Donnez-nous un email et on vous les envoie en PDF. Gratuit pendant la beta — pas de carte bancaire."
+        tip="Votre email ne sera utilisé que pour ce rapport et, si vous cochez la case, pour vous prévenir de la sortie V1. Aucun spam, aucune revente."
+      />
+      <div className="mt-10">
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Votre email</label>
+        <input
+          type="email"
+          {...form.register("email")}
+          placeholder="votre@email.com"
+          className="mc-input w-full text-sm rounded-lg focus:outline-none"
+          style={{ background: "var(--mc-bg)", border: "1px solid var(--mc-border)", color: "var(--mc-text)", padding: "0.9rem 1.25rem" }}
+        />
+      </div>
+      <div className="mt-8 mc-card-soft p-4 flex gap-3 items-start">
+        <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} />
+        <div className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+          <span className="font-medium" style={{ color: "var(--mc-text)" }}>Vous êtes à un clic.</span>{" "}
+          Après soumission, le matching prend 10–20 secondes. Vous verrez les résultats en direct.
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StepOptional({ form }: { form: any }) {
+  const social: string[] = form.watch("socialDimension") || [];
+  const toggleSocial = (v: string) => {
+    const next = social.includes(v) ? social.filter(x => x !== v) : [...social, v];
+    form.setValue("socialDimension", next);
+  };
+  return (
+    <>
+      <Hero num="07" eyebrow="Affiner (optionnel)"
+        title={<>ON AFFINE<br />ENCORE<span style={{ color: "var(--mc-primary)" }}>?</span></>}
+        intro="Ces questions débloquent des dispositifs plus spécifiques. Ignorez ce qui ne vous concerne pas — rien n'est obligatoire ici."
+      />
+      <div className="mt-10 space-y-4">
+        <div className="mc-card p-5">
+          <div className="mb-3">
+            <div className="font-medium">Dimension sociale / inclusive</div>
+            <div className="text-xs mt-1" style={{ color: "var(--mc-muted)" }}>Inclusion, éducation, territoire, égalité, accessibilité…</div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { v: "inclusion", l: "Inclusion" },
+              { v: "education", l: "Éducation" },
+              { v: "territoire", l: "Territoire rural" },
+              { v: "egalite", l: "Égalité F/H" },
+            ].map(({ v, l }) => {
+              const sel = social.includes(v);
+              return (
+                <button
+                  key={v}
+                  onClick={() => toggleSocial(v)}
+                  className="mc-card-soft px-3 py-1.5 text-xs rounded-full transition"
+                  style={sel
+                    ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                    : undefined}
+                >
+                  {l}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mc-card p-5">
+          <div className="font-medium">Urgence</div>
+          <div className="text-xs mt-1 mb-3" style={{ color: "var(--mc-muted)" }}>On priorise les aides qui ferment bientôt.</div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { v: "immediate", l: "Urgent (< 1 mois)" },
+              { v: "court", l: "Court terme (1-3 mois)" },
+              { v: "moyen", l: "Moyen terme (3-6 mois)" },
+              { v: "pas-presse", l: "Pas pressé" },
+            ].map(({ v, l }) => {
+              const cur = form.watch("urgency") || "";
+              const sel = cur === v;
+              return (
+                <button
+                  key={v}
+                  onClick={() => form.setValue("urgency", sel ? "" : v)}
+                  className="mc-card-soft px-3 py-1.5 text-xs rounded-full transition"
+                  style={sel
+                    ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                    : undefined}
+                >
+                  {l}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mc-card p-5 text-sm" style={{ color: "var(--mc-muted)" }}>
+          Vous pouvez aussi laisser ce formulaire tel quel — on lance le matching sur les données déjà saisies.
+        </div>
+      </div>
+    </>
   );
 }

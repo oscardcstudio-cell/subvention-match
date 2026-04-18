@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Style 02 — Editorial Italic</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Inter',sans-serif; background:#FAF7F2; color:#1A1410; }
+  .serif { font-family:'Fraunces',serif; }
+  .mono { font-family:'JetBrains Mono', monospace; }
+  .accent { color:#B8341E; }
+  .rule { border-color:#D9CFBD; }
+  .top-link { position: fixed; top: 12px; left: 12px; z-index: 99; font-family:'JetBrains Mono',monospace; font-size:11px; background:#1A1410; color:#FAF7F2; padding:4px 10px; border-radius:999px; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="top-link">← mockups · style 02</a>
+
+<!-- HEADER -->
+<header class="border-b rule">
+  <div class="max-w-6xl mx-auto px-8 h-16 flex items-center justify-between">
+    <div class="flex items-baseline gap-4">
+      <span class="serif italic text-2xl">Mécène</span>
+      <span class="text-xs tracking-widest uppercase text-neutral-500 border-l rule pl-4 hidden md:inline">Paris · MMXXVI</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#" class="hover:accent">Méthode</a>
+      <a href="#" class="hover:accent">Répertoire</a>
+      <a href="#" class="hover:accent">Journal</a>
+      <a href="#" class="hover:accent">Tarifs</a>
+    </nav>
+    <button class="text-sm border rule px-4 py-2 rounded-full hover:bg-[#1A1410] hover:text-[#FAF7F2] transition">Commencer →</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="border-b rule">
+  <div class="max-w-6xl mx-auto px-8 py-28 min-h-[560px] flex flex-col items-start justify-center">
+    <div class="serif italic text-sm text-neutral-500 mb-8">— pour les créateurs qui n'ont pas le temps</div>
+    <h1 class="serif italic font-normal text-[132px] leading-[0.92]" style="letter-spacing:-0.025em">
+      Trouvez<br>votre<br>subvention<span class="accent">.</span>
+    </h1>
+    <div class="mt-14 flex items-center gap-6">
+      <button class="bg-[#1A1410] text-[#FAF7F2] px-6 py-3 rounded-full text-sm">Commencer le diagnostic</button>
+      <span class="serif italic text-neutral-500">4 minutes · gratuit.</span>
+    </div>
+  </div>
+</section>
+
+<!-- EDITORIAL INTRO -->
+<section class="border-b rule">
+  <div class="max-w-4xl mx-auto px-8 py-24">
+    <div class="text-xs uppercase tracking-[0.25em] accent mb-6">Note de la rédaction</div>
+    <p class="serif text-3xl md:text-4xl leading-[1.35]">
+      Pendant des années, chercher une subvention revenait à lire des PDFs de vingt
+      pages rédigés pour des fonctionnaires. Nous avons pensé qu'une autre grammaire
+      était possible — <em class="accent">plus proche de l'œuvre, plus loin de la bureaucratie.</em>
+    </p>
+  </div>
+</section>
+
+<!-- METHOD in 3 columns editorial -->
+<section class="border-b rule">
+  <div class="max-w-6xl mx-auto px-8 py-24">
+    <div class="flex justify-between items-end mb-16">
+      <h2 class="serif text-5xl">La méthode.</h2>
+      <div class="text-xs uppercase tracking-widest text-neutral-500">Trois mouvements</div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-10">
+      <div>
+        <div class="serif italic text-6xl leading-none mb-4 text-neutral-400">i.</div>
+        <h3 class="serif text-2xl mb-3">L'entretien</h3>
+        <p class="text-sm text-neutral-600 leading-relaxed">Un formulaire conversationnel rédigé par une éditrice, pas un ingénieur. Pas de redites, pas de Cerfa.</p>
+      </div>
+      <div>
+        <div class="serif italic text-6xl leading-none mb-4 accent">ii.</div>
+        <h3 class="serif text-2xl mb-3">La lecture</h3>
+        <p class="text-sm text-neutral-600 leading-relaxed">470 dispositifs croisés. Les hors-sujets écartés — un poète ne reçoit pas d'aide au mobilier.</p>
+      </div>
+      <div>
+        <div class="serif italic text-6xl leading-none mb-4 text-neutral-400">iii.</div>
+        <h3 class="serif text-2xl mb-3">Le rapport</h3>
+        <p class="text-sm text-neutral-600 leading-relaxed">Six pages. Dix subventions classées, deadlines, conseils, estimation sincère des chances.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PULL QUOTE -->
+<section class="border-b rule bg-[#F4EDE0]">
+  <div class="max-w-4xl mx-auto px-8 py-28 relative">
+    <div class="serif italic text-[160px] leading-none accent absolute -top-4 left-0 opacity-20 select-none">"</div>
+    <blockquote class="serif italic text-3xl md:text-4xl leading-snug relative">
+      La première fois qu'un outil comprend la différence entre un
+      projet d'auteur et une demande de guichet.
+    </blockquote>
+    <div class="mt-8 flex items-center gap-4 text-sm text-neutral-600">
+      <div class="w-px h-8 bg-[#1A1410]"></div>
+      <div>
+        <div class="font-medium text-[#1A1410]">Anne L.</div>
+        <div>Réalisatrice · Marseille</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REPERTOIRE -->
+<section class="border-b rule">
+  <div class="max-w-6xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-16">
+    <div>
+      <div class="text-xs uppercase tracking-widest text-neutral-500 mb-3">Le répertoire</div>
+      <h3 class="serif text-4xl leading-tight mb-5">470 dispositifs,<br><em>tenus à jour</em>.</h3>
+      <p class="text-sm text-neutral-600 max-w-sm">Scrapers quotidiens, sources officielles, enrichissement par IA. Les dates bougent, nous suivons.</p>
+    </div>
+    <ul class="text-sm serif">
+      <li class="flex justify-between border-b rule py-3"><span>Arts visuels</span><em class="italic text-neutral-500">62 dispositifs</em></li>
+      <li class="flex justify-between border-b rule py-3"><span>Musique</span><em class="italic text-neutral-500">84 dispositifs</em></li>
+      <li class="flex justify-between border-b rule py-3"><span>Cinéma &amp; audiovisuel</span><em class="italic text-neutral-500">97 dispositifs</em></li>
+      <li class="flex justify-between border-b rule py-3"><span>Livre &amp; édition</span><em class="italic text-neutral-500">53 dispositifs</em></li>
+      <li class="flex justify-between border-b rule py-3"><span>Spectacle vivant</span><em class="italic text-neutral-500">78 dispositifs</em></li>
+      <li class="flex justify-between py-3"><span>Transversal</span><em class="italic text-neutral-500">96 dispositifs</em></li>
+    </ul>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="border-b rule">
+  <div class="max-w-4xl mx-auto px-8 py-32 text-center">
+    <div class="text-xs uppercase tracking-[0.25em] accent mb-6">Fin de la colonne</div>
+    <h2 class="serif italic text-7xl md:text-8xl leading-[0.95]">
+      Votre prochain<br>
+      <em>chapitre</em> commence ici.
+    </h2>
+    <button class="inline-block mt-12 bg-[#1A1410] text-[#FAF7F2] px-8 py-4 rounded-full hover:bg-black transition">
+      Lancer le diagnostic →
+    </button>
+  </div>
+</section>
+
+<footer class="text-xs text-neutral-500">
+  <div class="max-w-6xl mx-auto px-8 py-10 flex flex-wrap justify-between gap-4">
+    <span>© 2026 Mécène · Imprimé à Paris</span>
+    <span class="flex gap-6"><a href="#">Mentions</a><a href="#">Contact</a><a href="#">RSS</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
