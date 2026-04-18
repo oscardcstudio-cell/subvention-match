@@ -1031,7 +1031,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
                   </div>
                   <div class="section-content">
                     ${quality.hasDescription && grant.description
-                      ? formatHTMLContent(grant.description, 600)
+                      ? formatHTMLContent(grant.description)
                       : `<div class="info-missing">ℹ️ Description complète non disponible — consultez le site officiel ou contactez ${grant.organization} pour le détail de cette aide.</div>`
                     }
                   </div>
@@ -1044,7 +1044,7 @@ function generatePDFHTML(data: PDFData, applicationUrls: Map<string, Application
                   </div>
                   <div class="section-content">
                     ${quality.hasEligibility && grant.eligibility
-                      ? formatHTMLContent(grant.eligibility, 600)
+                      ? formatHTMLContent(grant.eligibility)
                       : `<div class="info-missing">⚠️ Critères d'éligibilité à vérifier auprès de ${grant.organization}. L'information n'a pas été publiée de manière exhaustive sur les sources publiques que nous consultons.</div>`
                     }
                   </div>
