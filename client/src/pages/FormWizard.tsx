@@ -139,23 +139,78 @@ export default function FormWizard() {
   const [stepIdx, setStepIdx] = useState(0);
   const currentStep = STEPS[stepIdx];
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Validate the fields that belong to the current step before advancing.
+    // On the email step, trigger email validation; on region, trigger region.
+    const stepFields: Record<StepId, (keyof FormData)[]> = {
+      status: [],
+      domain: [],
+      description: [],
+      type: [],
+      region: ["region"],
+      email: ["email"],
+      optional: [],
+    };
+    const fieldsToCheck = stepFields[currentStep.id];
+    if (fieldsToCheck.length > 0) {
+      const valid = await form.trigger(fieldsToCheck as any);
+      if (!valid) {
+        // Focus the first invalid field
+        const firstInvalid = fieldsToCheck.find((f) => (form.formState.errors as any)[f]);
+        if (firstInvalid === "email") {
+          toast({
+            title: language === "fr" ? "Email invalide" : "Invalid email",
+            description:
+              language === "fr"
+                ? "Indiquez une adresse email valide pour recevoir vos résultats."
+                : "Please enter a valid email to receive your results.",
+            variant: "destructive",
+            duration: 3000,
+          });
+        }
+        return;
+      }
+    }
+
     if (stepIdx < STEPS.length - 1) {
       setStepIdx(stepIdx + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    // Last step -> submit
+
+    // Last step: validate email + region directly (don't rely on
+    // form.formState.errors which may be stale if fields were never touched).
     const data = form.getValues();
-    if (!data.email || !data.region) {
+    const emailValid = !!data.email && /^\S+@\S+\.\S+$/.test(data.email);
+    const regionValid = !!data.region && data.region.trim().length > 0;
+
+    if (!emailValid) {
+      await form.trigger("email"); // populate errors for inline display on the step
+      setStepIdx(5);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       toast({
-        title: language === "fr" ? "Champs requis" : "Required fields",
-        description: language === "fr" ? "Email et région sont obligatoires." : "Email and region are required.",
+        title: language === "fr" ? "Email requis" : "Email required",
+        description:
+          language === "fr"
+            ? "On a besoin d'un email valide pour vous envoyer le rapport."
+            : "We need a valid email to send you the report.",
         variant: "destructive",
-        duration: 2500,
+        duration: 3500,
       });
       return;
     }
+    if (!regionValid) {
+      await form.trigger("region");
+      setStepIdx(4);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast({
+        title: language === "fr" ? "Région requise" : "Region required",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
     trackFormSubmitted({
       artisticDomain: data.artisticDomain?.join(", "),
       region: data.region,
@@ -558,6 +613,7 @@ function StepRegion({ form }: { form: any }) {
 }
 
 function StepEmail({ form }: { form: any }) {
+  const emailError = form.formState.errors.email?.message;
   return (
     <>
       <Hero num="06" eyebrow="Où envoyer votre rapport ?"
@@ -566,14 +622,27 @@ function StepEmail({ form }: { form: any }) {
         tip="Votre email ne sera utilisé que pour ce rapport et, si vous cochez la case, pour vous prévenir de la sortie V1. Aucun spam, aucune revente."
       />
       <div className="mt-10">
-        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Votre email</label>
+        <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>
+          Votre email <span style={{ color: "var(--mc-primary)" }}>*</span>
+        </label>
         <input
           type="email"
+          autoFocus
           {...form.register("email")}
           placeholder="votre@email.com"
           className="mc-input w-full text-sm rounded-lg focus:outline-none"
-          style={{ background: "var(--mc-bg)", border: "1px solid var(--mc-border)", color: "var(--mc-text)", padding: "0.9rem 1.25rem" }}
+          style={{
+            background: "var(--mc-bg)",
+            border: `1px solid ${emailError ? "var(--mc-danger)" : "var(--mc-border)"}`,
+            color: "var(--mc-text)",
+            padding: "0.9rem 1.25rem",
+          }}
         />
+        {emailError && (
+          <div className="mt-2 text-xs mc-mono uppercase tracking-widest" style={{ color: "var(--mc-danger)" }}>
+            ↳ {typeof emailError === "string" ? emailError : "Email invalide"}
+          </div>
+        )}
       </div>
       <div className="mt-8 mc-card-soft p-4 flex gap-3 items-start">
         <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} />

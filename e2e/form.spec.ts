@@ -27,9 +27,11 @@ test.describe("Form wizard", () => {
     for (let i = 0; i < 7; i++) {
       const h1 = await page.locator("h1").first().innerText();
       titles.push(h1);
+      // Email required to advance past step 06
+      if (i === 5) await page.locator('input[type="email"]').fill("e2e@test.com");
       if (i < 6) {
         await page.getByRole("button", { name: /Question suivante/i }).click();
-        await page.waitForTimeout(200);
+        await page.waitForTimeout(250);
       }
     }
 
@@ -45,23 +47,56 @@ test.describe("Form wizard", () => {
   test("last step shows 'Lancer le matching' and submits to loading", async ({ page }) => {
     await page.goto("/form");
     for (let i = 0; i < 6; i++) {
+      if (i === 5) await page.locator('input[type="email"]').fill("e2e@test.com");
       await page.getByRole("button", { name: /Question suivante/i }).click();
-      await page.waitForTimeout(150);
+      await page.waitForTimeout(200);
     }
     // Step 7
     await expect(page.getByRole("button", { name: /Lancer le matching/i })).toBeVisible();
 
-    // Fill email (required for submit)
-    // We're on step 7 but email is step 6 - go back, fill, re-advance
-    await page.getByRole("button", { name: /Précédent/i }).click();
-    await page.waitForTimeout(150);
-    await page.locator('input[type="email"]').fill("e2e@test.com");
-    await page.getByRole("button", { name: /Question suivante/i }).click();
-    await page.waitForTimeout(150);
-
     // Submit
     await page.getByRole("button", { name: /Lancer le matching/i }).click();
     await expect(page).toHaveURL(/\/loading\?sessionId=/, { timeout: 5_000 });
+  });
+
+  test("cannot advance past email step without a valid email", async ({ page }) => {
+    await page.goto("/form");
+    // Jump to email step (06)
+    await page.locator('button:has-text("Email")').click();
+    await page.waitForTimeout(200);
+    await expect(page.locator("h1").first()).toContainText("RAPPORT");
+
+    // Try to advance with empty email
+    await page.getByRole("button", { name: /Question suivante/i }).click();
+    await page.waitForTimeout(300);
+    // Should still be on the email step
+    await expect(page.locator("h1").first()).toContainText("RAPPORT");
+
+    // Fill invalid email
+    await page.locator('input[type="email"]').fill("not-an-email");
+    await page.getByRole("button", { name: /Question suivante/i }).click();
+    await page.waitForTimeout(300);
+    await expect(page.locator("h1").first()).toContainText("RAPPORT");
+
+    // Fill valid email → advance
+    await page.locator('input[type="email"]').fill("valid@example.com");
+    await page.getByRole("button", { name: /Question suivante/i }).click();
+    await page.waitForTimeout(300);
+    await expect(page.locator("h1").first()).toContainText("AFFINE");
+  });
+
+  test("submit on step 7 with missing email bounces back to step 06", async ({ page }) => {
+    await page.goto("/form");
+    // Jump directly to step 7 via grid (skipping email)
+    await page.locator('button:has-text("Optionnel")').click();
+    await page.waitForTimeout(200);
+    await expect(page.locator("h1").first()).toContainText("AFFINE");
+
+    // Try to launch without filling email
+    await page.getByRole("button", { name: /Lancer le matching/i }).click();
+    await page.waitForTimeout(400);
+    // Should bounce back to email step
+    await expect(page.locator("h1").first()).toContainText("RAPPORT");
   });
 
   test("progress grid at bottom allows jumping between steps", async ({ page }) => {
