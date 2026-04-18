@@ -58,7 +58,7 @@ function ExampleGrantCard({ language }: { language: string }) {
           </div>
         </div>
 
-        <h3 className="mc-display text-4xl mb-3">
+        <h3 className="mc-display text-xl sm:text-3xl md:text-4xl mb-3 break-words">
           {language === "fr"
             ? "ADSV — AIDES AUX ÉQUIPES INDÉPENDANTES"
             : "ADSV — SUPPORT FOR INDEPENDENT TEAMS"}
@@ -231,7 +231,7 @@ function BetaWaitlistSection({ language, grantsCount }: { language: string; gran
         <div className="mc-chip mc-chip-warn inline-flex mc-mono text-xs uppercase tracking-widest mb-8">
           [ BETA ] — {language === "fr" ? "Version en test" : "Test version"}
         </div>
-        <h2 className="mc-display text-6xl md:text-7xl">
+        <h2 className="mc-display text-4xl sm:text-5xl md:text-7xl">
           {language === "fr" ? (
             <>
               100 % GRATUIT<br />
@@ -389,7 +389,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
       {/* Beta banner */}
       <div className="mc-mono text-xs text-center py-2 px-4" style={{ background: "var(--mc-warn)", color: "var(--mc-bg)" }}>
         [ BETA ] &nbsp;&nbsp;
@@ -436,7 +436,7 @@ export default function Home() {
             <div className="mc-mono text-xs uppercase tracking-widest mb-8 md:mb-10" style={{ color: "var(--mc-primary)" }}>
               — {language === "fr" ? "l'IA qui a lu les 473 PDFs pour vous" : "the AI that read 473 PDFs so you don't have to"}
             </div>
-            <h1 className="mc-display text-[64px] md:text-[108px]">
+            <h1 className="mc-display text-[38px] sm:text-[56px] md:text-[108px] leading-none">
               {language === "fr" ? (
                 <>
                   VOUS AVEZ<br />L'ŒUVRE<span style={{ color: "var(--mc-primary)" }}>.</span>
@@ -748,7 +748,7 @@ export default function Home() {
             <div className="mc-mono text-xs uppercase tracking-widest mb-6 md:mb-8" style={{ color: "rgba(0,0,0,0.5)" }}>
               / 06 — {language === "fr" ? "Commencer" : "Get started"}
             </div>
-            <h2 className="mc-display text-[72px] md:text-[128px]">
+            <h2 className="mc-display text-[44px] sm:text-[64px] md:text-[128px]">
               {language === "fr" ? <>PRÊT ?<br />C'EST PARTI.</> : <>READY?<br />LET'S GO.</>}
             </h2>
           </div>
