@@ -70,13 +70,18 @@ export const userFormInputSchema = createInsertSchema(formSubmissions)
     artisticDomain: z.array(z.string()).optional(),
     artisticDomainOther: z.string().optional(),
     age: z.number().int().min(1).max(120).optional(), // Âge optionnel pour aides -25 ans
-    projectDescription: z.string().optional(),
+    projectDescription: z.string().max(3000).optional(),
     projectType: z.array(z.string()).optional(),
-    projectTypeOther: z.string().optional(),
+    projectTypeOther: z.string().max(300).optional(),
     projectStage: z.string().optional(),
     region: z.string().min(1, "La région est obligatoire"), // Champ OBLIGATOIRE
     isInternational: z.string().optional(),
     email: z.string().email(), // Champ OBLIGATOIRE
+    statusOther: z.string().max(300).optional(),
+    artisticDomainOther: z.string().max(300).optional(),
+    innovationOther: z.string().max(300).optional(),
+    socialDimensionOther: z.string().max(300).optional(),
+    aidTypesOther: z.string().max(300).optional(),
   });
 
 export type InsertFormSubmission = z.infer<typeof insertFormSubmissionSchema>;
@@ -301,7 +306,7 @@ export const formDataSchema = z.object({
   age: z.number().int().min(1).max(120).optional(), // Âge optionnel pour aides -25 ans
   
   // Section 2: Projet - OPTIONNEL
-  projectDescription: z.string().optional(),
+  projectDescription: z.string().max(3000).optional(),
   projectType: z.array(z.string()).optional(),
   projectTypeOther: z.string().optional(),
   projectStage: z.string().optional(),

@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, type InsertGrant, type Grant, type GrantResult, type FormSubmission } from "@shared/schema";
+import { sanitizeFormBody, findBlockedField } from "./content-filter";
 import { storage } from "./storage";
 import { grantStorage } from "./grant-storage";
 import { matchGrantsWithAI } from "./ai-matcher";
@@ -287,7 +288,12 @@ export function registerRoutes(app: Express): Server {
   // Route pour soumettre le formulaire (MODE GRATUIT - BETA)
   app.post("/api/submit-form", formSubmitLimiter, async (req, res) => {
     try {
-      const validatedData = userFormInputSchema.parse(req.body);
+      const sanitizedBody = sanitizeFormBody(req.body);
+      const blockedField = findBlockedField(sanitizedBody);
+      if (blockedField) {
+        return res.status(400).json({ error: "Contenu inapproprié détecté. Veuillez reformuler." });
+      }
+      const validatedData = userFormInputSchema.parse(sanitizedBody);
 
       const submission = await storage.createFormSubmission(validatedData);
       console.log(`📝 Nouvelle soumission: ${maskSessionId(submission.sessionId)}`);
