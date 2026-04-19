@@ -734,16 +734,40 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
 
   // GET /api/beta/capacity — compteur emails uniques vs cap configurable
   // Lit BETA_CAP depuis process.env (défaut 150). isFull=true quand count >= cap.
+  // Si ?source=X est fourni, retourne aussi un cap par source (BETA_CAP_PER_SOURCE,
+  // défaut 25) pour éviter qu'une discipline monopolise la beta.
   app.get("/api/beta/capacity", async (req, res) => {
     try {
       const { db } = await import("./db");
-      const { countDistinct } = await import("drizzle-orm");
+      const { countDistinct, eq } = await import("drizzle-orm");
       const cap = parseInt(process.env.BETA_CAP ?? "150", 10);
+      const capPerSource = parseInt(process.env.BETA_CAP_PER_SOURCE ?? "25", 10);
+
       const [row] = await db
         .select({ count: countDistinct(formSubmissions.email) })
         .from(formSubmissions);
       const count = Number(row?.count ?? 0);
-      res.json({ count, cap, isFull: count >= cap });
+
+      // Per-source: si ?source=X est dans l'URL, on calcule aussi son cap propre
+      const sourceParam = typeof req.query.source === "string" ? req.query.source.slice(0, 80) : null;
+      let perSource: { source: string; count: number; cap: number; isFull: boolean } | null = null;
+      if (sourceParam) {
+        const [srcRow] = await db
+          .select({ count: countDistinct(formSubmissions.email) })
+          .from(formSubmissions)
+          .where(eq(formSubmissions.source, sourceParam));
+        const srcCount = Number(srcRow?.count ?? 0);
+        perSource = {
+          source: sourceParam,
+          count: srcCount,
+          cap: capPerSource,
+          isFull: srcCount >= capPerSource,
+        };
+      }
+
+      // isFull = global plein OU source-specific plein (si source fournie)
+      const isFull = count >= cap || (perSource?.isFull ?? false);
+      res.json({ count, cap, isFull, perSource });
     } catch (error: any) {
       console.error("Erreur beta/capacity:", error);
       res.status(500).json({ error: error.message });
@@ -814,19 +838,28 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
       // taux utilisation match_feedback (votes / soumissions)
       const totalVotes = matchVotes.reduce((s, r) => s + Number(r.total), 0);
 
-      // Aggregation par source d'acquisition (GROWTH-03)
+      // Aggregation par source d'acquisition (GROWTH-03) avec emails uniques + cap par source
+      const capPerSource = parseInt(process.env.BETA_CAP_PER_SOURCE ?? "25", 10);
       const sourceBreakdown = await db
-        .select({ source: formSubmissions.source, total: count() })
+        .select({ source: formSubmissions.source, total: countDistinct(formSubmissions.email) })
         .from(formSubmissions)
         .groupBy(formSubmissions.source)
-        .orderBy(desc(count()));
+        .orderBy(desc(countDistinct(formSubmissions.email)));
+
+      const sourceBreakdownWithCap = sourceBreakdown.map((s) => ({
+        source: s.source,
+        count: Number(s.total),
+        cap: capPerSource,
+        isFull: Number(s.total) >= capPerSource,
+      }));
 
       res.json({
         betaCapacity: { count: betaCount, cap, isFull: betaCount >= cap },
         matchFeedback: { byRating: matchVotes, totalVotes },
         recentBetaFeedback,
         qualifiedWaitlist,
-        sourceBreakdown,
+        sourceBreakdown: sourceBreakdownWithCap,
+        capPerSource,
       });
     } catch (error: any) {
       console.error("Erreur feedback-dashboard:", error);

@@ -24,7 +24,8 @@ type FeedbackDashboard = {
   matchFeedback: { byRating: Array<{ rating: string; total: number }>; totalVotes: number };
   recentBetaFeedback: BetaFeedback[];
   qualifiedWaitlist: BetaWaitlistEntry[];
-  sourceBreakdown: Array<{ source: string | null; total: number }>;
+  sourceBreakdown: Array<{ source: string | null; count: number; cap: number; isFull: boolean }>;
+  capPerSource: number;
 };
 
 export default function AdminPage() {
@@ -146,19 +147,34 @@ export default function AdminPage() {
               </Card>
             </div>
 
-            {/* Source breakdown (GROWTH-03) */}
+            {/* Source breakdown (GROWTH-03) avec cap par source */}
             {dashboardData.sourceBreakdown && dashboardData.sourceBreakdown.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-base font-semibold text-gray-800 mb-3">Sources d'acquisition</h3>
+                <h3 className="text-base font-semibold text-gray-800 mb-3">
+                  Sources d'acquisition
+                  <span className="text-xs text-gray-400 font-normal ml-2">
+                    (cap : {dashboardData.capPerSource} testeurs / source)
+                  </span>
+                </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {dashboardData.sourceBreakdown.map((s, idx) => (
-                    <Card key={idx} className="p-3">
-                      <div className="text-xs text-gray-500 truncate" title={s.source ?? "(direct)"}>
-                        {s.source ?? "(direct / inconnue)"}
-                      </div>
-                      <div className="text-2xl font-bold">{Number(s.total)}</div>
-                    </Card>
-                  ))}
+                  {dashboardData.sourceBreakdown.map((s, idx) => {
+                    const pct = Math.min(100, (s.count / s.cap) * 100);
+                    const barColor = s.isFull ? "bg-red-500" : pct > 70 ? "bg-orange-400" : "bg-emerald-500";
+                    return (
+                      <Card key={idx} className="p-3">
+                        <div className="text-xs text-gray-500 truncate" title={s.source ?? "(direct)"}>
+                          {s.source ?? "(direct / inconnue)"}
+                        </div>
+                        <div className="text-2xl font-bold mb-1">
+                          {s.count}<span className="text-sm font-normal text-gray-400"> / {s.cap}</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full ${barColor}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        {s.isFull && <div className="text-xs text-red-500 mt-1">COMPLET</div>}
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             )}

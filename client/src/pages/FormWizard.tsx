@@ -146,8 +146,23 @@ export default function FormWizard() {
     },
   });
 
-  const { data: capacityData } = useQuery<{ count: number; cap: number; isFull: boolean }>({
-    queryKey: ["/api/beta/capacity"],
+  // On lit la source d'acquisition pour passer le param ?source= au capacity check
+  // → permet au backend d'imposer aussi le cap par source si dépassé.
+  const currentSource = typeof window !== "undefined" ? getAcquisitionSource() : null;
+  const { data: capacityData } = useQuery<{
+    count: number;
+    cap: number;
+    isFull: boolean;
+    perSource: { source: string; count: number; cap: number; isFull: boolean } | null;
+  }>({
+    queryKey: ["/api/beta/capacity", currentSource],
+    queryFn: async () => {
+      const url = currentSource
+        ? `/api/beta/capacity?source=${encodeURIComponent(currentSource)}`
+        : "/api/beta/capacity";
+      const r = await fetch(url);
+      return r.json();
+    },
     staleTime: 60_000,
   });
 
@@ -245,6 +260,15 @@ export default function FormWizard() {
 
   // Cap gate — shown AFTER all hooks (hooks must not be conditional)
   if (capacityData?.isFull) {
+    // Distinction : cap par discipline atteint vs cap global atteint
+    const sourceFull = capacityData.perSource?.isFull && capacityData.count < capacityData.cap;
+    const headline = sourceFull
+      ? `Beaucoup de monde sur cette catégorie déjà.`
+      : `Les ${capacityData.cap} places beta sont prises.`;
+    const subline = sourceFull
+      ? `On garde des places pour d'autres disciplines (${capacityData.perSource?.count}/${capacityData.perSource?.cap} testeurs déjà inscrits via ce canal). Rejoignez la liste d'attente, on vous notifie quand on rouvre.`
+      : `Rejoignez la liste d'attente prioritaire — les premiers inscrits seront les premiers servis quand de nouvelles places s'ouvrent.`;
+    const chipLabel = sourceFull ? "[ CATÉGORIE COMPLÈTE ]" : "[ BETA COMPLÈTE ]";
     return (
       <div
         className="min-h-screen flex flex-col items-center justify-center px-6"
@@ -252,13 +276,13 @@ export default function FormWizard() {
       >
         <div className="max-w-lg w-full">
           <div className="mc-chip mc-chip-warn inline-flex mc-mono text-xs uppercase tracking-widest mb-6">
-            [ BETA COMPLÈTE ]
+            {chipLabel}
           </div>
           <h1 className="mc-display text-4xl mb-4">
-            Les {capacityData.cap} places beta sont prises<span style={{ color: "var(--mc-primary)" }}>.</span>
+            {headline}
           </h1>
           <p className="mb-8 leading-relaxed" style={{ color: "var(--mc-muted)" }}>
-            Rejoignez la liste d'attente prioritaire — les premiers inscrits seront les premiers servis quand de nouvelles places s'ouvrent.
+            {subline}
           </p>
           {waitlistStatus === "success" ? (
             <div className="mc-card p-5 flex items-center gap-3" style={{ borderColor: "var(--mc-primary)" }}>
