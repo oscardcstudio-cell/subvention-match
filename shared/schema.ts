@@ -39,7 +39,10 @@ export const formSubmissions = pgTable("form_submissions", {
   
   // Contact
   email: text("email").notNull(),
-  
+
+  // Acquisition tracking (GROWTH-03) — UTM source ou source manuelle (reddit, facebook, linkedin, direct)
+  source: text("source"),
+
   // Results and payment
   results: jsonb("results"),
   isPaid: text("is_paid").default("false").notNull(),

@@ -24,6 +24,7 @@ type FeedbackDashboard = {
   matchFeedback: { byRating: Array<{ rating: string; total: number }>; totalVotes: number };
   recentBetaFeedback: BetaFeedback[];
   qualifiedWaitlist: BetaWaitlistEntry[];
+  sourceBreakdown: Array<{ source: string | null; total: number }>;
 };
 
 export default function AdminPage() {
@@ -144,6 +145,23 @@ export default function AdminPage() {
                 <div className="text-xs text-gray-400 mt-1">avec intention de payer renseignée</div>
               </Card>
             </div>
+
+            {/* Source breakdown (GROWTH-03) */}
+            {dashboardData.sourceBreakdown && dashboardData.sourceBreakdown.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-base font-semibold text-gray-800 mb-3">Sources d'acquisition</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {dashboardData.sourceBreakdown.map((s, idx) => (
+                    <Card key={idx} className="p-3">
+                      <div className="text-xs text-gray-500 truncate" title={s.source ?? "(direct)"}>
+                        {s.source ?? "(direct / inconnue)"}
+                      </div>
+                      <div className="text-2xl font-bold">{Number(s.total)}</div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Tableau waitlist qualifiée */}
             {dashboardData.qualifiedWaitlist.length > 0 && (

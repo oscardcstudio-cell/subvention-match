@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { trackFormStarted, trackFormSubmitted } from "@/lib/analytics";
 import { BetaCapCounter } from "@/components/BetaCapCounter";
+import { captureAcquisitionSource, getAcquisitionSource } from "@/lib/useAcquisitionSource";
 import {
   Music, Headphones, Pen, Palette, Wrench, Drama, Sparkles, Ticket, Film, Cpu,
   Landmark, Building, Megaphone, ArrowLeft, ArrowRight, Check, Loader2,
@@ -119,9 +120,17 @@ export default function FormWizard() {
     }
   }, [domainParam, profileParam, form]);
 
+  // Capture la source d'acquisition au mount (au cas où l'utilisateur arriverait
+  // directement sur /form?source=reddit sans passer par la home)
+  useEffect(() => {
+    captureAcquisitionSource();
+  }, []);
+
   const submitMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const res = await apiRequest("POST", "/api/submit-form", data);
+      const source = getAcquisitionSource();
+      const payload = source ? { ...data, source } : data;
+      const res = await apiRequest("POST", "/api/submit-form", payload);
       return res.json();
     },
     onSuccess: (data) => {

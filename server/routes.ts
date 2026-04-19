@@ -814,11 +814,19 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
       // taux utilisation match_feedback (votes / soumissions)
       const totalVotes = matchVotes.reduce((s, r) => s + Number(r.total), 0);
 
+      // Aggregation par source d'acquisition (GROWTH-03)
+      const sourceBreakdown = await db
+        .select({ source: formSubmissions.source, total: count() })
+        .from(formSubmissions)
+        .groupBy(formSubmissions.source)
+        .orderBy(desc(count()));
+
       res.json({
         betaCapacity: { count: betaCount, cap, isFull: betaCount >= cap },
         matchFeedback: { byRating: matchVotes, totalVotes },
         recentBetaFeedback,
         qualifiedWaitlist,
+        sourceBreakdown,
       });
     } catch (error: any) {
       console.error("Erreur feedback-dashboard:", error);

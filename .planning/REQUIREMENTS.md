@@ -21,15 +21,15 @@ Milestone opérationnel : collecter du signal pour décider go/no-go sur la suit
 
 ### Growth & Recruitment
 
-- [ ] **GROWTH-01**: Founder dispose d'un template de post réutilisable (variantes Reddit FR / Facebook groupes / LinkedIn) et d'un pitch landing dédié
-- [ ] **GROWTH-02**: 50 vrais users supplémentaires recrutés via canaux ciblés sur la durée du milestone (objectif ~75-80 uniques total)
-- [ ] **GROWTH-03**: Sources d'acquisition trackées (param UTM ou `source` en DB) pour savoir quel canal convertit
+- [x] **GROWTH-01**: Founder dispose d'un template de post réutilisable (variantes Reddit FR / Facebook groupes / LinkedIn) et d'un pitch landing dédié *(`.planning/strategy/RECRUITMENT-POSTS.md`)*
+- [ ] **GROWTH-02**: 50 vrais users supplémentaires recrutés via canaux ciblés sur la durée du milestone (objectif ~75-80 uniques total) *(NÉCESSITE ACTION HUMAINE — poster les templates)*
+- [x] **GROWTH-03**: Sources d'acquisition trackées (param UTM ou `source` en DB) pour savoir quel canal convertit *(colonne `source` + capture client + agrégation /admin)*
 
 ### Research & Decision
 
-- [ ] **RESEARCH-01**: 5 entretiens qualitatifs 30min menés avec users cibles (priorité : multi-rôles, entrepreneurs culturels, intermittents)
-- [ ] **RESEARCH-02**: Synthèse écrite des entretiens + métriques quanti (NPS maison, intention de payer, complétion, retention) dans `.planning/strategy/VALIDATION-REPORT.md`
-- [ ] **RESEARCH-03**: Décision documentée go/no-go (continuer sur prospecting V2 / pivoter / lâcher) avec critères quanti + quali explicites
+- [ ] **RESEARCH-01**: 5 entretiens qualitatifs 30min menés avec users cibles (priorité : multi-rôles, entrepreneurs culturels, intermittents) *(template prêt : `INTERVIEW-TEMPLATE.md`)*
+- [ ] **RESEARCH-02**: Synthèse écrite des entretiens + métriques quanti dans `VALIDATION-REPORT.md` *(squelette prêt : `VALIDATION-REPORT-SKELETON.md`)*
+- [ ] **RESEARCH-03**: Décision documentée go/no-go avec critères quanti + quali explicites *(critères chiffrés définis dans squelette)*
 
 ## v2 Requirements — Post-validation (si go)
 
@@ -73,12 +73,12 @@ Déférés, pas dans ce milestone.
 | CAP-01 | Phase 1 | API ready (01-01), UI pending (01-03) |
 | CAP-02 | Phase 1 | Complete |
 | CAP-03 | Phase 1 | Complete (01-01) |
-| GROWTH-01 | Phase 2 | Pending |
-| GROWTH-02 | Phase 2 | Pending |
-| GROWTH-03 | Phase 2 | Pending |
-| RESEARCH-01 | Phase 3 | Pending |
-| RESEARCH-02 | Phase 3 | Pending |
-| RESEARCH-03 | Phase 3 | Pending |
+| GROWTH-01 | Phase 2 | Complete (templates ready) |
+| GROWTH-02 | Phase 2 | Pending (human action) |
+| GROWTH-03 | Phase 2 | Complete (UTM tracking live) |
+| RESEARCH-01 | Phase 3 | Pending (template ready) |
+| RESEARCH-02 | Phase 3 | Pending (skeleton ready) |
+| RESEARCH-03 | Phase 3 | Pending (criteria defined) |
 
 **Coverage:**
 - v1.1 requirements: 12 total
@@ -87,4 +87,4 @@ Déférés, pas dans ce milestone.
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-19 after 01-01 execution (FEEDBACK-02, FEEDBACK-03, CAP-03 complete)*
+*Last updated: 2026-04-19 after autonomous overnight execution — Phase 1 complete + GROWTH-01/03 done + Phase 3 templates prepared*

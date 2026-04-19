@@ -38,6 +38,7 @@ export class DatabaseStorage implements IStorage {
       aidTypesOther: userInput.aidTypesOther || null,
       geographicScope: userInput.geographicScope || null,
       email: userInput.email, // OBLIGATOIRE - pas de valeur par défaut
+      source: userInput.source || null, // GROWTH-03 — source d'acquisition (UTM)
       results: null,
     };
     

@@ -4,7 +4,8 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { BetaCapCounter } from "@/components/BetaCapCounter";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { captureAcquisitionSource } from "@/lib/useAcquisitionSource";
 import {
   Music, Headphones, Pen, Palette, Wrench, Drama, Sparkles, Ticket, Film,
   Cpu, Landmark, Building, Megaphone, Image as ImageIcon, Disc, BookOpen, Users,
@@ -479,6 +480,12 @@ function QualifiedWaitlistSection({ language, grantsCount }: { language: string;
  *  ------------------------------------------------------------------ */
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
+
+  // Capture la source d'acquisition (?source= ou ?utm_source=) au mount.
+  // La valeur reste en sessionStorage pour être lue au moment de la soumission.
+  useEffect(() => {
+    captureAcquisitionSource();
+  }, []);
 
   const { data: statsData } = useQuery<GrantsStats>({
     queryKey: ["/api/grants/stats"],
