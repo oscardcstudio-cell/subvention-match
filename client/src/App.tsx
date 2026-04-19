@@ -10,6 +10,7 @@ import FormWizard from "@/pages/FormWizard";
 import LoadingPage from "@/pages/LoadingPage";
 import ResultsPage from "@/pages/ResultsPage";
 import DemoResultsPage from "@/pages/DemoResultsPage";
+import CardPreviewPage from "@/pages/CardPreviewPage";
 import EnrichedResultsPage from "@/pages/EnrichedResultsPage";
 import ResultsGraphPage from "@/pages/ResultsGraphPage";
 import CheckoutPage from "@/pages/CheckoutPage";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/loading" component={LoadingPage} />
       <Route path="/results" component={ResultsPage} />
       <Route path="/demo" component={DemoResultsPage} />
+      <Route path="/card-preview" component={CardPreviewPage} />
       <Route path="/enriched" component={EnrichedResultsPage} />
       <Route path="/results-graph" component={ResultsGraphPage} />
       <Route path="/checkout" component={CheckoutPage} />

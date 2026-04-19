@@ -66,19 +66,17 @@ export const userFormInputSchema = createInsertSchema(formSubmissions)
   .extend({
     // Rendre tous les champs optionnels sauf email et région
     status: z.array(z.string()).optional(),
-    statusOther: z.string().optional(),
+    statusOther: z.string().max(300).optional(),
     artisticDomain: z.array(z.string()).optional(),
-    artisticDomainOther: z.string().optional(),
-    age: z.number().int().min(1).max(120).optional(), // Âge optionnel pour aides -25 ans
+    artisticDomainOther: z.string().max(300).optional(),
+    age: z.number().int().min(1).max(120).optional(),
     projectDescription: z.string().max(3000).optional(),
     projectType: z.array(z.string()).optional(),
     projectTypeOther: z.string().max(300).optional(),
     projectStage: z.string().optional(),
-    region: z.string().min(1, "La région est obligatoire"), // Champ OBLIGATOIRE
+    region: z.string().min(1, "La région est obligatoire"),
     isInternational: z.string().optional(),
-    email: z.string().email(), // Champ OBLIGATOIRE
-    statusOther: z.string().max(300).optional(),
-    artisticDomainOther: z.string().max(300).optional(),
+    email: z.string().email(),
     innovationOther: z.string().max(300).optional(),
     socialDimensionOther: z.string().max(300).optional(),
     aidTypesOther: z.string().max(300).optional(),

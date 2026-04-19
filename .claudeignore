@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Backups & dead code
+*.bak
+*.backup
+server/routes-old.ts.bak
+client/src/pages/FormWizard.tsx.backup
+
+# Generated / binary
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# OS junk
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Misc
+.config/
+package-lock.json

@@ -215,6 +215,81 @@ function preselectByDomain(
 }
 
 /**
+ * Parse various deadline formats (ISO, fr numeric, fr text) → Date or null.
+ * Duplicated lightweight version (deadline-checker has a fuller one) so the
+ * matcher stays self-contained.
+ */
+function parseDeadlineLoose(deadline: string): Date | null {
+  if (!deadline) return null;
+  const iso = deadline.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
+
+  const fr = deadline.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (fr) return new Date(+fr[3], +fr[2] - 1, +fr[1]);
+
+  const months: Record<string, number> = {
+    janvier: 0, février: 1, fevrier: 1, mars: 2, avril: 3, mai: 4, juin: 5,
+    juillet: 6, août: 7, aout: 7, septembre: 8, octobre: 9, novembre: 10,
+    décembre: 11, decembre: 11,
+  };
+  const txt = deadline.match(/(\d{1,2})\s+(janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre)\s+(\d{4})/i);
+  if (txt) {
+    const m = months[txt[2].toLowerCase()];
+    if (m !== undefined) return new Date(+txt[3], m, +txt[1]);
+  }
+  return null;
+}
+
+const SHORT_DEADLINE_DAYS = 14;
+
+/**
+ * Compute a user-facing notice about the deadline for display in results.
+ * Mutates grant with deadlineNotice + deadlineStatus. Called after filtering.
+ */
+function annotateDeadline(grant: GrantResult): GrantResult {
+  if (!grant.deadline || grant.deadline.trim() === '') return grant;
+
+  const deadlineDate = parseDeadlineLoose(grant.deadline);
+  if (!deadlineDate) return grant; // unparseable (e.g. "sessions annuelles")
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+  const recurring = isGrantRecurring(grant);
+
+  if (diffDays < 0) {
+    if (recurring) {
+      const nextYear = new Date(deadlineDate);
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+      const nextStr = nextYear.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      return {
+        ...grant,
+        deadlineStatus: 'passed-recurring',
+        deadlineNotice: `Édition ${deadlineDate.getFullYear()} terminée — prochaine session attendue vers le ${nextStr}. Prépare ton dossier dès maintenant pour l'année prochaine.`,
+      };
+    }
+    return grant; // should have been filtered out already
+  }
+
+  if (diffDays <= SHORT_DEADLINE_DAYS) {
+    if (recurring) {
+      return {
+        ...grant,
+        deadlineStatus: 'short-recurring',
+        deadlineNotice: `Deadline très courte (${diffDays} jour${diffDays > 1 ? 's' : ''}) — monter un dossier solide en si peu de temps est risqué. Mieux vaut viser l'édition de l'année prochaine.`,
+      };
+    }
+    return {
+      ...grant,
+      deadlineStatus: 'urgent',
+      deadlineNotice: `Urgent : il ne reste que ${diffDays} jour${diffDays > 1 ? 's' : ''} pour déposer le dossier.`,
+    };
+  }
+
+  return { ...grant, deadlineStatus: 'ok' };
+}
+
+/**
  * Filter grants by deadline - keep only grants that are open or recurring.
  *
  * Recurring grants whose deadline has passed are KEPT — the UI shows
@@ -238,16 +313,13 @@ function filterGrantsByDeadline(grants: GrantResult[]): GrantResult[] {
       return true;
     }
 
-    try {
-      const deadlineDate = new Date(grant.deadline);
-      deadlineDate.setHours(23, 59, 59, 999);
-
-      // One-shot grants: keep only if deadline is in the future
-      return deadlineDate >= today;
-    } catch (e) {
+    const deadlineDate = parseDeadlineLoose(grant.deadline);
+    if (!deadlineDate) {
       console.warn(`⚠️ Could not parse deadline for grant ${grant.id}: ${grant.deadline}`);
       return true;
     }
+    deadlineDate.setHours(23, 59, 59, 999);
+    return deadlineDate >= today;
   });
 }
 
@@ -521,12 +593,12 @@ Analyse ce profil et retourne UNIQUEMENT les IDs des subventions pertinentes (pa
       console.log(
         `⚠️ Aucune grant au-dessus du seuil ${MATCH_SCORE_THRESHOLD} — on renvoie la meilleure (score ${best.matchScore})`
       );
-      return [best];
+      return [annotateDeadline(best)];
     }
 
     // Re-trier par matchScore décroissant au cas où l'ordre IA initial diverge
     highQuality.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
-    return highQuality;
+    return highQuality.map(annotateDeadline);
   } catch (error: any) {
     console.error("❌ Erreur matching IA:", error.message);
     throw error;

@@ -70,6 +70,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Signal durci + cap beta | v1.1 | 1/3 | In progress | - |
+| 1. Signal durci + cap beta | v1.1 | Complete    | 2026-04-19 | - |
 | 2. Campagne recrutement | v1.1 | 0/TBD | Not started | - |
 | 3. Synthèse & décision | v1.1 | 0/TBD | Not started | - |

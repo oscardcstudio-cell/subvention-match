@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.1
+milestone_name: Validation signal beta
+status: completed
+last_updated: "2026-04-19T01:11:19.154Z"
+last_activity: 2026-04-19 — 01-03 (BetaCapCounter + QualifiedWaitlist + cap gate) complete
+progress:
+  total_phases: 3
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 3
+---
+
 # STATE
 
 ## Current Position
