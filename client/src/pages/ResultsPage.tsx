@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import {
   Loader2, Calendar, ArrowRight, Coins, Zap, Target, Check, ExternalLink,
-  FileText, Filter, ChevronDown, ThumbsUp, ThumbsDown, Mail,
+  FileText, Filter, ChevronDown, ThumbsUp, ThumbsDown, Mail, X,
 } from "lucide-react";
 import type { GrantResult } from "@shared/schema";
 import { trackResultsViewed, trackMatchFeedback, trackPdfDownloaded } from "@/lib/analytics";
@@ -31,6 +31,7 @@ export default function ResultsPage() {
   const [sessionId, setSessionId] = useState<string>("");
   const [sortBy, setSortBy] = useState<"score" | "deadline" | "amount">("score");
   const [feedbackSent, setFeedbackSent] = useState<Record<string, "up" | "down">>({});
+  const [nudgeVisible, setNudgeVisible] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -49,6 +50,13 @@ export default function ResultsPage() {
       trackResultsViewed({ matchCount: data.results.length, sessionId });
     }
   }, [data?.results?.length, sessionId]);
+
+  useEffect(() => {
+    if (!results.length) return;
+    if (sessionStorage.getItem('nudge_dismissed') === '1') return;
+    const t = setTimeout(() => setNudgeVisible(true), 3000);
+    return () => clearTimeout(t);
+  }, [results.length]);
 
   const results = data?.results || [];
   const sorted = [...results].sort((a, b) => {
@@ -283,6 +291,30 @@ export default function ResultsPage() {
         </div>
       </section>
 
+      {/* FeedbackNudge */}
+      {nudgeVisible && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-6 py-3 mc-mono text-xs uppercase tracking-widest"
+          style={{ background: "var(--mc-warn)", color: "var(--mc-bg)" }}
+        >
+          <span>
+            {language === "fr"
+              ? "Aidez-nous : les pouces haut/bas sur chaque résultat prennent 5 secondes."
+              : "Help us: thumbs up/down on each result takes 5 seconds."}
+          </span>
+          <button
+            onClick={() => {
+              setNudgeVisible(false);
+              sessionStorage.setItem('nudge_dismissed', '1');
+            }}
+            className="flex-shrink-0 hover:opacity-70 transition-opacity"
+            aria-label="Fermer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className="border-t" style={{ borderColor: "var(--mc-border)" }}>
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-8 mc-mono text-xs uppercase tracking-widest flex flex-wrap justify-between gap-4" style={{ color: "var(--mc-muted)" }}>
@@ -325,7 +357,7 @@ function SynthRow({ label, value, color, size }: { label: string; value: string;
   );
 }
 
-function MatchCard({ grant, rank, top, feedback, onFeedback, language }: {
+export function MatchCard({ grant, rank, top, feedback, onFeedback, language }: {
   grant: GrantResult;
   rank: number;
   top: boolean;
@@ -431,6 +463,14 @@ function MatchCard({ grant, rank, top, feedback, onFeedback, language }: {
             label="Deadline"
             value={grant.deadline}
             highlight={grant.isRecurring}
+            notice={grant.deadlineNotice}
+            noticeTone={
+              grant.deadlineStatus === 'urgent' || grant.deadlineStatus === 'short-recurring'
+                ? 'warn'
+                : grant.deadlineStatus === 'passed-recurring'
+                ? 'info'
+                : undefined
+            }
           />
           {grant.applicationDifficulty && (
             <MetricBox icon={Zap} label={language === "fr" ? "Difficulté" : "Difficulty"} value={grant.applicationDifficulty} />
@@ -497,13 +537,30 @@ function ScoreRing({ value, active }: { value: number; active: boolean }) {
   );
 }
 
-function MetricBox({ icon: Icon, label, value, highlight }: { icon: React.ElementType; label: string; value: string; highlight?: boolean }) {
+function MetricBox({
+  icon: Icon, label, value, highlight, notice, noticeTone,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  highlight?: boolean;
+  notice?: string;
+  noticeTone?: 'warn' | 'info';
+}) {
+  const noticeColor =
+    noticeTone === 'warn' ? 'var(--mc-danger, #d97706)' :
+    noticeTone === 'info' ? 'var(--mc-muted)' : undefined;
   return (
     <div className="mc-card-soft p-4 mb-3">
       <div className="flex items-center gap-2 mc-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--mc-muted)" }}>
         <Icon className="w-3 h-3" /> {label}
       </div>
       <div className="font-bold" style={highlight ? { color: "var(--mc-primary)" } : undefined}>{value}</div>
+      {notice && (
+        <div className="mt-2 text-xs leading-snug" style={{ color: noticeColor }}>
+          {notice}
+        </div>
+      )}
     </div>
   );
 }
