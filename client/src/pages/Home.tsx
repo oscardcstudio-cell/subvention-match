@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { BetaCapCounter } from "@/components/BetaCapCounter";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -196,12 +197,48 @@ function ExampleGrantCard({ language }: { language: string }) {
 }
 
 /** ------------------------------------------------------------------
- *  Beta Waitlist Section (preserved fetch to /api/waitlist)
+ *  Qualified Waitlist Section — captures email + pricing intent + trigger features
+ *  Posts to /api/waitlist/qualified in BOTH modes (beta open and beta full).
  *  ------------------------------------------------------------------ */
-function BetaWaitlistSection({ language, grantsCount }: { language: string; grantsCount: number }) {
+const PRICING_OPTIONS = [
+  { value: "lt5",      label: "< 5 €" },
+  { value: "5-10",     label: "5–10 €" },
+  { value: "10-20",    label: "10–20 €" },
+  { value: "20+",      label: "20 € +" },
+  { value: "indecis",  label: "Pas encore décidé" },
+];
+
+const FEATURE_OPTIONS = [
+  { value: "matching_illimite",  label: "Matching illimité" },
+  { value: "prospecting",        label: "Prospecting agents / galeries / labels" },
+  { value: "suivi_deadline",     label: "Suivi des deadlines" },
+  { value: "pdf_avance",         label: "PDF avancé (lettre de motivation auto)" },
+  { value: "accompagnement",     label: "Accompagnement personnalisé" },
+];
+
+function QualifiedWaitlistSection({ language, grantsCount }: { language: string; grantsCount: number }) {
+  const { data: capacityData } = useQuery<{ count: number; cap: number; isFull: boolean }>({
+    queryKey: ["/api/beta/capacity"],
+    staleTime: 30_000,
+  });
+
+  const isFull = capacityData?.isFull ?? false;
+  const count = capacityData?.count ?? 0;
+  const cap = capacityData?.cap ?? 150;
+
   const [email, setEmail] = useState("");
+  const [pricingIntent, setPricingIntent] = useState("");
+  const [triggerFeatures, setTriggerFeatures] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const toggleFeature = (v: string) => {
+    setTriggerFeatures((prev) => {
+      if (prev.includes(v)) return prev.filter((x) => x !== v);
+      if (prev.length >= 3) return prev; // max 3
+      return [...prev, v];
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,10 +246,15 @@ function BetaWaitlistSection({ language, grantsCount }: { language: string; gran
     setStatus("loading");
     setErrorMsg("");
     try {
-      const res = await fetch("/api/waitlist", {
+      const res = await fetch("/api/waitlist/qualified", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "homepage-pricing" }),
+        body: JSON.stringify({
+          email,
+          pricingIntent: pricingIntent || undefined,
+          triggerFeatures: triggerFeatures.length > 0 ? triggerFeatures : undefined,
+          source: "homepage-qualified",
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -229,7 +271,9 @@ function BetaWaitlistSection({ language, grantsCount }: { language: string; gran
     <section id="pricing" className="mc-section-rule">
       <div className="max-w-5xl mx-auto px-6 md:px-8 py-24 text-center">
         <div className="mc-chip mc-chip-warn inline-flex mc-mono text-xs uppercase tracking-widest mb-8">
-          [ BETA ] — {language === "fr" ? "Version en test" : "Test version"}
+          {isFull
+            ? "[ BETA COMPLÈTE ]"
+            : `[ BETA ] — ${language === "fr" ? "Version en test" : "Test version"}`}
         </div>
         <h2 className="mc-display text-4xl sm:text-5xl md:text-7xl">
           {language === "fr" ? (
@@ -290,63 +334,132 @@ function BetaWaitlistSection({ language, grantsCount }: { language: string; gran
         </div>
 
         <div className="mc-card mt-12 p-8 md:p-10 text-left">
-          <div className="grid md:grid-cols-12 gap-6 items-center">
-            <div className="md:col-span-6">
+          <div className="grid md:grid-cols-12 gap-6 items-start">
+            <div className="md:col-span-5">
               <div className="mc-mono text-xs uppercase tracking-widest mb-3" style={{ color: "var(--mc-muted)" }}>
                 / V1 — {language === "fr" ? "à venir" : "coming soon"}
               </div>
-              <h3 className="mc-display text-3xl">
-                {language === "fr" ? (
-                  <>PRÉVENEZ-MOI<br />QUAND LA V1 SORT.</>
+              <h3 className="mc-display text-3xl mb-3">
+                {isFull ? (
+                  language === "fr" ? <>REJOINDRE<br />LA WAITLIST.</> : <>JOIN<br />THE WAITLIST.</>
                 ) : (
-                  <>NOTIFY ME<br />WHEN V1 LAUNCHES.</>
+                  language === "fr" ? <>PRÉVENEZ-MOI<br />QUAND LA V1 SORT.</> : <>NOTIFY ME<br />WHEN V1 LAUNCHES.</>
                 )}
               </h3>
+              {isFull ? (
+                <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                  {language === "fr"
+                    ? `Beta complète (${count} / ${cap} places). Inscrivez-vous pour être parmi les premiers prévenus quand de nouvelles places s'ouvrent.`
+                    : `Beta full (${count} / ${cap} spots). Sign up to be first notified when new spots open.`}
+                </p>
+              ) : (
+                <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+                  {language === "fr"
+                    ? `${cap - count} places restantes — inscrivez-vous maintenant pour être informé(e) en avant-première, avec un tarif de lancement réservé aux beta-testeurs.`
+                    : `${cap - count} spots left — sign up now for early access with a launch price reserved for beta testers.`}
+                </p>
+              )}
             </div>
-            <div className="md:col-span-6">
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: "var(--mc-muted)" }}>
-                {language === "fr"
-                  ? "Vous serez informé(e) en avant-première, avec un tarif de lancement réservé aux beta-testeurs."
-                  : "You'll get early access with a launch price reserved for beta testers."}
-              </p>
+            <div className="md:col-span-7">
               {status === "success" ? (
-                <div className="mc-card-soft p-4 flex items-center gap-3" style={{ borderColor: "var(--mc-primary)" }}>
-                  <Check className="w-5 h-5" style={{ color: "var(--mc-primary)" }} strokeWidth={3} />
+                <div className="mc-card-soft p-5 flex items-center gap-3" style={{ borderColor: "var(--mc-primary)" }}>
+                  <Check className="w-5 h-5 flex-shrink-0" style={{ color: "var(--mc-primary)" }} strokeWidth={3} />
                   <p className="text-sm">
                     {language === "fr" ? "C'est noté ! On vous tiendra au courant." : "You're in! We'll keep you posted."}
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-                  <input
-                    type="email"
-                    required
-                    placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={status === "loading"}
-                    className="mc-input flex-1 rounded-full px-5 py-3 text-sm disabled:opacity-60"
-                    style={{
-                      background: "var(--mc-bg)",
-                      border: "1px solid var(--mc-border)",
-                      color: "var(--mc-text)",
-                    }}
-                    data-testid="input-waitlist-email"
-                  />
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Email */}
+                  <div>
+                    <label className="mc-mono text-[10px] uppercase tracking-widest mb-2 block" style={{ color: "var(--mc-muted)" }}>
+                      Email <span style={{ color: "var(--mc-primary)" }}>*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder={language === "fr" ? "votre@email.com" : "your@email.com"}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={status === "loading"}
+                      className="mc-input w-full rounded-full px-5 py-3 text-sm disabled:opacity-60"
+                      style={{
+                        background: "var(--mc-bg)",
+                        border: "1px solid var(--mc-border)",
+                        color: "var(--mc-text)",
+                      }}
+                      data-testid="input-waitlist-email"
+                    />
+                  </div>
+
+                  {/* Pricing intent */}
+                  <div>
+                    <label className="mc-mono text-[10px] uppercase tracking-widest mb-2 block" style={{ color: "var(--mc-muted)" }}>
+                      {language === "fr" ? "Budget mensuel V1 (optionnel)" : "Monthly V1 budget (optional)"}
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {PRICING_OPTIONS.map(({ value, label }) => {
+                        const selected = pricingIntent === value;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setPricingIntent(selected ? "" : value)}
+                            className="mc-chip text-xs transition"
+                            style={selected
+                              ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                              : { borderColor: "var(--mc-border)" }}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Trigger features */}
+                  <div>
+                    <label className="mc-mono text-[10px] uppercase tracking-widest mb-2 block" style={{ color: "var(--mc-muted)" }}>
+                      {language === "fr" ? "Ce qui vous déciderait le plus (max 3, optionnel)" : "What would trigger you most (max 3, optional)"}
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {FEATURE_OPTIONS.map(({ value, label }) => {
+                        const selected = triggerFeatures.includes(value);
+                        const disabled = !selected && triggerFeatures.length >= 3;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => toggleFeature(value)}
+                            disabled={disabled}
+                            className="mc-chip text-xs transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            style={selected
+                              ? { borderColor: "var(--mc-primary)", background: "var(--mc-primary-soft)", color: "var(--mc-primary)" }
+                              : { borderColor: "var(--mc-border)" }}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="mc-btn-primary px-6 py-3 rounded-full text-sm mc-mono uppercase tracking-widest disabled:opacity-60"
+                    className="mc-btn-primary w-full px-6 py-3 rounded-full text-sm mc-mono uppercase tracking-widest disabled:opacity-60"
                     data-testid="button-waitlist-submit"
                   >
                     {status === "loading"
                       ? (language === "fr" ? "Envoi…" : "Sending…")
-                      : (language === "fr" ? "Me prévenir" : "Notify me")}
+                      : isFull
+                        ? (language === "fr" ? "Rejoindre la waitlist" : "Join waitlist")
+                        : (language === "fr" ? "Rejoindre la beta" : "Join the beta")}
                   </button>
                 </form>
               )}
               {status === "error" && (
-                <p className="text-sm mt-3" style={{ color: "var(--mc-danger)" }}>{errorMsg}</p>
+                <p className="text-sm mt-3" style={{ color: "var(--mc-danger, #ef4444)" }}>{errorMsg}</p>
               )}
               <p className="text-xs mt-3" style={{ color: "var(--mc-muted-2)" }}>
                 {language === "fr"
@@ -436,6 +549,7 @@ export default function Home() {
             <div className="mc-mono text-xs uppercase tracking-widest mb-8 md:mb-10" style={{ color: "var(--mc-primary)" }}>
               — {language === "fr" ? "l'IA qui a lu les 473 PDFs pour vous" : "the AI that read 473 PDFs so you don't have to"}
             </div>
+            <BetaCapCounter className="mb-4" />
             <h1 className="mc-display text-[38px] sm:text-[56px] md:text-[108px] leading-none">
               {language === "fr" ? (
                 <>
@@ -687,8 +801,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BETA WAITLIST */}
-      <BetaWaitlistSection language={language} grantsCount={grantsCount} />
+      {/* QUALIFIED WAITLIST */}
+      <QualifiedWaitlistSection language={language} grantsCount={grantsCount} />
 
       {/* COMING SOON */}
       <section className="mc-section-rule">
