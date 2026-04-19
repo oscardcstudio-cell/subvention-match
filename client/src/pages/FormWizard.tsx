@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formDataSchema, type FormData } from "@shared/schema";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { trackFormStarted, trackFormSubmitted } from "@/lib/analytics";
+import { BetaCapCounter } from "@/components/BetaCapCounter";
 import {
   Music, Headphones, Pen, Palette, Wrench, Drama, Sparkles, Ticket, Film, Cpu,
   Landmark, Building, Megaphone, ArrowLeft, ArrowRight, Check, Loader2,
@@ -136,6 +137,14 @@ export default function FormWizard() {
     },
   });
 
+  const { data: capacityData } = useQuery<{ count: number; cap: number; isFull: boolean }>({
+    queryKey: ["/api/beta/capacity"],
+    staleTime: 60_000,
+  });
+
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
   const [stepIdx, setStepIdx] = useState(0);
   const currentStep = STEPS[stepIdx];
 
@@ -225,6 +234,82 @@ export default function FormWizard() {
     }
   };
 
+  // Cap gate — shown AFTER all hooks (hooks must not be conditional)
+  if (capacityData?.isFull) {
+    return (
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-6"
+        style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}
+      >
+        <div className="max-w-lg w-full">
+          <div className="mc-chip mc-chip-warn inline-flex mc-mono text-xs uppercase tracking-widest mb-6">
+            [ BETA COMPLÈTE ]
+          </div>
+          <h1 className="mc-display text-4xl mb-4">
+            Les {capacityData.cap} places beta sont prises<span style={{ color: "var(--mc-primary)" }}>.</span>
+          </h1>
+          <p className="mb-8 leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+            Rejoignez la liste d'attente prioritaire — les premiers inscrits seront les premiers servis quand de nouvelles places s'ouvrent.
+          </p>
+          {waitlistStatus === "success" ? (
+            <div className="mc-card p-5 flex items-center gap-3" style={{ borderColor: "var(--mc-primary)" }}>
+              <Check className="w-5 h-5" style={{ color: "var(--mc-primary)" }} strokeWidth={3} />
+              <p>Inscription confirmée. On vous prévient dès qu'une place se libère.</p>
+            </div>
+          ) : (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setWaitlistStatus("loading");
+                try {
+                  const res = await fetch("/api/waitlist/qualified", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: waitlistEmail, source: "form-cap-gate" }),
+                  });
+                  if (!res.ok) throw new Error("Erreur");
+                  setWaitlistStatus("success");
+                } catch {
+                  setWaitlistStatus("error");
+                }
+              }}
+              className="flex gap-3"
+            >
+              <input
+                type="email"
+                required
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                placeholder="votre@email.com"
+                className="mc-input flex-1 rounded-full px-5 py-3 text-sm"
+                style={{
+                  background: "var(--mc-panel)",
+                  border: "1px solid var(--mc-border)",
+                  color: "var(--mc-text)",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={waitlistStatus === "loading"}
+                className="mc-btn-primary px-6 py-3 rounded-full text-sm mc-mono uppercase tracking-widest"
+              >
+                {waitlistStatus === "loading" ? "…" : "Me prévenir"}
+              </button>
+            </form>
+          )}
+          {waitlistStatus === "error" && (
+            <p className="text-sm mt-3" style={{ color: "var(--mc-danger, #ef4444)" }}>
+              Une erreur s'est produite. Réessayez.
+            </p>
+          )}
+          <p className="text-xs mt-4" style={{ color: "var(--mc-muted-2)" }}>
+            Aucun spam. Email utilisé uniquement pour vous prévenir.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
       {/* Banner */}
@@ -249,6 +334,7 @@ export default function FormWizard() {
               {language === "fr" ? "Formulaire" : "Form"}
             </span>
           </a>
+          <BetaCapCounter className="hidden md:inline-flex" />
           <div className="mc-mono text-xs uppercase tracking-widest whitespace-nowrap" style={{ color: "var(--mc-muted)" }}>
             {language === "fr" ? "Étape" : "Step"} <span style={{ color: "var(--mc-text)" }}>{currentStep.num}</span> <span style={{ color: "var(--mc-muted-2)" }}>/</span> 07
           </div>
