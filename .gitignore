@@ -63,3 +63,4 @@ logs
 vite.config.ts.*
 attached_assets/
 generated-icon.png
+.claude/worktrees/
