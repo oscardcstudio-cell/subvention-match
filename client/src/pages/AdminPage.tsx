@@ -4,7 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, FileText, AlertTriangle } from "lucide-react";
 import { SubmissionCard, type AdminSubmission } from "@/components/admin/SubmissionCard";
 
+type BetaFeedback = {
+  id: number;
+  email?: string;
+  createdAt: string;
+  [key: string]: unknown;
+};
+
+type BetaWaitlistEntry = {
+  id: number;
+  email: string;
+  pricingIntent?: string;
+  triggerFeatures?: string[];
+  createdAt: string;
+};
+
+type FeedbackDashboard = {
+  betaCapacity: { count: number; cap: number; isFull: boolean };
+  matchFeedback: { byRating: Array<{ rating: string; total: number }>; totalVotes: number };
+  recentBetaFeedback: BetaFeedback[];
+  qualifiedWaitlist: BetaWaitlistEntry[];
+};
+
 export default function AdminPage() {
+  const adminToken =
+    typeof window !== "undefined"
+      ? localStorage.getItem("adminToken") ||
+        new URLSearchParams(window.location.search).get("admin_token") ||
+        ""
+      : "";
+
   const {
     data: submissions,
     isLoading,
@@ -14,6 +43,18 @@ export default function AdminPage() {
     refetch,
   } = useQuery<AdminSubmission[]>({
     queryKey: ["/api/admin/submissions"],
+  });
+
+  const { data: dashboardData, isLoading: dashboardLoading } = useQuery<FeedbackDashboard>({
+    queryKey: ["/api/admin/feedback-dashboard", adminToken],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/feedback-dashboard", {
+        headers: { "x-admin-token": adminToken },
+      });
+      if (!res.ok) throw new Error("Non autorisé");
+      return res.json();
+    },
+    enabled: !!adminToken,
   });
 
   // Premier chargement — on bloque l'UI.
@@ -64,6 +105,79 @@ export default function AdminPage() {
               <SubmissionCard key={submission.sessionId} submission={submission} />
             ))}
           </div>
+        )}
+
+        {/* Signal beta dashboard */}
+        {dashboardLoading && adminToken && (
+          <div className="mt-8 flex items-center gap-2 text-gray-500">
+            <Loader2 className="h-4 w-4 animate-spin" /> Chargement Signal beta…
+          </div>
+        )}
+        {dashboardData && (
+          <section className="max-w-7xl mx-auto py-8 border-t border-gray-200 mt-8" data-testid="feedback-dashboard">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Signal beta</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {/* Cap beta */}
+              <Card className="p-5">
+                <div className="text-sm font-medium text-gray-500 mb-1">Cap beta</div>
+                <div className="text-3xl font-bold">
+                  {dashboardData.betaCapacity.count} / {dashboardData.betaCapacity.cap}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {dashboardData.betaCapacity.isFull ? "COMPLET" : "Places disponibles"}
+                </div>
+              </Card>
+              {/* Match feedback */}
+              <Card className="p-5">
+                <div className="text-sm font-medium text-gray-500 mb-1">Match feedback</div>
+                <div className="text-3xl font-bold">{dashboardData.matchFeedback.totalVotes}</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {dashboardData.matchFeedback.byRating.map((r) => `${r.rating}: ${r.total}`).join(" · ")}
+                </div>
+              </Card>
+              {/* Waitlist qualifiée */}
+              <Card className="p-5">
+                <div className="text-sm font-medium text-gray-500 mb-1">Waitlist qualifiée</div>
+                <div className="text-3xl font-bold">
+                  {dashboardData.qualifiedWaitlist.filter((e) => e.pricingIntent).length}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">avec intention de payer renseignée</div>
+              </Card>
+            </div>
+
+            {/* Tableau waitlist qualifiée */}
+            {dashboardData.qualifiedWaitlist.length > 0 && (
+              <div>
+                <h3 className="text-base font-semibold text-gray-800 mb-3">Waitlist qualifiée</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-gray-500 border-b">
+                        <th className="pb-2 pr-4">Email</th>
+                        <th className="pb-2 pr-4">Prix €/mois</th>
+                        <th className="pb-2 pr-4">Features</th>
+                        <th className="pb-2">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboardData.qualifiedWaitlist.map((e) => (
+                        <tr key={e.id} className="border-b border-gray-100">
+                          <td className="py-2 pr-4 text-gray-700">{e.email}</td>
+                          <td className="py-2 pr-4">{e.pricingIntent || "—"}</td>
+                          <td className="py-2 pr-4 text-xs text-gray-500">
+                            {e.triggerFeatures ? e.triggerFeatures.join(", ") : "—"}
+                          </td>
+                          <td className="py-2 text-xs text-gray-400">
+                            {new Date(e.createdAt).toLocaleDateString("fr-FR")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </section>
         )}
       </main>
     </div>
