@@ -9,14 +9,14 @@ Milestone opérationnel : collecter du signal pour décider go/no-go sur la suit
 
 ### Feedback & Signal
 
-- [ ] **FEEDBACK-01**: User voit un nudge discret (non-bloquant, skippable) proposant de noter la pertinence des matches après les résultats
+- [x] **FEEDBACK-01**: User voit un nudge discret (non-bloquant, skippable) proposant de noter la pertinence des matches après les résultats
 - [x] **FEEDBACK-02**: User peut rejoindre une waitlist qualifiée en indiquant (a) quelles features il paierait, (b) combien €/mois (slider ou options)
 - [x] **FEEDBACK-03**: Admin peut consulter un dashboard minimal des feedbacks collectés (match + beta + waitlist qualifiée)
 
 ### Cap & Scarcity
 
-- [ ] **CAP-01**: Compteur "X / 150 places" visible sur homepage + header du formulaire, basé sur emails uniques en DB  *(API ready — UI plan 01-03)*
-- [ ] **CAP-02**: Quand le cap est atteint, le formulaire bascule sur la waitlist et affiche un état "beta complète"
+- [x] **CAP-01**: Compteur "X / 150 places" visible sur homepage + header du formulaire, basé sur emails uniques en DB  *(API ready — UI plan 01-03)*
+- [x] **CAP-02**: Quand le cap est atteint, le formulaire bascule sur la waitlist et affiche un état "beta complète"
 - [x] **CAP-03**: Le cap est configurable via variable d'env `BETA_CAP` (défaut 150), sans redeploy nécessaire pour changer la valeur en prod
 
 ### Growth & Recruitment
@@ -67,11 +67,11 @@ Déférés, pas dans ce milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FEEDBACK-01 | Phase 1 | Pending |
+| FEEDBACK-01 | Phase 1 | Complete |
 | FEEDBACK-02 | Phase 1 | Complete (01-01) |
 | FEEDBACK-03 | Phase 1 | Complete (01-01) |
 | CAP-01 | Phase 1 | API ready (01-01), UI pending (01-03) |
-| CAP-02 | Phase 1 | Pending |
+| CAP-02 | Phase 1 | Complete |
 | CAP-03 | Phase 1 | Complete (01-01) |
 | GROWTH-01 | Phase 2 | Pending |
 | GROWTH-02 | Phase 2 | Pending |

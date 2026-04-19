@@ -13,7 +13,7 @@
 
 Décision go/no-go à prendre sur 2-3 semaines. Milestone opérationnel, pas feature-driven.
 
-- [ ] **Phase 1: Signal durci + cap beta** - Instrumenter l'app pour capter intention et protéger coûts
+- [x] **Phase 1: Signal durci + cap beta** - Instrumenter l'app pour capter intention et protéger coûts
 - [ ] **Phase 2: Campagne recrutement** - +50 vrais users via canaux FR ciblés avec tracking source
 - [ ] **Phase 3: Synthèse & décision** - 5 entretiens quali + rapport + décision go/no-go argumentée
 
@@ -32,8 +32,8 @@ Décision go/no-go à prendre sur 2-3 semaines. Milestone opérationnel, pas fea
 
 Plans:
 - [x] 01-01-PLAN.md — Schema Drizzle étendu + 3 endpoints API (capacity, waitlist qualifiée, admin dashboard)
-- [ ] 01-02-PLAN.md — Nudge match_feedback sur ResultsPage + section Signal beta dans AdminPage
-- [ ] 01-03-PLAN.md — BetaCapCounter (Home + FormWizard) + QualifiedWaitlistSection + cap gate
+- [x] 01-02-PLAN.md — Nudge match_feedback sur ResultsPage + section Signal beta dans AdminPage
+- [x] 01-03-PLAN.md — BetaCapCounter (Home + FormWizard) + QualifiedWaitlistSection + cap gate
 
 ### Phase 2: Campagne recrutement
 **Goal**: Recruter +50 vrais users via canaux ciblés (groupes Facebook, Reddit FR, LinkedIn, forums spécialisés) avec tracking de la source d'acquisition.
