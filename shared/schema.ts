@@ -220,14 +220,24 @@ export const betaFeedback = pgTable("beta_feedback", {
 export type BetaFeedback = typeof betaFeedback.$inferSelect;
 
 // Beta waitlist — emails captures depuis la homepage pour etre preven\u0301es quand la V1 payante sort
+// v1.1: ajout champs qualification pour la waitlist enrichie (intention de payer, features déclencheuses)
+// Migration SQL équivalente (à appliquer si drizzle-kit push échoue) :
+// -- Migration v1.1: ajout champs qualification waitlist
+// ALTER TABLE beta_waitlist ADD COLUMN IF NOT EXISTS pricing_intent TEXT;
+// ALTER TABLE beta_waitlist ADD COLUMN IF NOT EXISTS trigger_features TEXT[];
 export const betaWaitlist = pgTable("beta_waitlist", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull(),
   source: text("source"), // ex: 'homepage-pricing', 'homepage-hero'
   notified: text("notified").default("false").notNull(),
+  // v1.1 — nullable, rétro-compatible
+  pricingIntent: text("pricing_intent"),     // ex: "5-10", "10-20", "20+", "non_sur"
+  triggerFeatures: text("trigger_features").array(), // ex: ["prospecting", "suivi_deadline", "pdf_avance"]
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const insertBetaWaitlistSchema = createInsertSchema(betaWaitlist).omit({ id: true, createdAt: true });
+export type InsertBetaWaitlistEntry = z.infer<typeof insertBetaWaitlistSchema>;
 export type BetaWaitlistEntry = typeof betaWaitlist.$inferSelect;
 
 // Grant/Subvention result schema (from AI matching)
@@ -243,6 +253,8 @@ export const grantResultSchema = z.object({
   frequency: z.string().optional(),
   isRecurring: z.boolean().optional(),
   nextSession: z.string().optional(),
+  deadlineNotice: z.string().optional(),
+  deadlineStatus: z.enum(['ok', 'urgent', 'passed-recurring', 'short-recurring']).optional(),
   
   // Description et éligibilité
   description: z.string().optional(),
