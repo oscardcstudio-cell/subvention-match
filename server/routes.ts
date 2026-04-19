@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, type InsertGrant, type Grant, type GrantResult, type FormSubmission } from "@shared/schema";
+import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, formSubmissions, type InsertGrant, type Grant, type GrantResult, type FormSubmission } from "@shared/schema";
 import { sanitizeFormBody, findBlockedField } from "./content-filter";
 import { storage } from "./storage";
 import { grantStorage } from "./grant-storage";
@@ -726,6 +726,102 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
       res.json(entries);
     } catch (error: any) {
       console.error("Erreur listing waitlist:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // --- Beta capacity + qualified waitlist + feedback dashboard ---
+
+  // GET /api/beta/capacity — compteur emails uniques vs cap configurable
+  // Lit BETA_CAP depuis process.env (défaut 150). isFull=true quand count >= cap.
+  app.get("/api/beta/capacity", async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { countDistinct } = await import("drizzle-orm");
+      const cap = parseInt(process.env.BETA_CAP ?? "150", 10);
+      const [row] = await db
+        .select({ count: countDistinct(formSubmissions.email) })
+        .from(formSubmissions);
+      const count = Number(row?.count ?? 0);
+      res.json({ count, cap, isFull: count >= cap });
+    } catch (error: any) {
+      console.error("Erreur beta/capacity:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // POST /api/waitlist/qualified — capture la waitlist enrichie avec intention de payer
+  app.post("/api/waitlist/qualified", waitlistLimiter, async (req, res) => {
+    try {
+      const { email, source, pricingIntent, triggerFeatures } = req.body;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || typeof email !== "string" || !emailRegex.test(email)) {
+        return res.status(400).json({ error: "Email invalide" });
+      }
+      const { db } = await import("./db");
+      await db
+        .insert(betaWaitlist)
+        .values({
+          email: email.toLowerCase().trim().slice(0, 320),
+          source: source ? String(source).slice(0, 80) : "qualified-form",
+          pricingIntent: pricingIntent ? String(pricingIntent).slice(0, 20) : null,
+          triggerFeatures: Array.isArray(triggerFeatures)
+            ? triggerFeatures.map((f: unknown) => String(f).slice(0, 50)).slice(0, 10)
+            : null,
+        })
+        .onConflictDoNothing();
+      console.log(`📬 Waitlist qualifiée: ${maskEmail(email)} | prix: ${pricingIntent} | features: ${triggerFeatures}`);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Erreur waitlist qualifiée:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // GET /api/admin/feedback-dashboard — agrégats match_feedback + beta_feedback + waitlist qualifiée
+  app.get("/api/admin/feedback-dashboard", requireAdmin, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { desc, count, countDistinct } = await import("drizzle-orm");
+
+      // match_feedback : votes par rating
+      const matchVotes = await db
+        .select({ rating: matchFeedback.rating, total: count() })
+        .from(matchFeedback)
+        .groupBy(matchFeedback.rating);
+
+      // beta_feedback : 20 derniers
+      const recentBetaFeedback = await db
+        .select()
+        .from(betaFeedback)
+        .orderBy(desc(betaFeedback.createdAt))
+        .limit(20);
+
+      // waitlist qualifiée : toutes les entrées (max 200)
+      const qualifiedWaitlist = await db
+        .select()
+        .from(betaWaitlist)
+        .orderBy(desc(betaWaitlist.createdAt))
+        .limit(200);
+
+      // cap courant
+      const cap = parseInt(process.env.BETA_CAP ?? "150", 10);
+      const [capRow] = await db
+        .select({ count: countDistinct(formSubmissions.email) })
+        .from(formSubmissions);
+      const betaCount = Number(capRow?.count ?? 0);
+
+      // taux utilisation match_feedback (votes / soumissions)
+      const totalVotes = matchVotes.reduce((s, r) => s + Number(r.total), 0);
+
+      res.json({
+        betaCapacity: { count: betaCount, cap, isFull: betaCount >= cap },
+        matchFeedback: { byRating: matchVotes, totalVotes },
+        recentBetaFeedback,
+        qualifiedWaitlist,
+      });
+    } catch (error: any) {
+      console.error("Erreur feedback-dashboard:", error);
       res.status(500).json({ error: error.message });
     }
   });
