@@ -120,24 +120,6 @@ Retour qui m'aiderait : est-ce que l'outil propose des aides au bon stade de ton
 (Mods : si HS, ping-moi, je supprime.)`,
   },
   {
-    sub: "AutoEntrepreneur",
-    discipline: "Multi-disciplines micro",
-    title: "Outil gratuit pour matcher subventions culturelles si tu es créatif en micro-entreprise",
-    body: `Salut,
-
-Beaucoup de créatif·ves ici sont en micro (illustrateurs, photographes, vidéastes, musiciens, formateurs, etc.). Souvent on rate les subventions / bourses / aides parce que c'est éclaté entre 30 portails (DRAC, CNAP, ADAGP, ADAMI, Sacem, fondations, EU, régions).
-
-J'ai monté un outil en beta : 3 min de profilage (statut micro-entrepreneur, domaine, projet, région), l'IA filtre ~870 dispositifs et te sort une short-list adaptée + un PDF dossier prêt-à-envoyer.
-
-**Gratuit, beta 150 places**, juste l'email à la fin.
-
-👉 https://mecene.cool/?source=reddit-autoentrepreneur
-
-Retour qui m'intéresse : est-ce que les aides proposées sont vraiment compatibles avec un statut micro (vs. demander une asso ou un SIRET commercial) ?
-
-(Mods : si HS, je supprime.)`,
-  },
-  {
     sub: "Freelance_France",
     discipline: "Multi-disciplines freelance",
     title: "Outil gratuit pour matcher subventions culturelles sur ton profil — beta, retours bienvenus",

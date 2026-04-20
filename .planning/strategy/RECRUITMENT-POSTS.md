@@ -159,26 +159,6 @@ Chaque post utilise un **lien tracké** : `https://mecene.cool/?source=<canal>` 
 
 ---
 
-## 8) Reddit FR — r/AutoEntrepreneur
-
-**Sujet** : "Outil gratuit pour matcher subventions culturelles si tu es créatif en micro-entreprise"
-
-> Salut,
->
-> Beaucoup de créatif·ves ici sont en micro (illustrateurs, photographes, vidéastes, musiciens, formateurs, etc.). Souvent on rate les subventions / bourses / aides parce que c'est éclaté entre 30 portails (DRAC, CNAP, ADAGP, ADAMI, Sacem, fondations, EU, régions).
->
-> J'ai monté un outil en beta : 3 min de profilage (statut micro-entrepreneur, domaine, projet, région), l'IA filtre ~870 dispositifs et te sort une short-list adaptée + un PDF dossier prêt-à-envoyer.
->
-> **Gratuit, beta 150 places**, juste l'email à la fin.
->
-> 👉 https://mecene.cool/?source=reddit-autoentrepreneur
->
-> Retour qui m'intéresse : est-ce que les aides proposées sont vraiment compatibles avec un statut micro (vs. demander une asso ou un SIRET commercial) ?
->
-> (Mods : si HS, je supprime.)
-
----
-
 ## (Désactivés — autres canaux conservés pour mémoire)
 
 > Pour la campagne v1.1 on se concentre sur Reddit. Les sections ci-dessous restent disponibles si on veut élargir plus tard.
@@ -262,9 +242,10 @@ Cibler 5-10 contacts persos qui ont un réseau d'artistes (managers, collègues,
 | J4 | r/dessin | Illustration / arts visuels |
 | J5 | r/bd | BD |
 | J6 | r/cinemaFR | Cinéma |
-| J7 | r/AutoEntrepreneur | Multi-disciplines en micro |
-| J8 | r/Freelance_France | Multi-disciplines freelance |
-| J9+ | **Pause + bilan** : check `/admin → Sources d'acquisition`. Doubler les 2 subs qui ont le mieux converti via un repost en commentaire utile (PAS un repost direct) |
+| J7 | r/Freelance_France | Multi-disciplines freelance |
+| J8+ | **Pause + bilan** : check `/admin → Sources d'acquisition`. Doubler les 2 subs qui ont le mieux converti via un repost en commentaire utile (PAS un repost direct) |
+
+**r/AutoEntrepreneur retiré** de la liste : sub peuplé de dev-curieux qui repiquent les idées. On reste sur les communautés de créatifs (musique / écriture / photo / dessin / BD / ciné / freelance créatif).
 
 **Heures de post optimales (FR)** : 8h-10h (commute matin) ou 19h-21h (commute soir). Éviter le week-end pour les subs pro (r/Freelance_France, r/AutoEntrepreneur).
 
