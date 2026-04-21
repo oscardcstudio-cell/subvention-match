@@ -351,9 +351,91 @@ function StepFormation({ data, set }: { data: ProfileData; set: (d: Partial<Prof
   );
 }
 
+const JOB_HINTS = [
+  {
+    company: "Anthropic",
+    color: "border-orange-200 bg-orange-50",
+    tag: "text-orange-700 bg-orange-100",
+    topics: [
+      "Interprétabilité mécaniste des transformers",
+      "Scalable oversight / debate",
+      "Statut moral et conscience des LLMs",
+      "Formalisation mathématique de l'éthique",
+      "Constitutional AI / RLHF théorique",
+    ],
+  },
+  {
+    company: "Conjecture",
+    color: "border-violet-200 bg-violet-50",
+    tag: "text-violet-700 bg-violet-100",
+    topics: [
+      "Vérification formelle des systèmes IA",
+      "Goal misgeneralization",
+      "Théorie des catégories appliquée à l'IA",
+      "Émulation cognitive",
+      "Fondements mathématiques de l'alignement",
+    ],
+  },
+  {
+    company: "Mistral AI",
+    color: "border-sky-200 bg-sky-50",
+    tag: "text-sky-700 bg-sky-100",
+    topics: [
+      "Architectures efficaces (MoE, attention)",
+      "NLP multilingue",
+      "Évaluation et benchmarking",
+      "Fine-tuning et adaptation de modèles",
+    ],
+  },
+  {
+    company: "OpenAI",
+    color: "border-emerald-200 bg-emerald-50",
+    tag: "text-emerald-700 bg-emerald-100",
+    topics: [
+      "Superalignement / scalable oversight",
+      "Gouvernance IA et politique publique",
+      "Red-teaming et robustesse adversariale",
+      "Reward modeling",
+    ],
+  },
+];
+
+function JobHintsPanel() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-slate-200 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+      >
+        <span>Sujets recherchés par chaque entreprise</span>
+        <span className="text-slate-400">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="grid grid-cols-1 gap-3 p-4">
+          {JOB_HINTS.map((h) => (
+            <div key={h.company} className={`rounded-lg border p-3 ${h.color}`}>
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${h.tag}`}>{h.company}</span>
+              <ul className="mt-2 space-y-1">
+                {h.topics.map((t) => (
+                  <li key={t} className="text-xs text-slate-700 flex gap-1.5">
+                    <span className="mt-0.5 opacity-40">—</span>{t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StepTravaux({ data, set }: { data: ProfileData; set: (d: Partial<ProfileData>) => void }) {
   return (
     <div className="space-y-5">
+      <JobHintsPanel />
       <div className="space-y-2">
         <Label>Sur quoi travailles-tu en ce moment ?</Label>
         <Textarea placeholder="Projet, sujet de réflexion, recherche en cours..." value={data.travauxActuels} onChange={(e) => set({ travauxActuels: e.target.value })} rows={3} />
@@ -424,6 +506,23 @@ function StepCompetences({ data, set }: { data: ProfileData; set: (d: Partial<Pr
   );
 }
 
+const ANGLE_COMPANIES: Record<string, string[]> = {
+  "Alignement des valeurs":          ["Anthropic", "OpenAI"],
+  "Interprétabilité mécaniste":      ["Anthropic"],
+  "Gouvernance / politique IA":      ["OpenAI", "Anthropic"],
+  "Sécurité formelle / vérification":["Conjecture"],
+  "Conscience machine":              ["Anthropic", "Conjecture"],
+  "Risques existentiels":            ["Conjecture", "Anthropic"],
+  "Éthique computationnelle":        ["OpenAI", "Mistral AI"],
+};
+
+const COMPANY_TAG_STYLE: Record<string, string> = {
+  "Anthropic":  "bg-orange-100 text-orange-700",
+  "Conjecture": "bg-violet-100 text-violet-700",
+  "Mistral AI": "bg-sky-100 text-sky-700",
+  "OpenAI":     "bg-emerald-100 text-emerald-700",
+};
+
 function StepVision({ data, set }: { data: ProfileData; set: (d: Partial<ProfileData>) => void }) {
   const angles = [
     "Alignement des valeurs", "Interprétabilité mécaniste",
@@ -434,9 +533,26 @@ function StepVision({ data, set }: { data: ProfileData; set: (d: Partial<Profile
     <div className="space-y-5">
       <div className="space-y-2">
         <Label>Angles qui t'intéressent dans la sécurité IA</Label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-3">
           {angles.map((o) => (
-            <Checkbox key={o} label={o} checked={data.angleSecurite.includes(o)} onChange={() => set({ angleSecurite: toggle(data.angleSecurite, o) })} />
+            <div key={o} className="flex items-start gap-2">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-sm flex-1">
+                <input
+                  type="checkbox"
+                  checked={data.angleSecurite.includes(o)}
+                  onChange={() => set({ angleSecurite: toggle(data.angleSecurite, o) })}
+                  className="w-4 h-4 accent-indigo-600 mt-0.5 shrink-0"
+                />
+                {o}
+              </label>
+              <div className="flex gap-1 flex-wrap justify-end">
+                {(ANGLE_COMPANIES[o] || []).map((c) => (
+                  <span key={c} className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full whitespace-nowrap ${COMPANY_TAG_STYLE[c]}`}>
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>
