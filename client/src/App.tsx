@@ -28,6 +28,7 @@ import { MentionsLegales, CGV, PolitiqueConfidentialite } from "@/pages/LegalPag
 import { CookieBanner } from "@/components/CookieBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import NotFound from "@/pages/not-found";
+import AchrafProfile from "@/pages/AchrafProfile";
 
 /**
  * Scroll window to top on every route change.
@@ -69,6 +70,7 @@ function Router() {
       <Route path="/mentions-legales" component={MentionsLegales} />
       <Route path="/cgv" component={CGV} />
       <Route path="/confidentialite" component={PolitiqueConfidentialite} />
+      <Route path="/achraf" component={AchrafProfile} />
       <Route component={NotFound} />
     </Switch>
   );
