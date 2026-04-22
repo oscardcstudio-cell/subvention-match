@@ -630,10 +630,21 @@ function StepPratique({ data, set }: { data: ProfileData; set: (d: Partial<Profi
 export default function AchrafProfile() {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
-  const [data, setData] = useState<ProfileData>(EMPTY);
+  const [data, setData] = useState<ProfileData>(() => {
+    try {
+      const saved = localStorage.getItem("achraf-profile");
+      return saved ? { ...EMPTY, ...JSON.parse(saved) } : EMPTY;
+    } catch {
+      return EMPTY;
+    }
+  });
 
   function set(patch: Partial<ProfileData>) {
-    setData((prev) => ({ ...prev, ...patch }));
+    setData((prev) => {
+      const next = { ...prev, ...patch };
+      try { localStorage.setItem("achraf-profile", JSON.stringify(next)); } catch {}
+      return next;
+    });
   }
 
   const stepComponents = [
