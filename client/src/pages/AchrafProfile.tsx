@@ -296,6 +296,25 @@ Achraf Daghar`;
       <Button variant="ghost" onClick={onBack} className="w-full text-slate-500">
         Modifier le profil
       </Button>
+
+      <Card className="border-slate-200">
+        <CardHeader>
+          <CardTitle className="text-base text-slate-600">Exporter mes données</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-xs text-slate-500">Copie ce bloc et envoie-le pour importer ton profil sur un autre appareil.</p>
+          <pre className="text-xs bg-slate-100 rounded p-3 overflow-x-auto break-all whitespace-pre-wrap border">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => navigator.clipboard.writeText(JSON.stringify(data))}
+          >
+            Copier le JSON
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -625,6 +644,54 @@ function StepPratique({ data, set }: { data: ProfileData; set: (d: Partial<Profi
   );
 }
 
+// ─── Import panel ─────────────────────────────────────────────────────────────
+
+function ImportPanel({ onImport }: { onImport: (d: ProfileData) => void }) {
+  const [open, setOpen] = useState(false);
+  const [raw, setRaw] = useState("");
+  const [error, setError] = useState("");
+
+  function handleImport() {
+    try {
+      const parsed = JSON.parse(raw);
+      onImport({ ...EMPTY, ...parsed });
+      setOpen(false);
+      setRaw("");
+      setError("");
+    } catch {
+      setError("JSON invalide, vérifie le texte collé.");
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-slate-200 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 text-sm text-slate-500 hover:bg-slate-100 transition-colors"
+      >
+        <span>Importer un profil depuis un autre appareil</span>
+        <span>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="p-4 space-y-3">
+          <Textarea
+            rows={5}
+            placeholder='Colle ici le JSON copié depuis l\'autre appareil...'
+            value={raw}
+            onChange={(e) => setRaw(e.target.value)}
+            className="font-mono text-xs"
+          />
+          {error && <p className="text-xs text-red-500">{error}</p>}
+          <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleImport}>
+            Charger le profil
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function AchrafProfile() {
@@ -708,6 +775,12 @@ export default function AchrafProfile() {
             </Button>
           )}
         </div>
+
+        <ImportPanel onImport={(imported) => {
+          setData(imported);
+          try { localStorage.setItem("achraf-profile", JSON.stringify(imported)); } catch {}
+          setDone(true);
+        }} />
       </div>
     </div>
   );
