@@ -695,25 +695,7 @@ function ImportPanel({ onImport }: { onImport: (d: ProfileData) => void }) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function AchrafProfile() {
-  // Mode export : /achraf?export — affiche le JSON brut pour transfert cross-device
-  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("export")) {
-    const raw = localStorage.getItem("achraf-profile") || "{}";
-    return (
-      <div className="min-h-screen bg-slate-900 p-6 flex flex-col gap-4">
-        <p className="text-white font-bold text-lg">Export profil Achraf</p>
-        <p className="text-slate-400 text-sm">Copie tout ce texte et envoie-le à Oscar.</p>
-        <pre className="text-green-400 text-xs bg-slate-800 rounded-xl p-4 overflow-auto break-all whitespace-pre-wrap flex-1 border border-slate-700">
-          {JSON.stringify(JSON.parse(raw), null, 2)}
-        </pre>
-        <button
-          onClick={() => navigator.clipboard.writeText(raw).then(() => alert("Copié !"))}
-          className="bg-indigo-600 text-white rounded-xl py-4 text-base font-semibold active:opacity-70"
-        >
-          Copier le JSON
-        </button>
-      </div>
-    );
-  }
+  const isExportMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("export");
 
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
@@ -732,6 +714,26 @@ export default function AchrafProfile() {
       try { localStorage.setItem("achraf-profile", JSON.stringify(next)); } catch {}
       return next;
     });
+  }
+
+  // Mode export : /achraf?export
+  if (isExportMode) {
+    const raw = localStorage.getItem("achraf-profile") || "{}";
+    return (
+      <div className="min-h-screen bg-slate-900 p-6 flex flex-col gap-4">
+        <p className="text-white font-bold text-lg">Export profil Achraf</p>
+        <p className="text-slate-400 text-sm">Copie tout ce texte et envoie-le à Oscar.</p>
+        <pre className="text-green-400 text-xs bg-slate-800 rounded-xl p-4 overflow-auto break-all whitespace-pre-wrap flex-1 border border-slate-700">
+          {JSON.stringify(JSON.parse(raw), null, 2)}
+        </pre>
+        <button
+          onClick={() => navigator.clipboard.writeText(raw).then(() => alert("Copié !"))}
+          className="bg-indigo-600 text-white rounded-xl py-4 text-base font-semibold active:opacity-70"
+        >
+          Copier le JSON
+        </button>
+      </div>
+    );
   }
 
   const stepComponents = [
