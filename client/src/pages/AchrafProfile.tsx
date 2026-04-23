@@ -677,7 +677,7 @@ function ImportPanel({ onImport }: { onImport: (d: ProfileData) => void }) {
         <div className="p-4 space-y-3">
           <Textarea
             rows={5}
-            placeholder='Colle ici le JSON copié depuis l\'autre appareil...'
+            placeholder="Colle ici le JSON depuis l'autre appareil..."
             value={raw}
             onChange={(e) => setRaw(e.target.value)}
             className="font-mono text-xs"
