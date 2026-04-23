@@ -69,6 +69,8 @@ const EMPTY: ProfileData = {
   contraintesMobilite: "",
 };
 
+const ACHRAF_DEFAULT: ProfileData = {"universite":"Université paris 8","masterStatut":"En cours","masterSpecialite":"","philoDomaines":["Épistémologie","Métaphysique","Éthique normative","Philo des sciences"],"mathsDomaines":["Théorie des catégories","Algèbre","Théorie de la mesure","Topologie","Théorie des probabilités"],"travauxActuels":"Corp sans organes et son lien avec internet et le desir","themeMémoire":"","publications":"","questionsObsessionnelles":"","approche":"Plutôt conceptuelle / argumentative","langages":["Python","R"],"frameworksML":["PyTorch"],"niveauCoding":"Intermédiaire","experienceLLM":[],"angleSecurite":["Alignement des valeurs","Interprétabilité mécaniste","Gouvernance / politique IA","Conscience machine","Risques existentiels","Éthique computationnelle","Sécurité formelle / vérification"],"problemPhiloStatement":"La question de la technique est une question philosophique, le sens du progrès technique définit l'activité humaine et puis la complexité de l'IA promet émerger de l'intelligence et peuttre une expérience consciente du monde ce qui pose des questions sur tout les niveaux","posture":"Prudent mais optimiste","influencesChercheurs":"Bernard Steigler, Simondon, Virilo, Deleuze, Land, Negarestani, ","disponibilite":"Maintenant","contrats":["Fellowship / bourse de recherche","Peu importe","Freelance / consulting","CDD","CDI"],"salaireMin":"< 30 000 €","remote":"Hybride OK","contraintesMobilite":""};
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function toggle(arr: string[], val: string): string[] {
@@ -702,9 +704,9 @@ export default function AchrafProfile() {
   const [data, setData] = useState<ProfileData>(() => {
     try {
       const saved = localStorage.getItem("achraf-profile");
-      return saved ? { ...EMPTY, ...JSON.parse(saved) } : EMPTY;
+      return saved ? { ...ACHRAF_DEFAULT, ...JSON.parse(saved) } : ACHRAF_DEFAULT;
     } catch {
-      return EMPTY;
+      return ACHRAF_DEFAULT;
     }
   });
 
