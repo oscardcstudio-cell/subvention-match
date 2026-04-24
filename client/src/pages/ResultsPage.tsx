@@ -259,6 +259,7 @@ export default function ResultsPage() {
               feedback={feedbackSent[grant.id]}
               onFeedback={(vote) => handleFeedback(grant.id, vote)}
               language={language}
+              userRegion={data?.submission?.region}
             />
           ))}
         </div>
@@ -370,13 +371,14 @@ function SynthRow({ label, value, color, size }: { label: string; value: string;
   );
 }
 
-export function MatchCard({ grant, rank, top, feedback, onFeedback, language }: {
+export function MatchCard({ grant, rank, top, feedback, onFeedback, language, userRegion }: {
   grant: GrantResult;
   rank: number;
   top: boolean;
   feedback: "up" | "down" | undefined;
   onFeedback: (v: "up" | "down") => void;
   language: string;
+  userRegion?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const score = grant.matchScore || 0;
@@ -460,8 +462,16 @@ export function MatchCard({ grant, rank, top, feedback, onFeedback, language }: 
                 </div>
               )}
               {grant.contactEmail && (
-                <div className="inline-flex items-center gap-2 text-sm" style={{ color: "var(--mc-muted)" }}>
-                  <Mail className="w-3.5 h-3.5" /> {grant.contactEmail}
+                <div className="inline-flex items-start gap-2 text-sm" style={{ color: "var(--mc-muted)" }}>
+                  <Mail className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                  <span>
+                    {grant.contactEmail}
+                    {grant.region && userRegion && grant.region.toLowerCase() !== userRegion.toLowerCase() && (
+                      <span className="ml-2 mc-mono text-[10px] uppercase tracking-widest" style={{ color: "var(--mc-muted-2)" }}>
+                        {grant.region}
+                      </span>
+                    )}
+                  </span>
                 </div>
               )}
             </div>
