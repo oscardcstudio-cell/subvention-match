@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formDataSchema, type FormData } from "@shared/schema";
@@ -681,6 +681,68 @@ function StepType({ form }: { form: any }) {
   );
 }
 
+function RegionCombobox({ form }: { form: any }) {
+  const current: string = form.watch("region") || "";
+  const [query, setQuery] = useState(current);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = REGIONS.filter(r =>
+    r.toLowerCase().includes(query.toLowerCase())
+  );
+
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  const select = (r: string) => {
+    form.setValue("region", r, { shouldValidate: true });
+    setQuery(r);
+    setOpen(false);
+  };
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <input
+        type="text"
+        value={query}
+        onChange={e => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        placeholder="Ex : Provence-Alpes-Côte d'Azur…"
+        className="mc-input w-full text-sm rounded-lg focus:outline-none"
+        style={{ background: "var(--mc-bg)", border: "1px solid var(--mc-border)", color: "var(--mc-text)", padding: "0.9rem 1.25rem" }}
+        autoComplete="off"
+      />
+      {open && filtered.length > 0 && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
+          background: "var(--mc-panel)", border: "1px solid var(--mc-border)",
+          borderRadius: 8, zIndex: 50, overflow: "hidden",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+        }}>
+          {filtered.map(r => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => select(r)}
+              className="w-full text-left px-4 py-2.5 text-sm transition"
+              style={{ color: "var(--mc-text)", background: "transparent" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "var(--mc-border)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StepRegion({ form }: { form: any }) {
   const inter: string = form.watch("isInternational") || "";
   return (
@@ -692,13 +754,7 @@ function StepRegion({ form }: { form: any }) {
       />
       <div className="mt-10">
         <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Région administrative</label>
-        <select
-          {...form.register("region")}
-          className="mc-input w-full text-sm rounded-lg focus:outline-none"
-          style={{ background: "var(--mc-bg)", border: "1px solid var(--mc-border)", color: "var(--mc-text)", padding: "0.9rem 1.25rem" }}
-        >
-          {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-        </select>
+        <RegionCombobox form={form} />
       </div>
       <div className="mt-8">
         <label className="mc-mono text-xs uppercase tracking-widest mb-3 block" style={{ color: "var(--mc-muted)" }}>Votre projet a une dimension internationale ?</label>
