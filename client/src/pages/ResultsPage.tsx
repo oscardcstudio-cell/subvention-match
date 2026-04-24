@@ -40,16 +40,18 @@ export default function ResultsPage() {
     else setLocation("/");
   }, [setLocation]);
 
-  const { data, isLoading } = useQuery<ResultsResponse>({
+  const { data, isLoading, isError } = useQuery<ResultsResponse>({
     queryKey: ["/api/results", sessionId],
     enabled: !!sessionId,
   });
 
+  const results = data?.results || [];
+
   useEffect(() => {
-    if (data?.results?.length) {
-      trackResultsViewed({ matchCount: data.results.length, sessionId });
+    if (results.length) {
+      trackResultsViewed({ matchCount: results.length, sessionId });
     }
-  }, [data?.results?.length, sessionId]);
+  }, [results.length, sessionId]);
 
   useEffect(() => {
     if (!results.length) return;
@@ -57,8 +59,6 @@ export default function ResultsPage() {
     const t = setTimeout(() => setNudgeVisible(true), 3000);
     return () => clearTimeout(t);
   }, [results.length]);
-
-  const results = data?.results || [];
   const sorted = [...results].sort((a, b) => {
     if (sortBy === "score") return (b.matchScore || 0) - (a.matchScore || 0);
     if (sortBy === "deadline") {
@@ -98,8 +98,21 @@ export default function ResultsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
         <div className="flex items-center gap-3 mc-mono text-sm uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
-          <Loader2 className="w-4 h-4 animate-spin" /> Chargement des résultats…
+          <Loader2 className="w-4 h-4 animate-spin" /> {language === "fr" ? "Chargement des résultats…" : "Loading results…"}
         </div>
+      </div>
+    );
+  }
+
+  if (isError || (!isLoading && !data)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: "var(--mc-bg)", color: "var(--mc-text)" }}>
+        <div className="mc-mono text-sm uppercase tracking-widest" style={{ color: "var(--mc-muted)" }}>
+          {language === "fr" ? "Impossible de charger les résultats." : "Unable to load results."}
+        </div>
+        <a href="/" className="mc-btn-primary px-6 py-3 rounded-lg text-sm" style={{ textDecoration: "none" }}>
+          {language === "fr" ? "Retour à l'accueil" : "Back to home"}
+        </a>
       </div>
     );
   }
@@ -461,7 +474,7 @@ export function MatchCard({ grant, rank, top, feedback, onFeedback, language }: 
           <MetricBox
             icon={Calendar}
             label="Deadline"
-            value={grant.deadline}
+            value={grant.deadlineStatus === 'passed-recurring' && grant.nextSession ? `~${grant.nextSession}` : grant.deadline}
             highlight={grant.isRecurring}
             notice={grant.deadlineNotice}
             noticeTone={

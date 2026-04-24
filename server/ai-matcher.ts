@@ -265,6 +265,7 @@ function annotateDeadline(grant: GrantResult): GrantResult {
       return {
         ...grant,
         deadlineStatus: 'passed-recurring',
+        nextSession: nextStr,
         deadlineNotice: `Édition ${deadlineDate.getFullYear()} terminée — prochaine session attendue vers le ${nextStr}. Prépare ton dossier dès maintenant pour l'année prochaine.`,
       };
     }
