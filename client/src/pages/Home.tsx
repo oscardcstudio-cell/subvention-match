@@ -643,14 +643,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
             {profiles.map((p) => {
               const Icon = p.icon;
               return (
                 <Link key={p.test} href={p.href}>
                   <a
                     data-testid={p.test}
-                    className="mc-card hover:border-[var(--mc-primary)] transition px-5 py-4 flex items-center gap-3 cursor-pointer"
+                    className="mc-card hover:border-[var(--mc-primary)] transition px-3 sm:px-5 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 cursor-pointer"
                     style={{ textDecoration: "none", color: "var(--mc-text)" }}
                   >
                     <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "var(--mc-muted)" }} strokeWidth={1.75} />

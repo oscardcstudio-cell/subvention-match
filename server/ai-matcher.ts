@@ -362,7 +362,7 @@ export async function matchGrantsWithAI(
   // (ex: Conseil départemental des Landes pour un user breton). Laisse passer
   // les aides nationales, UE, et celles sans région clairement identifiable.
   const regionCompatibleGrants = qualifiedGrants.filter((g) =>
-    isRegionCompatible(g.organization, submission.region)
+    isRegionCompatible(g.organization, submission.region, g.geographicZone)
   );
   const rejectedByRegion = qualifiedGrants.length - regionCompatibleGrants.length;
   if (rejectedByRegion > 0) {

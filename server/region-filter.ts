@@ -103,22 +103,53 @@ export function detectRegionFromOrg(org: string | null | undefined): string | nu
   return null;
 }
 
+const UNIVERSAL_GEO_KEYWORDS = [
+  "national", "international", "france", "europe", "union europeenne", "outre-mer", "perimetre du gal",
+];
+
 /**
  * Vérifie si une grant est compatible avec la région de l'utilisateur.
  * - true : compatible (même région, nationale, ou région non identifiable)
  * - false : mismatch clair (ex: grant Landes pour user breton)
+ *
+ * Si geographicZones est fourni (champ DB explicite), il est utilisé en priorité
+ * sur la détection heuristique par nom d'organisme.
  */
 export function isRegionCompatible(
   grantOrg: string | null | undefined,
-  userRegion: string | null | undefined
+  userRegion: string | null | undefined,
+  geographicZones?: string[] | null
 ): boolean {
-  if (!userRegion) return true; // pas de région user → ne pas filtrer
+  if (!userRegion) return true;
 
+  // Utiliser geographicZone en priorité si disponible
+  if (geographicZones && geographicZones.length > 0) {
+    const zonesNorm = geographicZones.map(normalize);
+
+    // Aide nationale/internationale → passe toujours
+    if (zonesNorm.some((z) => UNIVERSAL_GEO_KEYWORDS.some((k) => z.includes(k)))) return true;
+
+    const userRegionNorm = normalize(userRegion);
+
+    // Match direct région (ex: "Île-de-France" === "Île-de-France")
+    if (zonesNorm.some((z) => z === userRegionNorm || z.includes(userRegionNorm))) return true;
+
+    // Match département → région (ex: "Drôme" appartient à "Auvergne-Rhône-Alpes")
+    const userRegionDepts = REGION_DEPARTMENTS[userRegion.toLowerCase()] ?? [];
+    if (userRegionDepts.length > 0) {
+      for (const dept of userRegionDepts) {
+        const deptNorm = normalize(dept);
+        if (zonesNorm.some((z) => z.includes(deptNorm))) return true;
+      }
+    }
+
+    // geographicZone présent mais ne match pas → rejeter
+    return false;
+  }
+
+  // Fallback : détection heuristique par nom d'organisme
   const grantRegion = detectRegionFromOrg(grantOrg);
   if (!grantRegion) return true; // aide nationale ou ambiguë → laisser passer
 
-  const userRegionNorm = normalize(userRegion);
-  const grantRegionNorm = normalize(grantRegion);
-
-  return userRegionNorm === grantRegionNorm;
+  return normalize(userRegion) === normalize(grantRegion);
 }

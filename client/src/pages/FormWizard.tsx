@@ -12,7 +12,7 @@ import { BetaCapCounter } from "@/components/BetaCapCounter";
 import { captureAcquisitionSource, getAcquisitionSource } from "@/lib/useAcquisitionSource";
 import {
   Music, Headphones, Pen, Palette, Wrench, Drama, Sparkles, Ticket, Film, Cpu,
-  Landmark, Building, Megaphone, ArrowLeft, ArrowRight, Check, Loader2,
+  Landmark, Building, Megaphone, ArrowLeft, ArrowRight, Check, Loader2, RotateCcw,
 } from "lucide-react";
 
 const REGIONS = [
@@ -377,6 +377,18 @@ export default function FormWizard() {
           >
             {language === "fr" ? "Sauvegarder" : "Save"}{" "}
             <span className="hidden md:inline">&amp; {language === "fr" ? "quitter" : "quit"}</span>
+          </button>
+          <button
+            onClick={() => {
+              form.reset();
+              setStepIdx(0);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            title={language === "fr" ? "Recommencer depuis le début" : "Start over"}
+            className="mc-btn-ghost text-xs uppercase tracking-widest mc-mono px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0 flex items-center gap-1.5"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span className="hidden md:inline">{language === "fr" ? "Recommencer" : "Reset"}</span>
           </button>
         </div>
       </header>
