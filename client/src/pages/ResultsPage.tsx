@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import {
   Loader2, Calendar, ArrowRight, Coins, Zap, Target, Check, ExternalLink,
-  FileText, Filter, ChevronDown, ThumbsUp, ThumbsDown, Mail, X,
+  FileText, Filter, ChevronDown, ThumbsUp, ThumbsDown, Mail, X, Lock, Unlock,
 } from "lucide-react";
 import type { GrantResult } from "@shared/schema";
 import { trackResultsViewed, trackMatchFeedback, trackPdfDownloaded } from "@/lib/analytics";
@@ -32,6 +32,9 @@ export default function ResultsPage() {
   const [sortBy, setSortBy] = useState<"score" | "deadline" | "amount">("score");
   const [feedbackSent, setFeedbackSent] = useState<Record<string, "up" | "down">>({});
   const [nudgeVisible, setNudgeVisible] = useState(false);
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem("results_unlocked") === "1");
+
+  const FREE_RESULTS = 3;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -72,7 +75,7 @@ export default function ResultsPage() {
   const feedbackMutation = useMutation({
     mutationFn: async ({ grantId, vote }: { grantId: string; vote: "up" | "down" }) => {
       const rating = vote === "up" ? "relevant" : "not_relevant";
-      await apiRequest("POST", "/api/match-feedback", { sessionId, grantId, rating });
+      await apiRequest("POST", "/api/feedback", { sessionId, grantId, rating });
       trackMatchFeedback({ grantId, sessionId, rating });
     },
   });
@@ -250,7 +253,7 @@ export default function ResultsPage() {
       {/* Matches */}
       <section id="matches">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-14 space-y-4">
-          {sorted.map((grant, i) => (
+          {sorted.slice(0, unlocked ? sorted.length : FREE_RESULTS).map((grant, i) => (
             <MatchCard
               key={grant.id}
               grant={grant}
@@ -262,6 +265,18 @@ export default function ResultsPage() {
               userRegion={data?.submission?.region}
             />
           ))}
+
+          {!unlocked && sorted.length > FREE_RESULTS && (
+            <FeedbackGate
+              remaining={sorted.length - FREE_RESULTS}
+              sessionId={sessionId}
+              language={language}
+              onUnlock={() => {
+                setUnlocked(true);
+                sessionStorage.setItem("results_unlocked", "1");
+              }}
+            />
+          )}
         </div>
       </section>
 
@@ -537,6 +552,114 @@ export function MatchCard({ grant, rank, top, feedback, onFeedback, language, us
         </div>
       </div>
     </article>
+  );
+}
+
+// ─── Feedback Gate ──────────────────────────────────────────────────────────
+
+const BULLSHIT_WORDS = ["ok", "bien", "top", "super", "merci", "test", "asd", "bla",
+  "rien", "non", "oui", "cool", "nice", "good", "great", "ouais", "osef", "lol"];
+
+function isValidFeedback(text: string): { valid: boolean; error?: string } {
+  const t = text.trim();
+  if (t.length < 40) return { valid: false, error: "Trop court — dites-nous vraiment ce que vous pensez (min. 40 caractères)." };
+  const words = t.toLowerCase().replace(/[^a-zàâäéèêëïîôùûüÿœæç\s]/g, "").split(/\s+/).filter(w => w.length > 2);
+  if (words.length < 6) return { valid: false, error: "Donnez-nous plus de détails pour débloquer les résultats." };
+  const uniqueWords = new Set(words);
+  if (uniqueWords.size < 4) return { valid: false, error: "Évitez les répétitions, développez votre retour." };
+  if (words.every(w => BULLSHIT_WORDS.includes(w))) return { valid: false, error: "On a besoin d'un vrai retour, pas d'un mot unique." };
+  return { valid: true };
+}
+
+function FeedbackGate({ remaining, sessionId, language, onUnlock }: {
+  remaining: number;
+  sessionId: string;
+  language: string;
+  onUnlock: () => void;
+}) {
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    const check = isValidFeedback(message);
+    if (!check.valid) { setError(check.error!); return; }
+    setError(null);
+    setSending(true);
+    try {
+      await fetch("/api/beta-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "suggestion",
+          message: message.trim(),
+          page: "/results?gate=1",
+          userAgent: navigator.userAgent,
+        }),
+      });
+      onUnlock();
+    } catch {
+      setError("Erreur réseau, réessayez.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="mc-card overflow-hidden" style={{ borderColor: "var(--mc-primary)", borderStyle: "dashed" }}>
+      <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
+        {/* Left */}
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-4">
+            <Lock className="w-4 h-4" style={{ color: "var(--mc-primary)" }} />
+            <span className="mc-mono text-xs uppercase tracking-widest" style={{ color: "var(--mc-primary)" }}>
+              {remaining} résultat{remaining > 1 ? "s" : ""} verrouillé{remaining > 1 ? "s" : ""}
+            </span>
+          </div>
+          <h3 className="mc-display text-2xl md:text-3xl mb-3">
+            DÉBLOQUEZ LA SUITE<span style={{ color: "var(--mc-primary)" }}>.</span>
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--mc-muted)" }}>
+            Dites-nous ce que vous pensez des résultats — les aides sont-elles pertinentes ?
+            Quelque chose manque ? Un mot sur votre projet ? <span style={{ color: "var(--mc-text)" }}>Soyez honnête</span>, ça améliore directement le matching pour tout le monde.
+          </p>
+        </div>
+
+        {/* Right — input */}
+        <div className="w-full md:w-96 flex-shrink-0">
+          <textarea
+            value={message}
+            onChange={(e) => { setMessage(e.target.value); setError(null); }}
+            placeholder="Ex : les aides proposées correspondent bien à mon profil musical, mais je n'ai pas vu d'aide pour la diffusion à l'étranger…"
+            className="w-full text-sm rounded-lg px-4 py-3 focus:outline-none resize-none"
+            style={{
+              background: "var(--mc-bg)",
+              border: `1px solid ${error ? "var(--mc-danger)" : "var(--mc-border)"}`,
+              color: "var(--mc-text)",
+              minHeight: 110,
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = error ? "var(--mc-danger)" : "var(--mc-primary)")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = error ? "var(--mc-danger)" : "var(--mc-border)")}
+          />
+          {error && (
+            <p className="mt-2 text-xs" style={{ color: "var(--mc-danger)" }}>{error}</p>
+          )}
+          <div className="flex items-center justify-between mt-3">
+            <span className="mc-mono text-[10px] uppercase tracking-widest" style={{ color: message.length >= 40 ? "var(--mc-primary)" : "var(--mc-muted-2)" }}>
+              {message.trim().length} / 40 min
+            </span>
+            <button
+              onClick={handleSubmit}
+              disabled={sending || message.trim().length < 10}
+              className="mc-btn-primary px-5 py-2.5 rounded-full text-sm inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Unlock className="w-3.5 h-3.5" />}
+              {sending ? "Envoi…" : `Débloquer ${remaining} résultat${remaining > 1 ? "s" : ""}`}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
