@@ -235,6 +235,37 @@ async function processSubmissionAsync(submission: FormSubmission): Promise<void>
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
 
+  // OG Image — génère un PNG 1200×630 depuis le SVG statique (cache en mémoire)
+  let ogImageCache: Buffer | null = null;
+  app.get("/og-image.png", async (_req, res) => {
+    if (ogImageCache) {
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      return res.send(ogImageCache);
+    }
+    try {
+      const puppeteer = await import("puppeteer");
+      const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+      const browser = await puppeteer.default.launch({
+        headless: true, executablePath,
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
+      });
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1200, height: 630 });
+      const svgPath = new URL("../../client/public/og-image.svg", import.meta.url).pathname;
+      await page.goto(`file://${svgPath}`, { waitUntil: "load" });
+      const buffer = await page.screenshot({ type: "png" });
+      await browser.close();
+      ogImageCache = Buffer.from(buffer);
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      return res.send(ogImageCache);
+    } catch (e) {
+      console.error("OG image generation failed:", e);
+      return res.status(500).send("OG image generation failed");
+    }
+  });
+
   // Health check endpoint pour Railway / uptime monitoring.
   // Pas de DB hit pour rester rapide et disponible même si Supabase est down.
   app.get("/api/health", (_req, res) => {
@@ -401,19 +432,11 @@ Réponds en JSON : { "nextQuestion": "ta question cool", "insights": "ce que tu 
         // Si ce n'est pas du JSON, utiliser la réponse brute
       }
 
-      // Re-matcher avec le profil enrichi
-      // Pour l'instant, on simule un léger ajustement du nombre
-      // Dans une vraie implémentation, on mettrait à jour le profil utilisateur
-      const allGrants = await grantStorage.getAllActiveGrants();
-      const formattedGrants = allGrants.map(formatGrantToResult);
-      
-      // Simuler un re-matching avec un nombre légèrement différent
       const currentResults = submission.results as GrantResult[] || [];
-      const newCount = Math.max(1, Math.min(allGrants.length, currentResults.length + Math.floor(Math.random() * 3) - 1));
 
       res.json({
         assistantMessage: nextQuestion,
-        newCount,
+        newCount: currentResults.length,
       });
     } catch (error: any) {
       console.error("Erreur chat-refine:", error);
