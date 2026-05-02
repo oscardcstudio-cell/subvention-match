@@ -39,6 +39,9 @@ desktop.ini
 # Claude Code local config
 .claude/settings.local.json
 
+# Notes perso locales (jamais versionnées)
+CLAUDE.local.md
+
 # Local test artifacts
 test-*.pdf
 *.bak

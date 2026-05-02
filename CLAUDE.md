@@ -1,5 +1,8 @@
 # SubventionMatch — Instructions Claude Code
 
+> **Hierarchie** : herite de `C:\dev\claude\CLAUDE.md` (meta cross-projets) + `C:\dev\claude\oscardcstudio\CLAUDE.md` (bucket perso).
+> Regles universelles, git multi-compte (compte perso `oscardcstudio-cell`) -> voir les parents. Ce fichier = specs specifiques au projet.
+
 ## Philosophie
 
 Ce projet part d'un prototype Replit migré vers GitHub + Railway. Le code existant
@@ -53,6 +56,9 @@ incompatible avec le profil (ex: mobilier pour un écrivain).
 `submissionToPdfFormData()` centralise le mapping submission → PDF.
 Toujours passer `formData` à la génération de PDF (sinon le résumé du projet
 n'apparaît pas).
+
+## Compaction
+Quand Claude compresse une longue session, toujours conserver : liste des fichiers modifiés, commandes de test en cours, état du pipeline matching (seuils quality gate, prompt DeepSeek en cours de tuning), décisions non committées.
 
 ## Erreurs TypeScript pré-existantes
 
