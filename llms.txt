@@ -1,0 +1,23 @@
+# SubventionMatch
+> Outil de matching subventions/aides publiques pour PME — pipeline IA DeepSeek + export PDF. Compte GitHub `oscardcstudio-cell`.
+
+## Vue d'ensemble
+- [CLAUDE.md](CLAUDE.md): Architecture, stack, pipeline de matching, conventions TypeScript
+
+## Fichiers critiques
+- [server/ai-matcher.ts](server/ai-matcher.ts): **Pipeline de matching complet** — filtre deadlines → quality gate → DeepSeek → enrichissement
+- [server/quality-gate.ts](server/quality-gate.ts): Score 0-100, seuil 60 (filtre avant envoi à DeepSeek)
+- [server/pdf-generator.ts](server/pdf-generator.ts): Génération HTML + Puppeteer pour PDF
+- [shared/schema.ts](shared/schema.ts): Drizzle schema — **source de vérité DB**
+- [client/](client/): SPA React + Vite + Tailwind
+
+## Stack
+React · Vite · Express TypeScript ESM · Drizzle ORM (PostgreSQL/Supabase) · DeepSeek via OpenRouter · Puppeteer · Resend (email) · Stripe · Railway
+
+## Points non-évidents
+- Le **prompt DeepSeek est critique** : règle n°1 = pertinence sectorielle (ne jamais proposer une aide incompatible avec le profil)
+- `routes-old.ts` = code mort (15+ erreurs TS), peut être supprimé
+- `submissionToPdfFormData()` doit toujours être passé à la génération PDF (sinon résumé absent)
+- Path alias `@shared/` → `shared/`
+- Stripe en **mode beta gratuit** actuellement
+- Compte GitHub : `oscardcstudio-cell`
