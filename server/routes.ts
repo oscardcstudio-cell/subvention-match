@@ -13,6 +13,7 @@ import { enrichMultipleGrants } from "./ai-enricher";
 import { analyzeDataQuality } from "./data-quality-analyzer";
 import { createPdfToken, verifyPdfToken } from "./pdf-token";
 import { isEuropeanGrant } from "@shared/grant-classification";
+import { registerSeoRoutes } from "./seo-pages.js";
 import Stripe from "stripe";
 import express from "express";
 import rateLimit from "express-rate-limit";
@@ -234,6 +235,9 @@ async function processSubmissionAsync(submission: FormSubmission): Promise<void>
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
+
+  // Pages SEO programmatiques (HTML pur, indexable Wave 1)
+  registerSeoRoutes(app);
 
   // OG Image — génère un PNG 1200×630 depuis le SVG statique (cache en mémoire)
   let ogImageCache: Buffer | null = null;

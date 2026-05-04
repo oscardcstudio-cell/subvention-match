@@ -3,4 +3,20 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
+# Bots IA — autoriser l'indexation pour GEO (Perplexity, ChatGPT, Google)
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
 Sitemap: https://subvention-match-production.up.railway.app/sitemap.xml
