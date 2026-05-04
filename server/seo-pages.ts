@@ -9,8 +9,51 @@
 
 import { db } from "./db.js";
 import { grants } from "../shared/schema.js";
-import { and, sql, isNotNull } from "drizzle-orm";
+import { isNotNull } from "drizzle-orm";
 import type { Express, Request, Response } from "express";
+
+// Mots-clés par domaine — même logique que ai-matcher.ts
+const DOMAIN_KEYWORDS: Record<string, string[]> = {
+  "musique": [
+    "musique", "musical", "musicien", "phonograph", "chanson", "concert",
+    "album", "tournée", "tournee", "festival", "cnm", "sacem", "spedidam", "adami",
+    "musiques actuelles", "enregistrement", "compositeur", "interprète", "interprete",
+    "programmation", "programmateur", "salle de concert", "smac", "diffusion musicale",
+  ],
+  "audiovisuel": [
+    "audiovisuel", "cinéma", "cinema", "cinématograph", "film", "court métrage",
+    "long métrage", "cnc", "documentaire", "série", "serie", "animation",
+  ],
+  "spectacle-vivant": [
+    "spectacle vivant", "théâtre", "theatre", "danse", "cirque",
+    "chorégraph", "compagnie", "dramatique", "marionnette", "festival",
+    "spedidam", "arts de la rue", "arts du mouvement",
+  ],
+  "arts-plastiques": [
+    "arts plastiques", "arts visuels", "plasticien", "sculpt",
+    "peinture", "peintre", "exposition", "galerie", "artiste visuel",
+    "centre d'art", "cnap",
+  ],
+  "arts-numeriques": [
+    "numérique", "numerique", "digital", "multimedia", "multimédia",
+    "interactif", "jeu vidéo", "jeu video", "arts numériques", "nouvelles technologies",
+    "réalité virtuelle", "immersion",
+  ],
+  "ecriture": [
+    "écriture", "ecriture", "écrivain", "ecrivain", "auteur", "autrice",
+    "littér", "litter", "roman", "édition", "edition", "livre", "cnl",
+    "manuscrit", "poésie", "poesie", "bande dessinée",
+  ],
+  "patrimoine": [
+    "patrimoine", "monument", "restauration", "musée", "musee",
+    "archéo", "conservation", "historique", "architectural",
+  ],
+  "metiers-art": [
+    "métiers d'art", "metiers d'art", "artisanat", "artisan", "savoir-faire",
+    "inma", "craft", "ébénisterie", "lutherie", "céramique", "tapisserie",
+  ],
+  "transversal": [], // vide = tout passe (domaine générique)
+};
 
 // ─── Mappings domaines ────────────────────────────────────────────────────────
 
@@ -48,7 +91,7 @@ export const REGION_SLUGS: Record<string, string> = {
 // ─── Requête DB ───────────────────────────────────────────────────────────────
 
 async function getGrantsForPage(domain: string, region: string) {
-  // Cherche les grants qui matchent le domaine ET (région OU nationale)
+  // Récupère toutes les grants actives — filtre domaine + région en JS
   const rows = await db
     .select({
       title: grants.title,
@@ -60,19 +103,27 @@ async function getGrantsForPage(domain: string, region: string) {
       improvedUrl: grants.improvedUrl,
       geographicZone: grants.geographicZone,
       isRecurring: grants.isRecurring,
+      eligibleSectors: grants.eligibleSectors,
     })
     .from(grants)
-    .where(
-      and(
-        isNotNull(grants.title),
-        sql`(grants.artistic_domain && ARRAY[${domain}]::text[] OR grants.eligible_sectors && ARRAY[${domain}]::text[])`,
-      )
-    )
-    .limit(50);
+    .where(isNotNull(grants.title))
+    .limit(300);
 
-  // Filtre côté JS : garder nationale + region concernée, exclure autres régions
+  const domainKeywords = DOMAIN_KEYWORDS[domain] ?? [];
   const regionNorm = region.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
   const relevant = rows.filter(g => {
+    // Filtre domaine — si pas de mots-clés (transversal) → tout passe
+    if (domainKeywords.length > 0) {
+      const haystack = [
+        g.title ?? "",
+        g.description ?? "",
+        (g.eligibleSectors ?? []).join(" "),
+      ].join(" ").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      if (!domainKeywords.some(kw => haystack.includes(kw))) return false;
+    }
+
+    // Filtre région — nationale ou compatible
     const zones = (g.geographicZone ?? []).map(z =>
       z.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
     );
