@@ -1,3 +1,15 @@
+// SECTIONS
+// L13   — Imports & rate limiters : déclarations, rate limiters par route, utils (masks, requireAdmin)
+// L113  — Helpers & init           : formatGrantToResult, Stripe init, processSubmissionAsync (background)
+// L248  — Bootstrap routes         : SEO pages, OG image, health checks (/api/health, /api/health/deep)
+// L335  — Core user flow           : submit-form, chat-refine IA, results polling
+// L628  — Feedback & beta          : match feedback, beta feedback, waitlist, beta capacity, dashboard admin
+// L909  — Paiement Stripe          : create-checkout-session, webhook stripe
+// L1050 — Grants CRUD              : create/read/update/delete/stats grants (public + admin)
+// L1255 — PDF & email              : serve PDF (sessionId + signed token), send-email, test flow admin
+// L1619 — Enrichissement IA        : status/start/stats enrichissement, liste grants enrichies
+// L1720 — Data admin               : organisms, URL fixer, HTML cleaner, deadlines, refresh scheduler
+
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { insertFormSubmissionSchema, userFormInputSchema, matchFeedback, betaFeedback, betaWaitlist, formSubmissions, type InsertGrant, type Grant, type GrantResult, type FormSubmission } from "@shared/schema";
