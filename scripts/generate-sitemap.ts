@@ -16,6 +16,11 @@ const DOMAINS = [
   "ecriture", "arts-numeriques", "patrimoine", "metiers-art", "transversal",
 ];
 
+const PROFILES = [
+  "musicien", "danseur", "comedien", "realisateur", "plasticien",
+  "photographe", "ecrivain", "artiste-numerique", "artisan-art", "artiste",
+];
+
 const REGION_SLUGS = [
   "auvergne-rhone-alpes", "bourgogne-franche-comte", "bretagne",
   "centre-val-de-loire", "corse", "grand-est", "hauts-de-france",
@@ -38,6 +43,18 @@ for (const domain of DOMAINS) {
 for (const domain of DOMAINS) {
   for (const region of REGION_SLUGS) {
     urls.push({ loc: `${BASE}/subventions/${domain}/${region}`, changefreq: "weekly", priority: "0.7", lastmod: TODAY });
+  }
+}
+
+// Pages index profil
+for (const profile of PROFILES) {
+  urls.push({ loc: `${BASE}/aides/${profile}`, changefreq: "weekly", priority: "0.8", lastmod: TODAY });
+}
+
+// Pages profil × région
+for (const profile of PROFILES) {
+  for (const region of REGION_SLUGS) {
+    urls.push({ loc: `${BASE}/aides/${profile}/${region}`, changefreq: "weekly", priority: "0.7", lastmod: TODAY });
   }
 }
 
